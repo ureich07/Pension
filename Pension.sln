@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12120.119
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Pension", "Pension\Pension.vbproj", "{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Debug|x86.Build.0 = Debug|Any CPU
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Release|x86.ActiveCfg = Release|x86
+		{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5358D385-8BD5-4A19-BA64-798BF1604C7B}
+	EndGlobalSection
+EndGlobal
