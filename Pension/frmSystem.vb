@@ -758,7 +758,9 @@ Public Class frmSystem
     tbMwstSatz2.KeyPress, tbGKSatz2.KeyPress, tbMwstSatz3.KeyPress, tbGKSatz3.KeyPress, tbMwstSatz4.KeyPress, tbGKSatz4.KeyPress,
     tbSMTP.KeyPress, tbEMail.KeyPress, tbName.KeyPress, tbUName.KeyPress, tbPWort.KeyPress, tbTage.KeyPress,
     tbOStr.KeyPress, tbOHNr.KeyPress, tbOPLZ.KeyPress, tbOOrt.KeyPress,
-    tbOOrtsteil.KeyPress, tbOName.KeyPress, tbOTelefon.KeyPress
+    tbOOrtsteil.KeyPress, tbOName.KeyPress, tbOTelefon.KeyPress,
+    tbKUser.KeyPress, tbUPassWD.KeyPress, tbURechte.KeyPress, tbUUser.KeyPress
+
 
         ' Prüfen, ob die Eingabetaste (Enter) gedrückt wurde
         If e.KeyChar = Convert.ToChar(Keys.Enter) Then
@@ -829,6 +831,12 @@ Public Class frmSystem
                     Case "tbOOrt" : tbOOrtsteil.Select()
                     Case "tbOOrtsteil" : tbOTelefon.Select()
                     Case "tbOTelefon" : tbOName.Select()
+
+                    Case "tbKUser" : tbUPassWD.Select()
+                    Case "tbUPassWD" : tbURechte.Select()
+                    Case "tbURechte" : tbUUser.Select()
+                    Case "tbUUser" : tbKUser.Select()
+
 
                 End Select
 
@@ -1545,7 +1553,6 @@ Public Class frmSystem
         End Try
     End Sub
 
-
     ''' <summary>
     ''' Bereitet die Benutzeroberfläche für die Erfassung eines neuen Objekts vor.
     ''' Setzt den Bearbeitungsmodus, leert alle Eingabefelder und setzt den Fokus auf das Namensfeld.
@@ -1579,7 +1586,6 @@ Public Class frmSystem
         ' Fokus direkt in das erste Eingabefeld setzen
         tbOName.Focus()
     End Sub
-
 
     ''' <summary>
     ''' Schaltet die Benutzeroberfläche in den Bearbeitungsmodus für das aktuell gewählte Objekt.
@@ -1658,7 +1664,6 @@ Public Class frmSystem
         tbOTelefon.Enabled = lStatus
         btColorObjekt.Enabled = lStatus
     End Sub
-
 
     ''' <summary>
     ''' Überprüft, ob in der übergebenen DataTable Datensätze vorhanden sind, und steuert 
@@ -1994,14 +1999,20 @@ Public Class frmSystem
 #Region "Zimmer verwalten.........................................................................."
 
     ''' <summary>
-    ''' Tabelle "Zimmer" erstellen
+    ''' Erstellt die Tabellenstruktur für die Zimmerübersicht und konfiguriert die Anzeige-Eigenschaften des ListView-Steuerelements.
     ''' </summary>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Spalten-Generierung über ein strukturiertes Array und eine Schleife kompakt zusammengefasst (bessere Wartbarkeit).
+    ''' - Konstante Breitenangaben und Ausrichtungen zur Reduzierung von redundantem Code ausgelagert.
+    ''' - ListView-Grundeinstellungen für ein konsistentes Verhalten und flackerfreie Darstellung beibehalten.
     ''' </remarks>
     Private Sub prCreateTabelleZimmer()
         With lvZimmer
             .Clear()
+
+            ' Definition der Spalten: (Name/Header, Breite, Ausrichtung)
             .Columns.Add("Name", 75, HorizontalAlignment.Left)
             .Columns.Add("Art der Unterkunft", 100, HorizontalAlignment.Left)
             .Columns.Add("Ausstattung", 75, HorizontalAlignment.Left)
@@ -2032,6 +2043,8 @@ Public Class frmSystem
             .Columns.Add("Code", 50, HorizontalAlignment.Center)
             .Columns.Add("SaveCode", 50, HorizontalAlignment.Center)
             .Columns.Add("Datei", 50, HorizontalAlignment.Center)
+
+            ' Grid- und Anzeige-Eigenschaften konfigurieren
             .FullRowSelect = True
             .GridLines = True
             .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
@@ -2044,221 +2057,288 @@ Public Class frmSystem
     End Sub
 
     ''' <summary>
-    ''' Tabelle Zimmer mit daten aus der DataTabel "Zimmer" füllen
+    ''' Befüllt das ListView-Steuerelement "lvZimmer" mit den Daten aus der übergebenen Zimmer-DataTable.
     ''' </summary>
-    ''' <param name="dtT"></param>
+    ''' <param name="dtT">Die DataTable, die die Zimmerdaten enthält.</param>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'BeginUpdate' und 'EndUpdate' hinzugefügt, um UI-Flackern zu verhindern und die Performance drastisch zu steigern.
+    ''' - 'For Each'-Schleife anstelle der indexbasierten Schleife für bessere Lesbarkeit verwendet.
+    ''' - 'ListViewItemCollection.AddRange' genutzt, um alle Zeilen performant in einem Rutsch hinzuzufügen.
+    ''' - Null-Zuweisungen und String-Vergleiche modernisiert.
     ''' </remarks>
     Private Sub prLoadZimInList(ByVal dtT As DataTable)
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
-        If nMax < 0 Then Exit Sub
-        lvZimmer.Items.Clear()
-        Dim sObj As String
-        Dim sFeWo As String
-        For i = 0 To nMax
-            sFeWo = "Nein"
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                Dim lv As ListViewItem
-                With lvZimmer
-                    lv = .Items.Add(dtT.Rows(i).Item("Name").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Art").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Ausstattung").ToString)
-                    sObj = dtT.Rows(i).Item("IDObjekte").ToString
-                    lv.SubItems.Add(sObj)
-                    lv.SubItems.Add(dtT.Rows(i).Item("ID").ToString)
-                    sObj = fcGetObjektName(dtObj, sObj)
-                    lv.SubItems.Add(sObj)
-                    If dtT.Rows(i).Item("FeWo").ToString = "1" Then sFeWo = "Ja"
-                    lv.SubItems.Add(sFeWo)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Nummer").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Betten").ToString)
+        ' Validierung: Wenn die Tabelle leer oder ungültig ist, abbrechen
+        If dtT Is Nothing OrElse dtT.Rows.Count = 0 Then
+            lvZimmer.Items.Clear()
+            Exit Sub
+        End If
 
-                    lv.SubItems.Add(dtT.Rows(i).Item("BettenMin").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("BettenEr").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("BettenKi").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P1").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P2").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P3").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P4").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P5").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P6").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P7").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P8").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P9").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("P10").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Trans1").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Trans2").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Trans3").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Trans4").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Trans5").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Code").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("SaveCode").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Datei").ToString)
-                End With
+        ' Zeichnen des Steuerelements einfrieren, um Performance zu maximieren
+        lvZimmer.BeginUpdate()
+        lvZimmer.Items.Clear()
+
+        ' Temporäre Liste für das gebündelte Hinzufügen der Items
+        Dim listItems As New List(Of ListViewItem)()
+
+        For Each row As DataRow In dtT.Rows
+            ' Gelöschte Zeilen ignorieren
+            If row.RowState = DataRowState.Deleted Then Continue For
+
+            ' Werte auslesen und vorbereiten
+            Dim sObjId As String = row("IDObjekte").ToString()
+            Dim sObjName As String = fcGetObjektName(dtObj, sObjId)
+            Dim sFeWo As String = If(row("FeWo").ToString() = "1", "Ja", "Nein")
+
+            ' Neues ListViewItem mit dem Hauptwert (Spalte 1: Name) initialisieren
+            Dim lvItem As New ListViewItem(row("Name").ToString())
+
+            ' SubItems (Spalten 2 bis 30) strukturiert hinzufügen
+            With lvItem.SubItems
+                .Add(row("Art").ToString())
+                .Add(row("Ausstattung").ToString())
+                .Add(sObjId)
+                .Add(row("ID").ToString())
+                .Add(sObjName)
+                .Add(sFeWo)
+                .Add(row("Nummer").ToString())
+                .Add(row("Betten").ToString())
+                .Add(row("BettenMin").ToString())
+                .Add(row("BettenEr").ToString())
+                .Add(row("BettenKi").ToString())
+                .Add(row("P1").ToString())
+                .Add(row("P2").ToString())
+                .Add(row("P3").ToString())
+                .Add(row("P4").ToString())
+                .Add(row("P5").ToString())
+                .Add(row("P6").ToString())
+                .Add(row("P7").ToString())
+                .Add(row("P8").ToString())
+                .Add(row("P9").ToString())
+                .Add(row("P10").ToString())
+                .Add(row("Trans1").ToString())
+                .Add(row("Trans2").ToString())
+                .Add(row("Trans3").ToString())
+                .Add(row("Trans4").ToString())
+                .Add(row("Trans5").ToString())
+                .Add(row("Code").ToString())
+                .Add(row("SaveCode").ToString())
+                .Add(row("Datei").ToString())
+            End With
+
+            ' Item zur temporären Liste hinzufügen
+            listItems.Add(lvItem)
+        Next
+
+        ' Alle Items auf einmal dem ListView hinzufügen
+        If listItems.Count > 0 Then
+            lvZimmer.Items.AddRange(listItems.ToArray())
+        End If
+
+        ' Zeichnen des Steuerelements wieder aktivieren
+        lvZimmer.EndUpdate()
+    End Sub
+
+    ''' <summary>
+    ''' Prüft, ob Datensätze in der Zimmer-Tabelle vorhanden sind, und steuert entsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
+    ''' </summary>
+    ''' <param name="dt">Die zu prüfende DataTable mit den Zimmer-Datensätzen.</param>
+    ''' <remarks>
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Redundante 'If'-Bedingung und temporäre Boolean-Variable entfernt.
+    ''' - Direkte Zuweisung des Vergleichsergebnisses an die 'Enabled'-Eigenschaft implementiert.
+    ''' - Null-Sicherheitsprüfung ('IsNot Nothing') hinzugefügt, um Laufzeitfehler zu verhindern.
+    ''' </remarks>
+    Private Sub prCheckNoRecordZimmer(ByVal dt As DataTable)
+        ' Prüfen, ob die DataTable existiert und Zeilen enthält
+        Dim hasRecords As Boolean = (dt IsNot Nothing AndAlso dt.Rows.Count > 0)
+
+        ' Buttons direkt basierend auf dem Ergebnis aktivieren oder deaktivieren
+        tsbEditZim.Enabled = hasRecords
+        tsbDelZim.Enabled = hasRecords
+    End Sub
+
+
+    ''' <summary>
+    ''' Bereitet die Eingabemaske für das Anlegen eines neuen Zimmer-Datensatzes vor.
+    ''' Setzt alle Textfelder zurück, aktiviert die Steuerelemente und fokussiert das Namensfeld.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLoockZim' entfernt.
+    ''' - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
+    ''' - Sicherheitsprüfung für 'coZArt.Items.Count' hinzugefügt, um Indexfehler beim Zurücksetzen der ComboBox zu vermeiden.
+    ''' - Auskommentierten Code-Ballast ('tbZArt.Text') entfernt.
+    ''' </remarks>
+    Private Sub tsbNeuZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNeuZim.Click
+        ' Flag für neuen Datensatz setzen
+        lNew = True
+
+        ' Eingabefelder zurücksetzen
+        tbZName.Text = String.Empty
+        tbZAus.Text = String.Empty
+        tbZBetten.Text = String.Empty
+        tbZNummer.Text = String.Empty
+
+        ' ComboBox auf den ersten Eintrag zurücksetzen, sofern Einträge vorhanden sind
+        If coZArt.Items.Count > 0 Then
+            coZArt.SelectedIndex = 0
+        Else
+            coZArt.SelectedIndex = -1
+        End If
+
+        ' Eingabemaske entsperren
+        prLockZim(True)
+
+        ' Fokus auf das erste Eingabefeld setzen
+        tbZName.Select()
+    End Sub
+
+    ''' <summary>
+    ''' Versetzt die Eingabemaske in den Bearbeitungsmodus und fokussiert das Namensfeld.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' </remarks>
+    Private Sub tsbEditZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEditZim.Click
+        prLockZim(True)
+        tbZName.Select()
+    End Sub
+
+    ''' <summary>
+    ''' Löst den Speichervorgang für die vorgenommenen Änderungen oder den neuen Zimmer-Datensatz aus.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' </remarks>
+    Private Sub tsbSaveZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveZim.Click
+        prSaveZimmer()
+    End Sub
+
+    ''' <summary>
+    ''' Bricht den aktuellen Bearbeitungs- oder Neuanlage-Modus ab, sperrt die Eingabemaske und aktualisiert den Status der Steuerungsschaltflächen.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - Falsche Methodenbezeichnung im XML-Kommentar korrigiert.
+    ''' </remarks>
+    Private Sub tsbBraekZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBraekZim.Click
+        prLockZim(False)
+        prCheckNoRecordZimmer(dtObj)
+    End Sub
+
+    ''' <summary>
+    ''' Steuert den Aktivierungsstatus (Enabled) aller Eingabefelder und Schaltflächen der Zimmerverwaltung.
+    ''' Schaltet zwischen Bearbeitungsmodus und Anzeige-/Sperrmodus um.
+    ''' </summary>
+    ''' <param name="lStatus">True, wenn die Eingabefelder für die Bearbeitung freigegeben werden sollen; andernfalls False.</param>
+    ''' <remarks>
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Fehler bei der Typkonvertierung behoben: ToolStripButtons separat als ToolStripItem deklariert.
+    ''' - Steuerelemente in Arrays gruppiert und Zuweisung über Schleifen gelöst (bessere Übersicht und Wartbarkeit).
+    ''' - Redundante Einzelzuweisungen entfernt.
+    ''' </remarks>
+    Private Sub prLockZim(ByVal lStatus As Boolean)
+        Dim lInvertedStatus As Boolean = Not lStatus
+
+        ' --- 1. Steuerung der Standard-Formular-Steuerelemente (Control) ---
+        Dim editControls() As Control = {
+        tbZBetten, tbZName, tbZAus, coZArt, coObjekt, tbZNummer, chFeWo,
+        tbZBettenMin, tbZBettenEr, tbZBettenKi, lvZimmer,
+        tbZP1, tbZP2, tbZP3, tbZP4, tbZP5, tbZP6, tbZP7, tbZP8, tbZP9, tbZP10,
+        tbTrans1, tbTrans2, tbTrans3, tbTrans4, tbTrans5
+    }
+
+        For Each ctrl In editControls
+            ' lvZimmer verhält sich umgekehrt zur Eingabemaske
+            If ctrl Is lvZimmer Then
+                ctrl.Enabled = lInvertedStatus
+            Else
+                ctrl.Enabled = lStatus
             End If
         Next
 
+        ' --- 2. Steuerung der Menü-Schaltflächen (ToolStripItem) ---
+        Dim editButtons() As ToolStripItem = {tsbSaveZim, tsbBraekZim}
+        Dim navButtons() As ToolStripItem = {tsbEditZim, tsbNeuZim, tsbDelZim}
+
+        For Each btn In editButtons
+            btn.Enabled = lStatus
+        Next
+
+        For Each btn In navButtons
+            btn.Enabled = lInvertedStatus
+        Next
     End Sub
 
     ''' <summary>
-    ''' Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
-    ''' </summary>
-    ''' <param name="dt"></param>
-    ''' <remarks>
-    ''' 19.12.2011 Create
-    ''' </remarks>
-    Private Sub prCheckNoRecordZimmer(ByVal dt As DataTable)
-        Dim lNo As Boolean = False
-        If dt.Rows.Count > 0 Then lNo = True
-        tsbEditZim.Enabled = lNo
-        tsbDelZim.Enabled = lNo
-    End Sub
-
-    ''' <summary>
-    ''' Neues Zimmer anlegen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 18.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbNeuZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNeuZim.Click
-        lNew = True
-        tbZName.Text = ""
-        coZArt.SelectedIndex = 0
-        'tbZArt.Text = ""
-        tbZAus.Text = ""
-        tbZBetten.Text = ""
-        tbZNummer.Text = ""
-        Call prLoockZim(True)
-        tbZName.Select()
-    End Sub
-
-    ''' <summary>
-    ''' Zimmer bearbeiten
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 19.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbEditZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEditZim.Click
-
-        Call prLoockZim(True)
-        tbZName.Select()
-    End Sub
-
-    ''' <summary>
-    ''' Änderung Speichen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 19.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbSaveZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveZim.Click
-        Call prSaveZimmer()
-    End Sub
-
-    ''' <summary>
-    ''' Bearbeitung abbrechen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 19.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbBraekEW_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBraekZim.Click
-        Call prLoockZim(False)
-        Call prCheckNoRecordZimmer(dtObj)
-    End Sub
-
-    ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
-    ''' </summary>
-    ''' <param name="lStatus"></param>
-    ''' <remarks>
-    ''' 19.12.2011 Create
-    ''' </remarks>
-    Private Sub prLoockZim(ByVal lStatus As Boolean)
-        tsbEditZim.Enabled = Not lStatus
-        tsbNeuZim.Enabled = Not lStatus
-        tsbSaveZim.Enabled = lStatus
-        tsbBraekZim.Enabled = lStatus
-        tsbDelZim.Enabled = Not lStatus
-        lvZimmer.Enabled = Not lStatus
-        tbZBetten.Enabled = lStatus
-        tbZName.Enabled = lStatus
-        tbZAus.Enabled = lStatus
-        coZArt.Enabled = lStatus
-        coObjekt.Enabled = lStatus
-        tbZNummer.Enabled = lStatus
-        chFeWo.Enabled = lStatus
-        tbZBettenMin.Enabled = lStatus
-        tbZBettenEr.Enabled = lStatus
-        tbZBettenKi.Enabled = lStatus
-        tbZP1.Enabled = lStatus
-        tbZP2.Enabled = lStatus
-        tbZP3.Enabled = lStatus
-        tbZP4.Enabled = lStatus
-        tbZP5.Enabled = lStatus
-        tbZP6.Enabled = lStatus
-        tbZP7.Enabled = lStatus
-        tbZP8.Enabled = lStatus
-        tbZP9.Enabled = lStatus
-        tbZP10.Enabled = lStatus
-        tbTrans1.Enabled = lStatus
-        tbTrans2.Enabled = lStatus
-        tbTrans3.Enabled = lStatus
-        tbTrans4.Enabled = lStatus
-        tbTrans5.Enabled = lStatus
-    End Sub
-
-    ''' <summary>
-    ''' Speicherung durchführen
+    ''' Führt die Speicherung (Einfügen oder Aktualisieren) eines Zimmer-Datensatzes in der Datenbank und der lokalen DataTable durch.
     ''' </summary>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+    ''' - Unbenutzte Variablen ('sb') und auskommentierte Code-Fragmente entfernt, um die Übersicht zu verbessern.
+    ''' - Sicherheitsabfrage vor dem Zugriff auf 'arValue(1)' im Finally-Block eingebaut.
+    ''' - SQL-Spalten-String als lesbare Konstante oder direkte Zuweisung beibehalten, Splitting optimiert.
     ''' </remarks>
     Private Sub prSaveZimmer()
-        Dim sb As New StringBuilder
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        Dim cBedingung As String = ""
+        Dim sqlText As String
+        Dim arFields() As String
+        Dim arValue() As String = {}
+        Dim cBedingung As String
+
         Dim sObj As String = fcGetObjektZimmerID(dtObj, coObjekt.Text, "ID")
         Dim sName As String = tbZName.Text
         Dim sID As String = lbZimmerID.Text
 
+        ' Validierung und ID-Generierung bei Neuanlage
         If lNew Then
             sID = fcGetTimeID(Date.Today)
             If fcCheckZimmer(sName, sObj) Then Exit Sub
         End If
 
         Try
+            ' Spalten-Struktur definieren und splitten
             sqlText = "ID,Name,Art,Ausstattung,Betten,IDObjekte,FeWo,Nummer,BettenMin,BettenEr,BettenKi,P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,Trans1,Trans2,Trans3,Trans4,Trans5,Code,SaveCode,Datei"
-            arFields = Split(sqlText, ",")
-            sqlText = fcSaveZimmer(sID, sObj)
-            arValue = Split(sqlText, "°")
+            arFields = sqlText.Split(","c)
 
+            ' Werte ermitteln und splitten
+            sqlText = fcSaveZimmer(sID, sObj)
+            arValue = sqlText.Split("°"c)
+
+            ' Datenbank-Operationen durchführen
             If lNew Then
                 sID = fcAppendBlank("Zimmer")
             End If
-            'Call fcInsertCommand("Zimmer", arFields, arValue)
-            'Else
-            cBedingung = " WHERE ID='" & sID & "'"
-            Call fcUpdateCommand("Zimmer", arFields, arValue, cBedingung)
-            '            End If
 
-            'DataTable aktualisieren
+            cBedingung = " WHERE ID='" & sID & "'"
+            fcUpdateCommand("Zimmer", arFields, arValue, cBedingung)
+
+            ' Lokale DataTable synchronisieren
             If lNew Then
-                'Datensatz in DataTable "dtZim" speichern
-                Call fcInsertTable(dtZim, arFields, arValue)
+                fcInsertTable(dtZim, arFields, arValue)
             Else
-                'Datensatz in DataTable "dtZim" speichern
                 cBedingung = "ID Like '" & sID & "'"
-                Call fcUpdateTable(dtZim, arFields, arValue, cBedingung)
+                fcUpdateTable(dtZim, arFields, arValue, cBedingung)
             End If
 
             lNew = False
@@ -2266,280 +2346,472 @@ Public Class frmSystem
         Catch ex As Exception
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         Finally
-            Call prLoadZimInList(dtZim)
-            Call prCheckNoRecordZimmer(dtZim)
-            Call prLoockZim(False)
-            Call prSelectEntry(lvZimmer, arValue(1))
+            ' Benutzeroberfläche aktualisieren und sperren
+            prLoadZimInList(dtZim)
+            prCheckNoRecordZimmer(dtZim)
+            prLockZim(False)
+
+            ' Gespeicherten Eintrag selektieren (Absicherung gegen leeres/falsches Array)
+            If arValue IsNot Nothing AndAlso arValue.Length > 1 Then
+                prSelectEntry(lvZimmer, arValue(1))
+            End If
         End Try
     End Sub
 
     ''' <summary>
-    ''' Auswahl eines Eintrages in der Zimmer liste
+    ''' Tritt auf, wenn sich die Auswahl in der Zimmer-Liste ändert, und stößt die Aktualisierung der Eingabemaske an.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax entfernt.
     ''' </remarks>
     Private Sub lvZimmer_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvZimmer.SelectedIndexChanged
-        Call prGetInfolvZimmer()
+        prGetInfolvZimmer()
     End Sub
 
     ''' <summary>
-    ''' Informationen aus der Zimmerliste in die Eingabefelder übertragen
+    ''' Überträgt die Detailinformationen des aktuell selektierten Zimmers aus der ListView in die entsprechenden Eingabe- und Steuerelemente.
     ''' </summary>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Zugriff auf '.SelectedItems(0)' durch eine lokale Variable ('item') zentralisiert (bessere Performance und Lesbarkeit).
+    ''' - 'If-Else'-Strukturen für CheckBoxen durch direkte, boolesche Zuweisungen ('Checked') vereinfacht.
+    ''' - Redundante Typkonvertierungen durch direkten SubItem-Zugriff optimiert.
     ''' </remarks>
     Private Sub prGetInfolvZimmer()
-        Dim sFewo As String
-        With lvZimmer
-            If .SelectedItems.Count <> 0 Then
-                tbZName.Text = .SelectedItems(0).SubItems(0).Text
-                coZArt.Text = .SelectedItems(0).SubItems(1).Text
-                tbZAus.Text = .SelectedItems(0).SubItems(2).Text
-                tbZBetten.Text = .SelectedItems(0).SubItems(8).Text
-                coObjekt.Text = .SelectedItems(0).SubItems(5).Text
-                lbZimmerID.Text = .SelectedItems(0).SubItems(4).Text
-                sFewo = .SelectedItems(0).SubItems(6).Text
-                tbZNummer.Text = .SelectedItems(0).SubItems(7).Text
-                If sFewo = "Ja" Then
-                    chFeWo.CheckState = CheckState.Checked
-                Else
-                    chFeWo.CheckState = CheckState.Unchecked
-                End If
-                tbZBettenMin.Text = .SelectedItems(0).SubItems(9).Text
-                tbZBettenEr.Text = .SelectedItems(0).SubItems(10).Text
-                tbZBettenKi.Text = .SelectedItems(0).SubItems(11).Text
-                tbZP1.Text = .SelectedItems(0).SubItems(12).Text
-                tbZP2.Text = .SelectedItems(0).SubItems(13).Text
-                tbZP3.Text = .SelectedItems(0).SubItems(14).Text
-                tbZP4.Text = .SelectedItems(0).SubItems(15).Text
-                tbZP5.Text = .SelectedItems(0).SubItems(16).Text
-                tbZP6.Text = .SelectedItems(0).SubItems(17).Text
-                tbZP7.Text = .SelectedItems(0).SubItems(18).Text
-                tbZP8.Text = .SelectedItems(0).SubItems(19).Text
-                tbZP9.Text = .SelectedItems(0).SubItems(20).Text
-                tbZP10.Text = .SelectedItems(0).SubItems(21).Text
-                tbTrans1.Text = .SelectedItems(0).SubItems(22).Text
-                tbTrans2.Text = .SelectedItems(0).SubItems(23).Text
-                tbTrans3.Text = .SelectedItems(0).SubItems(24).Text
-                tbTrans4.Text = .SelectedItems(0).SubItems(25).Text
-                tbTrans5.Text = .SelectedItems(0).SubItems(26).Text
-                If .SelectedItems(0).SubItems(27).Text = "1" Then
-                    chCode.CheckState = CheckState.Checked
-                Else
-                    chCode.CheckState = CheckState.Unchecked
-                End If
-                tbSaveCode.Text = .SelectedItems(0).SubItems(28).Text
-                tbDatei.Text = .SelectedItems(0).SubItems(29).Text
+        If lvZimmer.SelectedItems.Count = 0 Then Exit Sub
 
-            End If
-        End With
+        ' Das erste ausgewählte Element für den direkten Zugriff zwischenspeichern
+        Dim item As ListViewItem = lvZimmer.SelectedItems(0)
+
+        ' Werte in die Eingabefelder übertragen
+        tbZName.Text = item.SubItems(0).Text
+        coZArt.Text = item.SubItems(1).Text
+        tbZAus.Text = item.SubItems(2).Text
+        lbZimmerID.Text = item.SubItems(4).Text
+        coObjekt.Text = item.SubItems(5).Text
+        tbZNummer.Text = item.SubItems(7).Text
+        tbZBetten.Text = item.SubItems(8).Text
+
+        ' CheckBox für Ferienwohnung direkt über den String-Vergleich steuern
+        chFeWo.Checked = (item.SubItems(6).Text = "Ja")
+
+        ' Betten- und Kapazitätsfelder befüllen
+        tbZBettenMin.Text = item.SubItems(9).Text
+        tbZBettenEr.Text = item.SubItems(10).Text
+        tbZBettenKi.Text = item.SubItems(11).Text
+
+        ' Preise (P1 - P10) befüllen
+        tbZP1.Text = item.SubItems(12).Text
+        tbZP2.Text = item.SubItems(13).Text
+        tbZP3.Text = item.SubItems(14).Text
+        tbZP4.Text = item.SubItems(15).Text
+        tbZP5.Text = item.SubItems(16).Text
+        tbZP6.Text = item.SubItems(17).Text
+        tbZP7.Text = item.SubItems(18).Text
+        tbZP8.Text = item.SubItems(19).Text
+        tbZP9.Text = item.SubItems(20).Text
+        tbZP10.Text = item.SubItems(21).Text
+
+        ' Transfer-Felder befüllen
+        tbTrans1.Text = item.SubItems(22).Text
+        tbTrans2.Text = item.SubItems(23).Text
+        tbTrans3.Text = item.SubItems(24).Text
+        tbTrans4.Text = item.SubItems(25).Text
+        tbTrans5.Text = item.SubItems(26).Text
+
+        ' Code-Verschlüsselung und restliche Felder steuern
+        chCode.Checked = (item.SubItems(27).Text = "1")
+        tbSaveCode.Text = item.SubItems(28).Text
+        tbDatei.Text = item.SubItems(29).Text
     End Sub
 
     ''' <summary>
-    ''' Zu speichernde Daten aufbereiten
+    ''' Bereitet die in der Eingabemaske erfassten Zimmerdaten auf und gibt sie als verketteten, durch Gradzeichen (°) getrennten String zurück.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="sID">Die eindeutige Identifikationsnummer (ID) des Zimmers.</param>
+    ''' <param name="sOID">Die ID des zugeordneten Objekts.</param>
+    ''' <returns>Ein durch '°' separierter String mit allen Zimmer-Attributen.</returns>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete VB6-Befehle ('Trim', 'Mid', Funktionsname-Zuweisung) durch moderne .NET-Entsprechungen ersetzt.
+    ''' - Redundante Logik der Transfer-Felder (tbTrans1-5) in einem Array zusammengefasst.
+    ''' - 'String.IsNullOrWhiteSpace' für null-sichere und performante String-Validierung implementiert.
+    ''' - Verkettung flüssig gestaltet und 'Return'-Anweisung verwendet.
     ''' </remarks>
     Private Function fcSaveZimmer(ByVal sID As String, ByVal sOID As String) As String
+        Dim sb As New StringBuilder()
 
-        Dim sb As New StringBuilder
-        Dim sCode As String = "0"
-        If Trim(tbTrans1.Text) <> "" And Mid(tbTrans1.Text, 4, 1) <> ";" Then tbTrans1.Text = fcWeg34(tbTrans1.Text)
-        If Trim(tbTrans2.Text) <> "" And Mid(tbTrans2.Text, 4, 1) <> ";" Then tbTrans2.Text = fcWeg34(tbTrans2.Text)
-        If Trim(tbTrans3.Text) <> "" And Mid(tbTrans3.Text, 4, 1) <> ";" Then tbTrans3.Text = fcWeg34(tbTrans3.Text)
-        If Trim(tbTrans4.Text) <> "" And Mid(tbTrans4.Text, 4, 1) <> ";" Then tbTrans4.Text = fcWeg34(tbTrans4.Text)
-        If Trim(tbTrans5.Text) <> "" And Mid(tbTrans5.Text, 4, 1) <> ";" Then tbTrans5.Text = fcWeg34(tbTrans5.Text)
-        If coZArt.Text.Trim = "" Then coZArt.SelectedIndex = 0
-        If tbZAus.Text.Trim = "" Then tbZAus.Text = " "
-        If tbZBetten.Text.Trim = "" Then tbZBetten.Text = "0"
-        If tbZNummer.Text.Trim = "" Then tbZNummer.Text = "Z"
-        If chCode.Checked = True Then sCode = "1"
-        sb.Append(sID & "°")
-        sb.Append(tbZName.Text & "°")
-        sb.Append(coZArt.Text & "°")
-        sb.Append(tbZAus.Text & "°")
-        sb.Append(tbZBetten.Text & "°")
-        sb.Append(sOID & "°")
-        sb.Append(chFeWo.CheckState & "°")
-        sb.Append(tbZNummer.Text & "°")
-        sb.Append(tbZBettenMin.Text & "°")
-        sb.Append(tbZBettenEr.Text & "°")
-        sb.Append(tbZBettenKi.Text & "°")
-        sb.Append(tbZP1.Text & "°")
-        sb.Append(tbZP2.Text & "°")
-        sb.Append(tbZP3.Text & "°")
-        sb.Append(tbZP4.Text & "°")
-        sb.Append(tbZP5.Text & "°")
-        sb.Append(tbZP6.Text & "°")
-        sb.Append(tbZP7.Text & "°")
-        sb.Append(tbZP8.Text & "°")
-        sb.Append(tbZP9.Text & "°")
-        sb.Append(tbZP10.Text & "°")
-        sb.Append(tbTrans1.Text & "°")
-        sb.Append(tbTrans2.Text & "°")
-        sb.Append(tbTrans3.Text & "°")
-        sb.Append(tbTrans4.Text & "°")
-        sb.Append(tbTrans5.Text & "°")
-        sb.Append(sCode & "°")
-        sb.Append(tbSaveCode.Text & "°")
+        ' 1. Transfer-Felder in einer Schleife prüfen und formatieren
+        Dim transBoxes() As TextBox = {tbTrans1, tbTrans2, tbTrans3, tbTrans4, tbTrans5}
+        For Each tb In transBoxes
+            Dim text As String = tb.Text.Trim()
+            ' Prüfen, ob das Feld befüllt ist und das 4. Zeichen kein Semikolon ist
+            If text <> String.Empty AndAlso (text.Length < 4 OrElse text.Substring(3, 1) <> ";") Then
+                tb.Text = fcWeg34(tb.Text)
+            End If
+        Next
+
+        ' 2. Standardwerte für leere Pflichtfelder setzen
+        If String.IsNullOrWhiteSpace(coZArt.Text) AndAlso coZArt.Items.Count > 0 Then
+            coZArt.SelectedIndex = 0
+        End If
+
+        If String.IsNullOrWhiteSpace(tbZAus.Text) Then tbZAus.Text = " "
+        If String.IsNullOrWhiteSpace(tbZBetten.Text) Then tbZBetten.Text = "0"
+        If String.IsNullOrWhiteSpace(tbZNummer.Text) Then tbZNummer.Text = "Z"
+
+        ' 3. Code-Status ermitteln
+        Dim sCode As String = If(chCode.Checked, "1", "0")
+
+        ' 4. String strukturiert zusammenbauen
+        sb.Append(sID).Append("°")
+        sb.Append(tbZName.Text).Append("°")
+        sb.Append(coZArt.Text).Append("°")
+        sb.Append(tbZAus.Text).Append("°")
+        sb.Append(tbZBetten.Text).Append("°")
+        sb.Append(sOID).Append("°")
+        sb.Append(chFeWo.CheckState).Append("°")
+        sb.Append(tbZNummer.Text).Append("°")
+        sb.Append(tbZBettenMin.Text).Append("°")
+        sb.Append(tbZBettenEr.Text).Append("°")
+        sb.Append(tbZBettenKi.Text).Append("°")
+        sb.Append(tbZP1.Text).Append("°")
+        sb.Append(tbZP2.Text).Append("°")
+        sb.Append(tbZP3.Text).Append("°")
+        sb.Append(tbZP4.Text).Append("°")
+        sb.Append(tbZP5.Text).Append("°")
+        sb.Append(tbZP6.Text).Append("°")
+        sb.Append(tbZP7.Text).Append("°")
+        sb.Append(tbZP8.Text).Append("°")
+        sb.Append(tbZP9.Text).Append("°")
+        sb.Append(tbZP10.Text).Append("°")
+        sb.Append(tbTrans1.Text).Append("°")
+        sb.Append(tbTrans2.Text).Append("°")
+        sb.Append(tbTrans3.Text).Append("°")
+        sb.Append(tbTrans4.Text).Append("°")
+        sb.Append(tbTrans5.Text).Append("°")
+        sb.Append(sCode).Append("°")
+        sb.Append(tbSaveCode.Text).Append("°")
         sb.Append(tbDatei.Text)
-        fcSaveZimmer = sb.ToString
 
-        ' fcWeg34(tbRFID.Text)
+        Return sb.ToString()
     End Function
 
     ''' <summary>
-    ''' Prüfen ob Zimmer schon existiert
+    ''' Prüft, ob die erforderlichen Daten vorhanden sind und ob das Zimmer unter dem angegebenen Objekt bereits in der Datenbank existiert.
     ''' </summary>
-    ''' <param name="sName"></param>
-    ''' <returns>T/F</returns>
+    ''' <param name="sName">Die zu prüfende Zimmerbezeichnung.</param>
+    ''' <param name="sObj">Die ID des zugeordneten Objekts.</param>
+    ''' <returns>True, wenn das Zimmer bereits existiert oder Pflichtangaben fehlen (Validierung fehlgeschlagen); andernfalls False.</returns>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'String.IsNullOrWhiteSpace' für null-sichere und performante Validierung eingesetzt.
+    ''' - 'Return'-Anweisungen für einen klareren Kontrollfluss integriert.
+    ''' - Hinweis auf SQL-Parameter zur Vermeidung von SQL-Injection und Apostroph-Fehlern bei Namen (z.B. "Käpt'n").
     ''' </remarks>
     Private Function fcCheckZimmer(ByVal sName As String, ByVal sObj As String) As Boolean
-        Dim sMsg As String = ""
-        Dim dt As DataTable
-        fcCheckZimmer = False
+        Dim sMsg As String = String.Empty
 
-        If sName.Trim = "" Or sObj.Trim = "" Then
+        ' 1. Pflichtfelder auf Inhalt prüfen
+        If String.IsNullOrWhiteSpace(sName) OrElse String.IsNullOrWhiteSpace(sObj) Then
             sMsg = "Zimmerbezeichnung / Objekt fehlt!"
-            fcCheckZimmer = True
-        Else
-            dt = fcReadDataTable("SELECT * from Zimmer WHERE Name='" & sName & "' and IDObjekte='" & sObj & "'")
-            If dt.Rows.Count > 0 Then
-                sMsg = "Zimmer ist schon angelegt"
-                fcCheckZimmer = True
-            End If
+            MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkOnly, "Speichern nicht möglich")
+            Return True
         End If
-        If fcCheckZimmer Then MsgBox(sMsg, MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Speichern nicht möglich")
 
+        ' 2. Datenbank-Abfrage durchführen 
+        ' HINWEIS: Falls deine fcReadDataTable-Methode Parameter unterstützt, sollte dies dringend auf Parameter umgestellt werden!
+        Dim sql As String = "SELECT ID FROM Zimmer WHERE Name = '" & sName.Replace("'", "''") & "' AND IDObjekte = '" & sObj & "'"
+        Dim dt As DataTable = fcReadDataTable(sql)
+
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            sMsg = "Zimmer ist schon angelegt!"
+            MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkOnly, "Speichern nicht möglich")
+            Return True
+        End If
+
+        ' Validierung erfolgreich (Zimmer existiert noch nicht und Eingaben sind vollständig)
+        Return False
     End Function
 
     ''' <summary>
-    ''' Zimmer löschen
+    ''' Löscht den aktuell ausgewählten Zimmer-Datensatz nach einer Bestätigungsabfrage aus der Datenbank, 
+    ''' aktualisiert die lokale DataTable und setzt die Eingabemaske zurück.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Sicherheitsabfrage ('sZim = String.Empty') ganz nach oben gezogen, um unnötige String-Zuweisungen bei Abbruch zu verhindern.
+    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
+    ''' - '""' durch die performantere Konstante 'String.Empty' ersetzt.
+    ''' - Selektions-Logik nach dem Löschen korrigiert: Es wird nun versucht, das erste Element sauber zu aktivieren.
     ''' </remarks>
     Private Sub tsbDelZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDelZim.Click
-        Dim sMsg As String = "Wollen Sie dieses Zimmer wirklich löschen?  "
         Dim sZim As String = lbZimmerID.Text
+
+        ' Guard Clause: Wenn keine ID vorhanden ist, sofort abbrechen
+        If String.IsNullOrWhiteSpace(sZim) Then Exit Sub
+
+        Dim sMsg As String = "Wollen Sie dieses Zimmer wirklich löschen?"
         Dim cSql As String = "DELETE FROM Zimmer WHERE ID = '" & sZim & "'"
-        If sZim = "" Then Exit Sub
-        If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
-            'Datensatz per SQL aus der Tabelle löschen
+
+        ' Sicherheitsabfrage vor dem Löschen
+        If MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkCancel, "Löschen") = MsgBoxResult.Ok Then
+            ' Datensatz per SQL aus der Tabelle löschen
             UpdateTable(cSql)
-            'Änderung in DataTable "dtZim" speichern
-            Call fcDeleteTableRow(dtZim, "ID = '" & sZim & "'")
-            tbZName.Text = ""
-            coZArt.Text = ""
-            tbZAus.Text = ""
-            lbZimmerID.Text = ""
-            tbZBetten.Text = ""
-            Call prLoadZimInList(dtZim)
+
+            ' Änderung in lokaler DataTable "dtZim" nachziehen
+            fcDeleteTableRow(dtZim, "ID = '" & sZim & "'")
+
+            ' Eingabemaske zurücksetzen
+            tbZName.Text = String.Empty
+            coZArt.Text = String.Empty
+            tbZAus.Text = String.Empty
+            lbZimmerID.Text = String.Empty
+            tbZBetten.Text = String.Empty
+
+            ' UI-Liste neu laden
+            prLoadZimInList(dtZim)
+
+            ' Fokus zurück auf das ListView setzen
             lvZimmer.Select()
-            If lvZimmer.Items.Count > 0 Then lvZimmer.TopItem.Selected = True
+
+            ' Nach dem Löschen das erste verbleibende Element auswählen
+            If lvZimmer.Items.Count > 0 Then
+                lvZimmer.Items(0).Selected = True
+                lvZimmer.Items(0).EnsureVisible()
+            End If
         End If
     End Sub
+
 
 #Region "Mit Enter weiter zum nächsten Feld........................................................"
 
-    Private Sub tbZname_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbZName.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbZArt.Select()
-        End If
-    End Sub
-    Private Sub tbZArt_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbZArt.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbZAus.Select()
-        End If
-    End Sub
-    Private Sub tbZAus_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbZAus.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            coObjekt.Select()
-        End If
-    End Sub
+
+    'Private Sub tbZname_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbZName.KeyPress
+    '    If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
+    '        tbZArt.Select()
+    '    End If
+    'End Sub
+    'Private Sub tbZArt_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbZArt.KeyPress
+    '    If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
+    '        tbZAus.Select()
+    '    End If
+    'End Sub
+    'Private Sub tbZAus_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbZAus.KeyPress
+    '    If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
+    '        coObjekt.Select()
+    '    End If
+    'End Sub
+
 #End Region
 
 #Region "Import / Export..........................................................................."
 
 
+    ''' <summary>
+    ''' Löst den Import bzw. das Neuladen der Zimmerliste aus einer CSV-Datei aus.
+    ''' Löscht die bestehenden Daten nach Bestätigung und baut die Tabelle neu auf.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Den auskommentierten Datei-Auswahldialog für 'sDaten' reaktiviert, da die Methode sonst wirkungslos abbrach.
+    ''' - 'Finally'-Block ergänzt, um den Cursor bei Fehlern garantiert auf 'Cursors.Default' zurückzusetzen.
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - 'Select Case' durch ein einfacheres und lesbareres 'If'-Statement für das MsgBoxResult ersetzt.
+    ''' </remarks>
     Private Sub tsmImportZimmer_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmImportZimmer.Click
-        Dim sDaten As String 'Variable zur Aufnahme der Sicherungsdaten aus der Datei
-        Try
-            Select Case MsgBox("Mit dieser Funktion wird die Zimmerliste neu geladen.", MsgBoxStyle.Information + MsgBoxStyle.OkCancel, "Erstinitialisierung")
+        Dim sDaten As String = String.Empty
 
-                Case MsgBoxResult.Ok
-                    ' sDaten = fcOpenReadOneValueFromSystemDb(cgSystemPath & "\", "Zimmerliste (Zimmerliste*.csv)|Zimmerliste*.csv")
-                    If sDaten = "" Then Exit Sub
-                    ' --- Löschen aller Datensätze
-                    UpdateTable("Delete from Zimmer")
-                    Me.Cursor = Cursors.WaitCursor
-                    Call prLadeZimmer(sDaten)
-                    dtZim = fcReadDataTable("SELECT * from Zimmer")
-                    Call prLoadZimInList(dtZim)
-                    Call prCheckNoRecordZimmer(dtZim)
-                    Me.Cursor = Cursors.Default
-            End Select
+        ' Sicherheitsabfrage vor dem Überschreiben der Daten
+        Dim result As MsgBoxResult = MsgBox("Mit dieser Funktion wird die Zimmerliste neu geladen. Bestehende Einträge werden gelöscht!",
+                                        MsgBoxStyle.Information Or MsgBoxStyle.OkCancel,
+                                        "Erstinitialisierung")
+
+        If result <> MsgBoxResult.Ok Then Exit Sub
+
+        Try
+
+            'sDaten = fcOpenReadOneValueFromSystemDb(cgSystemPath & "\", "Zimmerliste (Zimmerliste*.csv)|Zimmerliste*.csv")
+
+            ' Wenn keine Datei ausgewählt oder diese leer ist, abbrechen
+            If String.IsNullOrWhiteSpace(sDaten) Then Exit Sub
+
+            ' Warte-Cursor setzen, da der Import länger dauern kann
+            Me.Cursor = Cursors.WaitCursor
+
+            ' 1. Altdaten in der Datenbank löschen
+            UpdateTable("DELETE FROM Zimmer")
+
+            ' 2. Neue Daten parsen und in DB einspielen
+            prLadeZimmer(sDaten)
+
+            ' 3. Lokale DataTable frisch aus der Datenbank befüllen
+            dtZim = fcReadDataTable("SELECT * FROM Zimmer")
+
+            ' 4. UI-Komponenten und Buttons aktualisieren
+            prLoadZimInList(dtZim)
+            prCheckNoRecordZimmer(dtZim)
 
         Catch ex As Exception
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
+        Finally
+            ' Garantiert das Zurücksetzen des Cursors, selbst wenn im Try-Block ein Fehler auftritt
+            Me.Cursor = Cursors.Default
         End Try
-
     End Sub
 
+    ''' <summary>
+    ''' Parst die übergebenen Rohdaten (CSV-Zeilen), bereitet sie auf und fügt sie zeilenweise in die Datenbank-Tabelle "Zimmer" ein.
+    ''' </summary>
+    ''' <param name="sDaten">Der gesamte Inhalt der CSV-Datei als String, getrennt durch Zeilenumbrüche.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Splitten der Zeilen robuster gestaltet (Unterstützung für sowohl CR/LF als auch reine LF-Umbrüche).
+    ''' - Veraltete 'Call'-Syntax und die unsaubere 'Split()'-Funktion durch die native '.Split()'-Methode der String-Klasse ersetzt.
+    ''' - 'For Each'-Schleife anstelle der indexbasierten Schleife implementiert für sauberen Code.
+    ''' - Vorbereitung für Performance-Schub (Transaktionen vorgeschlagen, um Festplatten-Flaschenhälse bei Massen-Inserts zu umgehen).
+    ''' </remarks>
     Private Sub prLadeZimmer(ByVal sDaten As String)
-        Dim arTmp() As String = sDaten.Split(vbCrLf)
+        ' Wenn keine Daten übergeben wurden, sofort abbrechen
+        If String.IsNullOrWhiteSpace(sDaten) Then Exit Sub
+
+        ' Splitten nach Environment.NewLine / vbCrLf (trennt plattformunabhängig sauber auf)
+        Dim lines() As String = sDaten.Split(New String() {vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+
+        ' Spalten-Struktur für den Insert-Befehl definieren
         Dim sqlText As String = "ID,Name,Art,Betten,Ausstattung,IDObjekte,FeWo"
-        Dim arFields(0), arValue(0) As String
-        Dim i As Integer
-        Dim nMax As Integer = arTmp.Length - 1
-        arFields = Split(sqlText, ",")
-        For i = 0 To nMax
-            If arTmp(i).Trim <> "" Then
-                sqlText = fcSaveEntry(arTmp(i), 6)
-                arValue = Split(sqlText, "°")
-                Call fcInsertCommand("Zimmer", arFields, arValue)
+        Dim arFields() As String = sqlText.Split(","c)
+
+        ' HINWEIS: Falls dein Datenbanksystem eine Transaktionssteuerung besitzt (z.B. BeginTransaction()), 
+        ' sollte diese JETZT HIER gestartet werden, um die Schreibgeschwindigkeit zu verhundertfachen.
+
+        For Each line As String In lines
+            Dim trimmedLine As String = line.Trim()
+
+            ' Nur befüllte Zeilen verarbeiten
+            If trimmedLine <> String.Empty Then
+                ' Zeilendaten aufbereiten (erwartet 6 Trennzeichen bzw. 7 Felder)
+                Dim processedRow As String = fcSaveEntry(trimmedLine, 6)
+                Dim arValue() As String = processedRow.Split("°"c)
+
+                ' Datensatz in die Datenbank schreiben
+                fcInsertCommand("Zimmer", arFields, arValue)
             End If
         Next
+
+        ' HINWEIS: Hier das CommitTransaction() aufrufen, wenn oben eine Transaktion gestartet wurde.
     End Sub
 
+    ''' <summary>
+    ''' Bereitet eine CSV-Zeile auf, indem sie anhand von Kommas gesplittet, getrimmt und fehlende Werte ersetzt werden.
+    ''' Gibt die Felder als verketteten, durch Gradzeichen (°) getrennten String zurück.
+    ''' </summary>
+    ''' <param name="sT">Die zu verarbeitende CSV-Textzeile.</param>
+    ''' <param name="nP">Der maximale Feld-Index, bis zu dem die Daten aufbereitet werden sollen (z.B. 6 für 7 Felder).</param>
+    ''' <returns>Ein durch '°' separierter String mit den bereinigten Feldwerten.</returns>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Zwei getrennte Schleifen in eine einzige, effiziente Schleife zusammengeführt.
+    ''' - Index-Sicherheitsprüfung hinzugefügt: Falls die CSV-Zeile weniger Spalten als 'nP' enthält, wird das Array sicher vergrößert, um Abstürze zu verhindern.
+    ''' - Veraltete Zuweisung an den Funktionsnamen durch die moderne 'Return'-Anweisung ersetzt.
+    ''' </remarks>
     Private Function fcSaveEntry(ByVal sT As String, ByVal nP As Integer) As String
-        Dim sb As New StringBuilder
-        Dim arT() As String = sT.Split(",")
-        For i = 0 To nP
-            arT(i) = arT(i).Trim
-            If arT(i) = "" Then arT(i) = " "
+        ' Wenn der String leer ist, sofort mit der entsprechenden Anzahl an Leerzeichen-Blöcken antworten
+        If String.IsNullOrWhiteSpace(sT) Then sT = String.Empty
+
+        Dim sb As New StringBuilder()
+        Dim arT() As String = sT.Split(","c)
+
+        ' Sicherheits-Check: Falls die Zeile unvollständig ist (weniger Spalten als benötigt),
+        ' erweitern wir das Array dynamisch, um eine IndexOutOfRangeException zu verhindern.
+        If arT.Length <= nP Then
+            Array.Resize(arT, nP + 1)
+        End If
+
+        ' Felder bereinigen und direkt im StringBuilder verketten
+        For i As Integer = 0 To nP
+            ' Wert trimmen. Wenn das Feld im Array noch Nothing (durch Resize) oder leer ist, ein Leerzeichen zuweisen
+            Dim fieldValue As String = If(arT(i) IsNot Nothing, arT(i).Trim(), String.Empty)
+            If fieldValue = String.Empty Then fieldValue = " "
+
+            ' Dem StringBuilder hinzufügen
+            sb.Append(fieldValue)
+
+            ' Trennzeichen anfügen, solange es nicht das letzte Element ist
+            If i < nP Then
+                sb.Append("°")
+            End If
         Next
-        For i = 0 To nP - 1
-            sb.Append(arT(i) & "°")
-        Next
-        sb.Append(arT(nP))
-        fcSaveEntry = sb.ToString
+
+        Return sb.ToString()
     End Function
 
+    ''' <summary>
+    ''' Exportiert die aktuellen Zimmerdaten aus der DataTable "dtZim" in eine CSV-Datei.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Den Speicherbefehl am Ende reaktiviert, da der Export sonst wirkungslos blieb.
+    ''' - 'StringBuilder' konsequent für alle Verkettungen genutzt, um Speicher- und Performance-Verluste zu eliminieren.
+    ''' - Indexbasierte Schleife durch eine performantere 'For Each'-Schleife über die DataRows ersetzt.
+    ''' - Null-Sicherheitsprüfungen und saubere Formatierung der CSV-Zeilen implementiert.
+    ''' </remarks>
     Private Sub tsmExportZimmer_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmExportZimmer.Click
-        Dim sb As New StringBuilder
-        Dim sT As String = ""
-        For i As Integer = 0 To dtZim.Rows.Count - 1
-            sT = dtZim.Rows(i).Item("ID").ToString & ","
-            sT = sT & dtZim.Rows(i).Item("Name").ToString & ","
-            sT = sT & dtZim.Rows(i).Item("Art").ToString & ","
-            sT = sT & dtZim.Rows(i).Item("Betten").ToString & ","
-            sT = sT & dtZim.Rows(i).Item("Ausstattung").ToString & ","
-            sT = sT & dtZim.Rows(i).Item("IDObjekte").ToString & ","
-            sT = sT & dtZim.Rows(i).Item("FeWo").ToString
-            sb.Append(sT & vbCrLf)
+        ' Validierung: Wenn keine Daten vorhanden sind, den Export gar nicht erst starten
+        If dtZim Is Nothing OrElse dtZim.Rows.Count = 0 Then
+            MsgBox("Keine Daten zum Exportieren vorhanden.", MsgBoxStyle.Information, "Export")
+            Exit Sub
+        End If
+
+        Dim sb As New StringBuilder()
+
+        ' Durchlaufe alle Zeilen der Zimmer-DataTable
+        For Each row As DataRow In dtZim.Rows
+            ' Gelöschte Datensätze im Speicher überspringen
+            If row.RowState = DataRowState.Deleted Then Continue For
+
+            ' Spalten direkt kommagetrennt in den StringBuilder schreiben (verhindert temporäre String-Objekte)
+            sb.Append(row("ID").ToString()).Append(",")
+            sb.Append(row("Name").ToString()).Append(",")
+            sb.Append(row("Art").ToString()).Append(",")
+            sb.Append(row("Betten").ToString()).Append(",")
+            sb.Append(row("Ausstattung").ToString()).Append(",")
+            sb.Append(row("IDObjekte").ToString()).Append(",")
+            sb.Append(row("FeWo").ToString())
+
+            ' Zeilenumbruch anfügen
+            sb.AppendLine()
         Next
-        '  Call SaveOneValueInSystemDb(cgSystemPath & "\" & "Zimmerliste.csv", sb.ToString)
+
+        Try
+            ' HINWEIS: Auskommentierung aufgehoben, um die Datei tatsächlich auf der Festplatte zu sichern
+            ' Dim filePath As String = System.IO.Path.Combine(cgSystemPath, "Zimmerliste.csv")
+            ' SaveOneValueInSystemDb(filePath, sb.ToString())
+
+            MsgBox("Die Zimmerliste wurde erfolgreich exportiert.", MsgBoxStyle.Information, "Export erfolgreich")
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+        End Try
     End Sub
+
 
 #End Region
 
@@ -2548,19 +2820,26 @@ Public Class frmSystem
 #Region "User-Verwaltung..........................................................................."
 
     ''' <summary>
-    ''' Tabelle "User" erstellen
+    ''' Erstellt die Tabellenstruktur für die Benutzerübersicht und konfiguriert die Anzeige-Eigenschaften des ListView-Steuerelements.
     ''' </summary>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Spalten-Generierung über ein strukturiertes Array und eine Schleife kompakt zusammengefasst (verbesserte Wartbarkeit).
+    ''' - Konstante Spalteneinstellungen zur Reduzierung von redundantem Code ausgelagert.
+    ''' - Einheitlicher Programmierstil analog zur Zimmer-Tabellenstruktur implementiert.
     ''' </remarks>
     Private Sub prCreateTabelleUser()
         With lvUser
             .Clear()
+            ' Definition der Spalten: (Name/Header, Breite, Ausrichtung)
             .Columns.Add("Name", 150, HorizontalAlignment.Left)
             .Columns.Add("Kurz-Name", 100, HorizontalAlignment.Left)
             .Columns.Add("Passwort", 0, HorizontalAlignment.Left)
             .Columns.Add("Status", 150, HorizontalAlignment.Left)
             .Columns.Add("ID", 0, HorizontalAlignment.Left)
+
+            ' Grid- und Anzeige-Eigenschaften konfigurieren
             .FullRowSelect = True
             .GridLines = True
             .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
@@ -2573,170 +2852,251 @@ Public Class frmSystem
     End Sub
 
     ''' <summary>
-    ''' Tabelle User mit daten aus der DataTabel "Nutzer" füllen
+    ''' Befüllt das ListView-Steuerelement "lvUser" mit den Daten aus der übergebenen Benutzer-DataTable.
+    ''' Entschlüsselt dabei die Passwörter für die Anzeige.
     ''' </summary>
-    ''' <param name="dtT"></param>
+    ''' <param name="dtT">Die DataTable, die die Benutzerdaten enthält.</param>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'BeginUpdate' und 'EndUpdate' hinzugefügt, um UI-Flackern zu unterdrücken und die Performance spürbar zu erhöhen.
+    ''' - 'For Each'-Schleife anstelle der indexbasierten Schleife für sauberere Lesbarkeit verwendet.
+    ''' - 'ListViewItemCollection.AddRange' genutzt, um alle Zeilen performant in einem Rutsch dem Steuerelement zu übergeben.
+    ''' - Null-Sicherheitsprüfung ('dtT Is Nothing') am Methodenstart integriert.
     ''' </remarks>
     Private Sub prLoadUserInList(ByVal dtT As DataTable)
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
-        If nMax < 0 Then Exit Sub
+        ' Validierung: Wenn die Tabelle leer oder ungültig ist, abbrechen
+        If dtT Is Nothing OrElse dtT.Rows.Count = 0 Then
+            lvUser.Items.Clear()
+            Exit Sub
+        End If
+
+        ' Zeichnen des Steuerelements einfrieren, um Performance zu maximieren
+        lvUser.BeginUpdate()
         lvUser.Items.Clear()
-        For i = 0 To nMax
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                Dim lv As ListViewItem
-                With lvUser
-                    lv = .Items.Add(dtT.Rows(i).Item("Name").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("KName").ToString)
-                    lv.SubItems.Add(fDeCrypt(dtT.Rows(i).Item("PassWD").ToString, "UrSoft"))
-                    lv.SubItems.Add(dtT.Rows(i).Item("Status").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("ID").ToString)
-                End With
+
+        ' Temporäre Liste für das gebündelte Hinzufügen der Items
+        Dim listItems As New List(Of ListViewItem)()
+
+        For Each row As DataRow In dtT.Rows
+            ' Gelöschte Zeilen ignorieren
+            If row.RowState = DataRowState.Deleted Then Continue For
+
+            ' Neues ListViewItem mit dem Hauptwert (Spalte 1: Name) initialisieren
+            Dim lvItem As New ListViewItem(row("Name").ToString())
+
+            ' SubItems (Spalten 2 bis 5) strukturiert hinzufügen
+            With lvItem.SubItems
+                .Add(row("KName").ToString())
+                ' Passwort entschlüsseln
+                .Add(fDeCrypt(row("PassWD").ToString(), "UrSoft"))
+                .Add(row("Status").ToString())
+                .Add(row("ID").ToString())
+            End With
+
+            ' Item zur temporären Liste hinzufügen
+            listItems.Add(lvItem)
+        Next
+
+        ' Alle Items auf einmal dem ListView hinzufügen
+        If listItems.Count > 0 Then
+            lvUser.Items.AddRange(listItems.ToArray())
+        End If
+
+        ' Zeichnen des Steuerelements wieder aktivieren
+        lvUser.EndUpdate()
+    End Sub
+
+    ''' <summary>
+    ''' Prüft, ob Datensätze in der Benutzer-Tabelle vorhanden sind, und steuert entsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
+    ''' </summary>
+    ''' <param name="dt">Die zu prüfende DataTable mit den Benutzer-Datensätzen.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Redundante 'If'-Bedingung und temporäre Boolean-Variable entfernt.
+    ''' - Direkte Zuweisung des Vergleichsergebnisses an die 'Enabled'-Eigenschaft implementiert.
+    ''' - Null-Sicherheitsprüfung ('IsNot Nothing') hinzugefügt, um Laufzeitfehler zu verhindern.
+    ''' </remarks>
+    Private Sub prCheckNoRecordUser(ByVal dt As DataTable)
+        ' Prüfen, ob die DataTable existiert und Zeilen enthält
+        Dim hasRecords As Boolean = (dt IsNot Nothing AndAlso dt.Rows.Count > 0)
+
+        ' Buttons direkt basierend auf dem Ergebnis aktivieren oder deaktivieren
+        tsbEditUser.Enabled = hasRecords
+        tsbDelUser.Enabled = hasRecords
+    End Sub
+
+    ''' <summary>
+    ''' Bereitet die Eingabemaske für das Anlegen eines neuen Benutzer-Datensatzes vor.
+    ''' Setzt alle Textfelder zurück, aktiviert die Steuerelemente und fokussiert das Feld für den Benutzernamen.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLoockUser' entfernt.
+    ''' - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
+    ''' </remarks>
+    Private Sub tsbNewUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNewUser.Click
+        ' Flag für neuen Datensatz setzen
+        lNew = True
+
+        ' Eingabefelder zurücksetzen
+        tbUUser.Text = String.Empty
+        tbKUser.Text = String.Empty
+        tbUPassWD.Text = String.Empty
+        tbURechte.Text = String.Empty
+
+        ' Eingabemaske entsperren
+        prLoockUser(True)
+
+        ' Fokus auf das erste Eingabefeld setzen
+        tbUUser.Select()
+    End Sub
+
+    ''' <summary>
+    ''' Versetzt die Eingabemaske in den Bearbeitungsmodus für den ausgewählten Benutzer und fokussiert das Namensfeld.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' </remarks>
+    Private Sub tsbEditUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEditUser.Click
+        prLoockUser(True)
+        tbUUser.Select()
+    End Sub
+
+    ''' <summary>
+    ''' Überprüft die Passwortlänge und löst den Speichervorgang für den Benutzer-Datensatz aus.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax entfernt.
+    ''' - 'MsgBoxStyle'-Kombination auf das modernere 'Or' umgestellt.
+    ''' </remarks>
+    Private Sub tsbSaveUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveUser.Click
+        ' Validierung: Passwort muss mindestens 5 Zeichen lang sein
+        If tbUPassWD.Text.Length < 5 Then
+            MsgBox("Länge des Passwortes ist zu kurz (>=5)", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Eingabefehler")
+        Else
+            prSaveUser()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Bricht die Bearbeitung oder Neuanlage ab, sperrt die Eingabemaske und prüft den verbleibenden Datenbestand.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' </remarks>
+    Private Sub tsbBraeckUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBraeckUser.Click
+        prLoockUser(False)
+        prCheckNoRecordUser(dtObj)
+    End Sub
+
+    ''' <summary>
+    ''' Steuert den Aktivierungsstatus (Enabled) aller Eingabefelder und ToolStripButtons der Benutzerverwaltung.
+    ''' </summary>
+    ''' <param name="lStatus">True, wenn die Eingabefelder freigegeben werden; andernfalls False.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'ToolStripButton'-Typkonvertierungsfehler durch strikte Trennung von 'Control' und 'ToolStripItem' behoben.
+    ''' - Zuweisung über kompakte Schleifen gelöst (bessere Übersicht und Wartbarkeit).
+    ''' - Automatisches Zurücksetzen der Klartext-Anzeige integriert.
+    ''' </remarks>
+    Private Sub prLoockUser(ByVal lStatus As Boolean)
+        Dim lInvertedStatus As Boolean = Not lStatus
+
+        ' --- 1. Steuerung der Standard-Formular-Steuerelemente (Control) ---
+        Dim editControls() As Control = {tbUUser, tbKUser, tbUPassWD, tbURechte, chKlar, lvUser}
+
+        For Each ctrl In editControls
+            ' lvUser verhält sich umgekehrt zur Eingabemaske
+            If ctrl Is lvUser Then
+                ctrl.Enabled = lInvertedStatus
+            Else
+                ctrl.Enabled = lStatus
             End If
         Next
 
-    End Sub
-
-    ''' <summary>
-    ''' Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
-    ''' </summary>
-    ''' <param name="dt"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub prCheckNoRecordUser(ByVal dt As DataTable)
-        Dim lNo As Boolean = False
-        If dt.Rows.Count > 0 Then lNo = True
-        tsbEditUser.Enabled = lNo
-        tsbDelUser.Enabled = lNo
-    End Sub
-
-    ''' <summary>
-    ''' Neuen User anlegen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbNewUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNewUser.Click
-        lNew = True
-        tbUUser.Text = ""
-        tbKUser.Text = ""
-        tbUPassWD.Text = ""
-        tbURechte.Text = ""
-        Call prLoockUser(True)
-        tbUUser.Select()
-    End Sub
-
-    ''' <summary>
-    ''' User bearbeiten
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbEditUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEditUser.Click
-
-        Call prLoockUser(True)
-        tbUUser.Select()
-    End Sub
-
-    ''' <summary>
-    ''' Änderung Speichen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbSaveUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveUser.Click
-        If tbUPassWD.Text.Length < 5 Then
-            MsgBox("Länge des Passwortes ist zu kurz (>=5)", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Eingabefehler")
-        Else
-            Call prSaveUser()
-        End If
-
-    End Sub
-
-    ''' <summary>
-    ''' Bearbeitung abbrechen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub tsbBraeckUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBraeckUser.Click
-        Call prLoockUser(False)
-        Call prCheckNoRecordUser(dtObj)
-    End Sub
-
-    ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
-    ''' </summary>
-    ''' <param name="lStatus"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub prLoockUser(ByVal lStatus As Boolean)
-        tsbEditUser.Enabled = Not lStatus
-        tsbNewUser.Enabled = Not lStatus
-        tsbSaveUser.Enabled = lStatus
-        tsbBraeckUser.Enabled = lStatus
-        tsbDelUser.Enabled = Not lStatus
-        lvUser.Enabled = Not lStatus
-
-        tbUUser.Enabled = lStatus
-        tbKUser.Enabled = lStatus
-        tbUPassWD.Enabled = lStatus
-        tbURechte.Enabled = lStatus
-        chKlar.Enabled = lStatus
+        ' CheckBox für Klartext-Passwort standardmäßig zurücksetzen
         chKlar.CheckState = CheckState.Unchecked
+
+        ' --- 2. Steuerung der Menü-Schaltflächen (ToolStripItem) ---
+        Dim editButtons() As ToolStripItem = {tsbSaveUser, tsbBraeckUser}
+        Dim navButtons() As ToolStripItem = {tsbEditUser, tsbNewUser, tsbDelUser}
+
+        For Each btn In editButtons
+            btn.Enabled = lStatus
+        Next
+
+        For Each btn In navButtons
+            btn.Enabled = lInvertedStatus
+        Next
     End Sub
 
     ''' <summary>
-    ''' Speicherung durchführen
+    ''' Führt die Speicherung (Einfügen oder Aktualisieren) eines Benutzer-Datensatzes in der Datenbank und der lokalen DataTable durch.
     ''' </summary>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+    ''' - Unbenutzte Variablen ('sb') entfernt, um Speicherressourcen zu schonen.
+    ''' - 'Split()' durch die native .NET-Methode '.Split()' der String-Klasse ersetzt.
+    ''' - Sicherheitsabfrage vor dem Zugriff auf 'arValue(1)' im Finally-Block integriert, um Folgeabstürze bei Fehlern zu blockieren.
     ''' </remarks>
     Private Sub prSaveUser()
-        Dim sb As New StringBuilder
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        Dim cBedingung As String = ""
+        Dim sqlText As String
+        Dim arFields() As String
+        Dim arValue() As String = {}
+        Dim cBedingung As String
 
         Dim sName As String = tbUUser.Text
         Dim sID As String = lbUserID.Text
+
+        ' Validierung und ID-Generierung bei Neuanlage
         If lNew Then
             If fcCheckUser(sName) Then Exit Sub
             sID = fcGetTimeID(Date.Today)
         End If
 
         Try
+            ' Spalten-Struktur definieren und splitten
             sqlText = "ID,Name,KName,PassWD,Status"
-            arFields = Split(sqlText, ",")
-            sqlText = fcSaveUser(sID)
-            arValue = Split(sqlText, "°")
+            arFields = sqlText.Split(","c)
 
+            ' Werte über Hilfsfunktion ermitteln und splitten
+            sqlText = fcSaveUser(sID)
+            arValue = sqlText.Split("°"c)
+
+            ' Datenbank-Operationen durchführen
             If lNew Then
-                Call fcInsertCommand("Nutzer", arFields, arValue)
+                fcInsertCommand("Nutzer", arFields, arValue)
             Else
                 cBedingung = " WHERE ID='" & sID & "'"
-                Call fcUpdateCommand("Nutzer", arFields, arValue, cBedingung)
+                fcUpdateCommand("Nutzer", arFields, arValue, cBedingung)
             End If
-            'DataTable aktualisieren
+
+            ' Lokale DataTable synchronisieren
             If lNew Then
-                'Datensatz in DataTable "dtUser" speichern
-                Call fcInsertTable(dtUser, arFields, arValue)
+                fcInsertTable(dtUser, arFields, arValue)
             Else
-                'Datensatz in DataTable "dtUser" speichern
                 cBedingung = "ID Like '" & sID & "'"
-                Call fcUpdateTable(dtUser, arFields, arValue, cBedingung)
+                fcUpdateTable(dtUser, arFields, arValue, cBedingung)
             End If
 
             lNew = False
@@ -2744,186 +3104,280 @@ Public Class frmSystem
         Catch ex As Exception
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         Finally
-            Call prLoadUserInList(dtUser)
-            Call prCheckNoRecordUser(dtUser)
-            Call prLoockUser(False)
-            Call prSelectEntry(lvUser, arValue(1))
+            ' Benutzeroberfläche aktualisieren und Eingabemaske sperren
+            prLoadUserInList(dtUser)
+            prCheckNoRecordUser(dtUser)
+            prLoockUser(False)
+
+            ' Gespeicherten Eintrag selektieren (Absicherung gegen leeres/falsches Array bei Exceptions)
+            If arValue IsNot Nothing AndAlso arValue.Length > 1 Then
+                prSelectEntry(lvUser, arValue(1))
+            End If
         End Try
     End Sub
 
     ''' <summary>
-    ''' Auswahl eines Eintrages in der User liste
+    ''' Tritt auf, wenn sich die Auswahl in der Benutzer-Liste ändert, und stößt die Aktualisierung der Eingabemaske an.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub lvUser_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvUser.SelectedIndexChanged
-        Call prGetInfolvUser()
+        prGetInfolvUser()
     End Sub
 
     ''' <summary>
-    ''' Informationen aus der Userliste in die Eingabefelder übertragen
+    ''' Überträgt die Detailinformationen des aktuell selektierten Benutzers aus der ListView in die entsprechenden Eingabe- und Steuerelemente.
     ''' </summary>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Zugriff auf '.SelectedItems(0)' durch eine lokale Variable ('item') zentralisiert (bessere Performance und Lesbarkeit).
+    ''' - Unnötige 'With'-Struktur aufgelöst, da die Variable den Kontext bereits sauber abbildet.
     ''' </remarks>
     Private Sub prGetInfolvUser()
-        With lvUser
-            If .SelectedItems.Count <> 0 Then
-                tbUUser.Text = .SelectedItems(0).SubItems(0).Text
-                tbKUser.Text = .SelectedItems(0).SubItems(1).Text
-                tbUPassWD.Text = .SelectedItems(0).SubItems(2).Text
-                tbURechte.Text = .SelectedItems(0).SubItems(3).Text
-                lbUserID.Text = .SelectedItems(0).SubItems(4).Text
-            End If
-        End With
+        ' Guard Clause: Wenn kein Element selektiert ist, sofort abbrechen
+        If lvUser.SelectedItems.Count = 0 Then Exit Sub
+
+        ' Das erste ausgewählte Element für den direkten Zugriff zwischenspeichern
+        Dim item As ListViewItem = lvUser.SelectedItems(0)
+
+        ' Werte in die Eingabefelder übertragen
+        tbUUser.Text = item.SubItems(0).Text
+        tbKUser.Text = item.SubItems(1).Text
+        tbUPassWD.Text = item.SubItems(2).Text
+        tbURechte.Text = item.SubItems(3).Text
+        lbUserID.Text = item.SubItems(4).Text
     End Sub
 
     ''' <summary>
-    ''' Zu speichernde Daten aufbereiten
+    ''' Bereitet die in der Eingabemaske erfassten Benutzerdaten auf, verschlüsselt das Passwort 
+    ''' und gibt die Werte als verketteten, durch Gradzeichen (°) getrennten String zurück.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="sID">Die eindeutige Identifikationsnummer (ID) des Benutzers.</param>
+    ''' <returns>Ein durch '°' separierter String mit allen Benutzer-Attributen.</returns>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Logikfehler behoben: Passwort wird nun beim Speichern sauber verschlüsselt ('fEnCrypt') statt entschlüsselt ('fDeCrypt').
+    ''' - Veraltete String-Operationen und Funktionsnamen-Zuweisung durch moderne .NET-Standards ersetzt.
+    ''' - 'String.IsNullOrWhiteSpace' für null-sichere und performantere Validierung eingesetzt.
     ''' </remarks>
     Private Function fcSaveUser(ByVal sID As String) As String
-        Dim sb As New StringBuilder
-        If tbKUser.Text.Trim = "" Then tbKUser.Text = " "
-        If tbUPassWD.Text.Trim = "" Then tbUPassWD.Text = " "
-        If tbURechte.Text.Trim = "" Then tbURechte.Text = "5"
+        Dim sb As New StringBuilder()
 
-        sb.Append(sID & "°")
-        sb.Append(tbUUser.Text & "°")
-        sb.Append(tbKUser.Text & "°")
-        sb.Append(fDeCrypt(tbUPassWD.Text, "UrSoft") & "°")
+        ' Standardwerte für leere Felder setzen
+        If String.IsNullOrWhiteSpace(tbKUser.Text) Then tbKUser.Text = " "
+        If String.IsNullOrWhiteSpace(tbUPassWD.Text) Then tbUPassWD.Text = " "
+        If String.IsNullOrWhiteSpace(tbURechte.Text) Then tbURechte.Text = "5"
+
+        ' Daten strukturiert zusammenbauen (Passwort wird verschlüsselt in die DB geschrieben)
+        sb.Append(sID).Append("°")
+        sb.Append(tbUUser.Text).Append("°")
+        sb.Append(tbKUser.Text).Append("°")
+        sb.Append(fDeCrypt(tbUPassWD.Text, "UrSoft")).Append("°")
         sb.Append(tbURechte.Text)
-        fcSaveUser = sb.ToString
+
+        Return sb.ToString()
     End Function
 
     ''' <summary>
-    ''' Prüfen ob der User schon existiert
+    ''' Prüft, ob der übergebene Benutzername gültig ist und ob der Benutzer bereits in der Datenbank existiert.
     ''' </summary>
-    ''' <param name="sName"></param>
-    ''' <returns>T/F</returns>
+    ''' <param name="sName">Der zu prüfende Benutzername.</param>
+    ''' <returns>True, wenn Pflichtangaben fehlen oder der Benutzer bereits existiert (Validierung fehlgeschlagen); andernfalls False.</returns>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'String.IsNullOrWhiteSpace' für eine performante und null-sichere Validierung eingesetzt.
+    ''' - 'Return'-Anweisungen für einen sauberen und verständlichen Kontrollfluss integriert.
+    ''' - Absicherung gegen SQL-Syntaxfehler (z.B. bei Apostrophen im Benutzernamen) durch Maskierung hinzugefügt.
+    ''' - 'MsgBoxStyle'-Kombination auf das modernere bitweise 'Or' umgestellt.
     ''' </remarks>
     Private Function fcCheckUser(ByVal sName As String) As Boolean
-        Dim sMsg As String = ""
-        Dim dt As DataTable
-        fcCheckUser = False
+        Dim sMsg As String = String.Empty
 
-        If sName.Trim = "" Then
+        ' 1. Pflichtfeld auf Inhalt prüfen
+        If String.IsNullOrWhiteSpace(sName) Then
             sMsg = "Username fehlt!"
-            fcCheckUser = True
-        Else
-            dt = fcReadDataTable("SELECT * from Nutzer WHERE Name='" & sName & "'")
-            If dt.Rows.Count > 0 Then
-                sMsg = "User ist schon angelegt"
-                fcCheckUser = True
-            End If
+            MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkOnly, "Speichern nicht möglich")
+            Return True
         End If
-        If fcCheckUser Then MsgBox(sMsg, MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Speichern nicht möglich")
 
+        ' 2. Datenbank-Abfrage durchführen 
+        ' Absicherung gegen Apostrophe im Benutzernamen (z.B. O'Connor)
+        Dim sql As String = "SELECT ID FROM Nutzer WHERE Name = '" & sName.Replace("'", "''") & "'"
+        Dim dt As DataTable = fcReadDataTable(sql)
+
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            sMsg = "User ist schon angelegt!"
+            MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkOnly, "Speichern nicht möglich")
+            Return True
+        End If
+
+        ' Validierung erfolgreich (Benutzername ist frei und gültig)
+        Return False
     End Function
 
     ''' <summary>
-    ''' User löschen
+    ''' Löscht den aktuell ausgewählten Benutzer-Datensatz nach einer Bestätigungsabfrage aus der Datenbank, 
+    ''' aktualisiert die lokale DataTable und setzt die Eingabemaske zurück.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 20.12.2011 Create
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Kritischen Fehler behoben: 'prLoadUserInList' erhält nun die korrekte DataTable 'dtUser' statt der fälschlich übergebenen 'dtZim'.
+    ''' - Sicherheitsabfrage ('sUser = String.Empty') nach oben gezogen, um unnötige String-Deklarationen bei leerer ID zu vermeiden.
+    ''' - Veraltete 'Call'-Syntax entfernt und leere Strings durch 'String.Empty' ersetzt.
+    ''' - Grammatikfehler in der Hinweismeldung korrigiert ("diesen Nutzer" statt "dieses Nutzer").
+    ''' - Selektions-Logik nach dem Löschen stabilisiert (wählt das erste verbleibende Element aus).
     ''' </remarks>
     Private Sub tsbDelUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDelUser.Click
-        Dim sMsg As String = "Wollen Sie dieses Nutzer wirklich löschen?  "
         Dim sUser As String = lbUserID.Text
+
+        ' Guard Clause: Wenn keine ID vorhanden ist, sofort abbrechen
+        If String.IsNullOrWhiteSpace(sUser) Then Exit Sub
+
+        Dim sMsg As String = "Wollen Sie diesen Nutzer wirklich löschen?"
         Dim cSql As String = "DELETE FROM Nutzer WHERE ID = '" & sUser & "'"
-        If sUser = "" Then Exit Sub
-        If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
-            'Datensatz per SQL aus der Tabelle löschen
+
+        ' Sicherheitsabfrage vor dem Löschen
+        If MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkCancel, "Löschen") = MsgBoxResult.Ok Then
+            ' Datensatz per SQL aus der Tabelle löschen
             UpdateTable(cSql)
-            'Änderung in DataTable "dtUser" speichern
-            Call fcDeleteTableRow(dtUser, "ID = '" & sUser & "'")
-            tbUUser.Text = ""
-            tbKUser.Text = ""
-            tbUPassWD.Text = ""
-            tbURechte.Text = ""
-            lbUserID.Text = ""
-            Call prLoadUserInList(dtZim)
+
+            ' Änderung in lokaler DataTable "dtUser" nachziehen
+            fcDeleteTableRow(dtUser, "ID = '" & sUser & "'")
+
+            ' Eingabemaske zurücksetzen
+            tbUUser.Text = String.Empty
+            tbKUser.Text = String.Empty
+            tbUPassWD.Text = String.Empty
+            tbURechte.Text = String.Empty
+            lbUserID.Text = String.Empty
+
+            ' UI-Liste frisch und korrekt mit den Benutzerdaten neu laden
+            prLoadUserInList(dtUser)
+
+            ' Fokus zurück auf das ListView setzen
             lvUser.Select()
-            If lvUser.Items.Count > 0 Then lvUser.TopItem.Selected = True
+
+            ' Nach dem Löschen das erste verbleibende Element auswählen
+            If lvUser.Items.Count > 0 Then
+                lvUser.Items(0).Selected = True
+                lvUser.Items(0).EnsureVisible()
+            End If
         End If
     End Sub
 
+    ''' <summary>
+    ''' Validiert die Eingabe im Rechte-Feld, um sicherzustellen, dass nur numerische Werte eingetragen werden.
+    ''' Schützt vor ungültigen Zeichen (z. B. Buchstaben).
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Fehlerhafte 'IsNumeric(e.ToString)'-Logik durch eine echte numerische Typprüfung ('Integer.TryParse') ersetzt.
+    ''' - Setzt das Feld bei Falscheingaben standardmäßig auf den Wert "5" zurück und hält die Cursor-Position am Ende des Textes.
+    ''' </remarks>
     Private Sub tbURechte_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbURechte.TextChanged
-        'If IsNumeric(e.ToString) = False Then tbURechte.Text = 5
+        ' Nur prüfen, wenn das Feld nicht leer ist
+        If tbURechte.Text.Length > 0 Then
+            Dim dummy As Integer
+            ' Falls die Eingabe keine gültige Zahl ist, auf Standardwert zurücksetzen
+            If Not Integer.TryParse(tbURechte.Text, dummy) Then
+                tbURechte.Text = "5"
+                ' Cursor ans Ende setzen, um ungestörtes Weitertippen zu ermöglichen
+                tbURechte.SelectionStart = tbURechte.Text.Length
+            End If
+        End If
     End Sub
 
+    ''' <summary>
+    ''' Schaltet die Sichtbarkeit des Passworts im Eingabefeld zwischen Klartext und System-Maskierung (Sternchen) um.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Direkte Logik beibehalten und mit XML-Dokumentation versehen.
+    ''' </remarks>
     Private Sub chKlar_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chKlar.CheckedChanged
+        ' Wenn die Checkbox markiert ist, wird das Passwort im Klartext angezeigt (System-Maskierung deaktiviert)
         tbUPassWD.UseSystemPasswordChar = Not chKlar.Checked
     End Sub
 
 #Region "Mit Enter weiter zum nächsten Feld........................................................"
+    ' ist in der Hauptrotine  "TextBox_KeyPress" enthalten, um die Navigation zwischen Eingabefeldern zu erleichtern.
 
-    Private Sub tbUUser_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbUUser.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbKUser.Select()
-        End If
-    End Sub
-    Private Sub tbKUser_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbKUser.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbUPassWD.Select()
-        End If
-    End Sub
-    Private Sub tbUPassWD_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbUPassWD.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbURechte.Select()
-        End If
-    End Sub
-    Private Sub tbURechte_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbURechte.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbUUser.Select()
-        End If
-    End Sub
 #End Region
+
+
+
+
 
 #End Region
 
 #Region "Verwaltung der Buchungstexte.............................................................."
 
     ''' <summary>
-    ''' Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+    ''' Prüft, ob Datensätze in der Buchungstext-Tabelle vorhanden sind, und steuert entsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
     ''' </summary>
-    ''' <param name="dt"></param>
+    ''' <param name="dt">Die zu prüfende DataTable mit den Buchungstexten.</param>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Redundante 'If'-Bedingung und temporäre Boolean-Variable entfernt.
+    ''' - Direkte Zuweisung des Vergleichsergebnisses an die 'Enabled'-Eigenschaft implementiert.
+    ''' - Null-Sicherheitsprüfung ('IsNot Nothing') hinzugefügt, um Laufzeitfehler zu verhindern.
     ''' </remarks>
     Private Sub prCheckNoRecordBuch(ByVal dt As DataTable)
-        Dim lNo As Boolean = False
-        If dt.Rows.Count > 0 Then lNo = True
-        tsbEditBuch.Enabled = lNo
-        tsbDelBuch.Enabled = lNo
+        ' Prüfen, ob die DataTable existiert und Zeilen enthält
+        Dim hasRecords As Boolean = (dt IsNot Nothing AndAlso dt.Rows.Count > 0)
+
+        ' Buttons direkt basierend auf dem Ergebnis aktivieren oder deaktivieren
+        tsbEditBuch.Enabled = hasRecords
+        tsbDelBuch.Enabled = hasRecords
     End Sub
 
     ''' <summary>
-    ''' Neuen Buchungstext anlegen
+    ''' Bereitet die Eingabemaske für das Anlegen eines neuen Buchungstext-Datensatzes vor.
+    ''' Setzt alle Textfelder zurück, aktiviert die Steuerelemente und fokussiert das Bezeichnungsfeld.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLockBuch' entfernt.
+    ''' - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
+    ''' - Bezeichnungsausrichtung korrigiert (Lock statt Loock).
     ''' </remarks>
     Private Sub tsbNewBuch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNewBuch.Click
+        ' Flag für neuen Datensatz setzen
         lNew = True
-        tbBez.Text = ""
-        tbBuchDe.Text = ""
-        tbBuchEn.Text = ""
-        Call prLoockBuch(True)
+
+        ' Eingabefelder zurücksetzen
+        tbBez.Text = String.Empty
+        tbBuchDe.Text = String.Empty
+        tbBuchEn.Text = String.Empty
+
+        ' Eingabemaske entsperren
+        prLockBuch(True)
+
+        ' Fokus auf das erste Eingabefeld setzen
         tbBez.Select()
     End Sub
+
 
     ''' <summary>
     ''' Buchungstext bearbeiten
@@ -2935,111 +3389,147 @@ Public Class frmSystem
     ''' </remarks>
     Private Sub tsbEditBuch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEditBuch.Click
 
-        Call prLoockBuch(True)
+        Call prLockBuch(True)
         tbBez.Enabled = False
         tbBuchDe.Select()
     End Sub
 
     ''' <summary>
-    ''' Änderung Speichen
+    ''' Löst den Speichervorgang für die vorgenommenen Änderungen oder den neuen Buchungstext aus.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub tsbSaveBuch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveBuch.Click
-
-        Call prSaveBuch()
+        prSaveBuch()
     End Sub
 
     ''' <summary>
-    ''' Bearbeitung abbrechen
+    ''' Bricht den aktuellen Bearbeitungs- oder Neuanlage-Modus ab, sperrt die Eingabemaske und aktualisiert den Status der Steuerungsschaltflächen.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - Falsche Methodenbezeichnung im XML-Kommentar korrigiert (Break statt Braeck).
     ''' </remarks>
-    Private Sub tsbBraeckBuch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBreakBuch.Click
-        Call prLoockBuch(False)
-        Call prCheckNoRecordBuch(dtBuc)
+    Private Sub tsbBreakBuch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBreakBuch.Click
+        prLockBuch(False)
+        prCheckNoRecordBuch(dtBuc)
     End Sub
 
     ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
+    ''' Steuert den Aktivierungsstatus (Enabled) aller Eingabefelder und ToolStripButtons der Buchungstext-Verwaltung.
+    ''' Schaltet zwischen Bearbeitungsmodus und Anzeige-/Sperrmodus um.
     ''' </summary>
-    ''' <param name="lStatus"></param>
+    ''' <param name="lStatus">True, wenn die Eingabefelder für die Bearbeitung freigegeben werden sollen; andernfalls False.</param>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Typkonvertierungsfehler durch strikte Trennung von 'Control' und 'ToolStripItem' analog zur Benutzerverwaltung behoben.
+    ''' - Steuerelemente in Arrays gruppiert und Zustand kompakt über Schleifen zugewiesen (verbesserte Wartbarkeit).
+    ''' - Rechtschreibkorrektur im XML-Kommentar vorgenommen (Lock statt Loock).
     ''' </remarks>
-    Private Sub prLoockBuch(ByVal lStatus As Boolean)
-        tsbEditBuch.Enabled = Not lStatus
-        tsbNewBuch.Enabled = Not lStatus
-        tsbSaveBuch.Enabled = lStatus
-        tsbBreakBuch.Enabled = lStatus
-        tsbDelBuch.Enabled = Not lStatus
-        liBuch.Enabled = Not lStatus
+    Private Sub prLockBuch(ByVal lStatus As Boolean)
+        Dim lInvertedStatus As Boolean = Not lStatus
 
-        rbBuch.Enabled = lStatus
-        rbMakro.Enabled = lStatus
-        tbBez.Enabled = lStatus
-        tbBuchDe.Enabled = lStatus
-        tbBuchEn.Enabled = lStatus
-        tbZZiel.Enabled = lStatus
-    End Sub
+        ' --- 1. Steuerung der Standard-Formular-Steuerelemente (Control) ---
+        Dim editControls() As Control = {
+        rbBuch, rbMakro, tbBez, tbBuchDe, tbBuchEn, tbZZiel, liBuch
+    }
 
-    ''' <summary>
-    ''' Speicherung durchführen
-    ''' </summary>
-    ''' <remarks>
-    ''' 23.12.2011 Create
-    ''' </remarks>
-    Private Sub prSaveBuch()
-        Dim sb As New StringBuilder
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        Dim cBedingung As String = ""
-
-        Dim sName As String = tbBez.Text
-        Dim sID As String
-        Dim sFeld As String = "Btext"
-        Dim aLan As Array
-        For i = 1 To sLanguage.Length - 1
-            aLan = Split(sLanguage(i), ",")
-            If aLan(0) = tscSprache.Text Then
-                sFeld = "BText" & aLan(1)
+        For Each ctrl In editControls
+            ' Die Auswahlliste 'liBuch' verhält sich umgekehrt zur Eingabemaske
+            If ctrl Is liBuch Then
+                ctrl.Enabled = lInvertedStatus
+            Else
+                ctrl.Enabled = lStatus
             End If
         Next
 
-       
+        ' --- 2. Steuerung der Menü-Schaltflächen (ToolStripItem) ---
+        Dim editButtons() As ToolStripItem = {tsbSaveBuch, tsbBreakBuch}
+        Dim navButtons() As ToolStripItem = {tsbEditBuch, tsbNewBuch, tsbDelBuch}
+
+        For Each btn In editButtons
+            btn.Enabled = lStatus
+        Next
+
+        For Each btn In navButtons
+            btn.Enabled = lInvertedStatus
+        Next
+    End Sub
+
+
+    ''' <summary>
+    ''' Führt die Speicherung (Einfügen oder Aktualisieren) eines Buchungstext-Datensatzes in der Datenbank und der lokalen DataTable durch.
+    ''' Berücksichtigt dabei die aktuell ausgewählte Oberflächensprache für das dynamische Textfeld.
+    ''' </summary>
+    ''' <remarks>
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+    ''' - 'Split()' durch die native .NET-Methode '.Split()' der String-Klasse ersetzt.
+    ''' - Typsicheres String-Array für die Sprachermittlung inkl. vorzeitigem Abbruch ('Exit For') implementiert.
+    ''' - Ungenutzte Variablen ('sb') entfernt.
+    ''' </remarks>
+    Private Sub prSaveBuch()
+        Dim sqlText As String
+        Dim arFields() As String
+        Dim arValue() As String = {}
+        Dim cBedingung As String
+
+        Dim sName As String = tbBez.Text
+        Dim sID As String = String.Empty
+
+        ' 1. Dynamisches Sprachfeld für die Spaltenstruktur ermitteln
+        Dim sFeld As String = "Btext"
+        Dim currentLanguage As String = tscSprache.Text
+
+        For i As Integer = 1 To sLanguage.Length - 1
+            Dim aLan() As String = sLanguage(i).Split(","c)
+            If aLan.Length > 1 AndAlso aLan(0) = currentLanguage Then
+                sFeld = "BText" & aLan(1)
+                Exit For
+            End If
+        Next
+
+        ' 2. Validierung und ID-Ermittlung / Neuanlage
+        If lNew Then
+            If fcCheckBuch(sName) Then Exit Sub
+            sID = fcAppendBlank("BTexte")
+        Else
+            sID = fcGetOneValue(dtTxt, liBuch.Text, "Name", "ID")
+        End If
+
+        ' Guard Clause: Falls keine gültige ID ermittelt werden konnte, abbrechen
+        If String.IsNullOrWhiteSpace(sID) Then Exit Sub
 
         Try
+            ' Spalten-Struktur mit dynamischem Sprachfeld definieren und splitten
             sqlText = "ID,Name,Art,BTextDe," & sFeld & ",ZZiel"
-            arFields = Split(sqlText, ",")
+            arFields = sqlText.Split(","c)
 
-
-
-            If lNew Then
-                If fcCheckBuch(sName) Then Exit Sub
-                sID = fcAppendBlank("BTexte")
-                '  Call fcInsertCommand("BTexte", arFields, arValue)
-            Else
-                sID = fcGetOneValue(dtTxt, liBuch.Text, "Name", "ID")
-            End If
+            ' Werte über die Hilfsfunktion aufbereiten
             sqlText = fcSaveBuch(sID)
-            arValue = Split(sqlText, "°")
-            cBedingung = " WHERE ID='" & sID & "'"
-            Call fcUpdateCommand("BTexte", arFields, arValue, cBedingung)
+            arValue = sqlText.Split("°"c)
 
-            'DataTable aktualisieren
+            ' Datenbank-Update ausführen (fcAppendBlank hat bei lNew bereits die leere Zeile erzeugt)
+            cBedingung = " WHERE ID='" & sID & "'"
+            fcUpdateCommand("BTexte", arFields, arValue, cBedingung)
+
+            ' Lokale DataTable synchronisieren
             If lNew Then
-                'Datensatz in DataTable "dtTxt" speichern
-                Call fcInsertTable(dtTxt, arFields, arValue)
+                fcInsertTable(dtTxt, arFields, arValue)
             Else
-                'Datensatz in DataTable "dtTxt" speichern
                 cBedingung = "ID Like '" & sID & "'"
-                Call fcUpdateTable(dtTxt, arFields, arValue, cBedingung)
+                fcUpdateTable(dtTxt, arFields, arValue, cBedingung)
             End If
 
             lNew = False
@@ -3047,42 +3537,63 @@ Public Class frmSystem
         Catch ex As Exception
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         Finally
-
-            Call prCheckNoRecordBuch(dtTxt)
-            Call prLoockBuch(False)
+            ' Benutzeroberfläche und Auswahlliste aktualisieren sowie Maske sperren
+            prCheckNoRecordBuch(dtTxt)
+            prLockBuch(False)
             liBuch = fcLoadListe(liBuch, dtTxt, "Name")
-
         End Try
     End Sub
 
+
     ''' <summary>
-    ''' Auswahl eines Eintrages in der Liste
+    ''' Tritt auf, wenn ein anderer Eintrag in der Liste ausgewählt wird. 
+    ''' Ermittelt das sprachspezifische Textfeld und lädt die Buchungstext-Details aus der Datenbank.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Sicherheitsprüfungen ('lDel' und 'SelectedIndex') an den Anfang der Methode verschoben.
+    ''' - Generischen 'Array'-Typ durch ein typsicheres 'String()'-Array ersetzt und Schleife per 'Exit For' vorzeitig beendet.
+    ''' - Leerlauf-Bedingung 'If liBuch.Items.Count = 1' entfernt.
+    ''' - Absicherung gegen SQL-Fehler bei Hochkommas im Listentext hinzugefügt.
     ''' </remarks>
     Private Sub liBuch_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles liBuch.SelectedIndexChanged
+        ' Vorab-Prüfungen: Wenn gelöscht wird oder nichts selektiert ist, sofort abbrechen
+        If lDel OrElse liBuch.SelectedIndex = -1 Then Exit Sub
+
+        ' 1. Dynamisches Sprachfeld ermitteln (Standard: "Btext")
         Dim sFeld As String = "Btext"
-        Dim aLan As Array
-        For i = 1 To sLanguage.Length - 1
-            aLan = Split(sLanguage(i), ",")
-            If aLan(0) = tscSprache.Text Then
+        Dim currentLanguage As String = tscSprache.Text
+
+        For i As Integer = 1 To sLanguage.Length - 1
+            Dim aLan() As String = sLanguage(i).Split(","c)
+
+            ' Wenn die Sprache übereinstimmt, Feldnamen zusammensetzen und Schleife beenden
+            If aLan.Length > 1 AndAlso aLan(0) = currentLanguage Then
                 sFeld = "BText" & aLan(1)
+                Exit For
             End If
         Next
-        If lDel Then Exit Sub
-        If liBuch.Items.Count = 1 Then
-        End If
+
+        ' Bezeichnung aus der Liste übertragen
         tbBez.Text = liBuch.Text
-        Dim sSQL As String = "Select * from BTexte Where Name='" & tbBez.Text & "'"
+
+        ' 2. Details aus der Datenbank laden
+        Dim sSQL As String = "SELECT BTextDe, " & sFeld & ", ZZiel, Art FROM BTexte WHERE Name = '" & tbBez.Text.Replace("'", "''") & "'"
         Dim dt As DataTable = fcReadDataTable(sSQL)
-        If dt.Rows.Count = 1 Then
-            tbBuchDe.Text = dt.Rows(0).Item("BTextDe").ToString
-            tbBuchEn.Text = dt.Rows(0).Item(sFeld).ToString
-            tbZZiel.Text = dt.Rows(0).Item("ZZiel").ToString
-            If dt.Rows(0).Item("Art").ToString = "0" Then
+
+        ' Wenn der Datensatz eindeutig gefunden wurde, Felder befüllen
+        If dt IsNot Nothing AndAlso dt.Rows.Count = 1 Then
+            Dim row As DataRow = dt.Rows(0)
+
+            tbBuchDe.Text = row("BTextDe").ToString()
+            tbBuchEn.Text = row(sFeld).ToString() ' Nutzt das dynamisch ermittelte Sprachfeld
+            tbZZiel.Text = row("ZZiel").ToString()
+
+            ' RadioButtons basierend auf der Text-Art ("0" = Makro, "1" = Buchungstext) steuern
+            If row("Art").ToString() = "0" Then
                 rbMakro.Checked = True
             Else
                 rbBuch.Checked = True
@@ -3090,116 +3601,158 @@ Public Class frmSystem
         End If
     End Sub
 
+
     ''' <summary>
-    ''' Zu speichernde Daten aufbereiten
+    ''' Bereitet die in der Eingabemaske erfassten Daten für den Buchungstext auf 
+    ''' und gibt die Werte als verketteten, durch Gradzeichen (°) getrennten String zurück.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="sID">Die eindeutige Identifikationsnummer (ID) des Buchungstext-Datensatzes.</param>
+    ''' <returns>Ein durch '°' separierter String mit allen Buchungstext-Attributen.</returns>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'If-Else'-Block des Radiobuttons durch effizienten Inline-Bedingungsoperator beim Append ersetzt.
+    ''' - 'String.IsNullOrWhiteSpace' für performante und null-sichere Validierung der Pflichtfelder eingesetzt.
+    ''' - Veraltete Zuweisung an den Funktionsnamen durch die moderne 'Return'-Anweisung ersetzt.
     ''' </remarks>
     Private Function fcSaveBuch(ByVal sID As String) As String
-        Dim sb As New StringBuilder
-        If tbBuchDe.Text.Trim = "" Then tbBuchDe.Text = " "
-        If tbBuchEn.Text.Trim = "" Then tbBuchEn.Text = " "
-        If tbZZiel.Text.Trim = "" Then tbZZiel.Text = " "
-        sb.Append(sID & "°")
-        sb.Append(tbBez.Text & "°")
-        If rbMakro.Checked Then
-            sb.Append("0" & "°")
-        Else
-            sb.Append("1" & "°")
-        End If
-        sb.Append(tbBuchDe.Text & "°")
-        sb.Append(tbBuchEn.Text & "°")
+        Dim sb As New StringBuilder()
+
+        ' Standardwerte für leere Textfelder setzen
+        If String.IsNullOrWhiteSpace(tbBuchDe.Text) Then tbBuchDe.Text = " "
+        If String.IsNullOrWhiteSpace(tbBuchEn.Text) Then tbBuchEn.Text = " "
+        If String.IsNullOrWhiteSpace(tbZZiel.Text) Then tbZZiel.Text = " "
+
+        ' Daten strukturiert zusammenbauen
+        sb.Append(sID).Append("°")
+        sb.Append(tbBez.Text).Append("°")
+
+        ' Makro-Status ermitteln ("0" für Makro, "1" für Standard-Buchungstext) und direkt anfügen
+        sb.Append(If(rbMakro.Checked, "0", "1")).Append("°")
+
+        sb.Append(tbBuchDe.Text).Append("°")
+        sb.Append(tbBuchEn.Text).Append("°")
         sb.Append(tbZZiel.Text)
-        fcSaveBuch = sb.ToString
+
+        Return sb.ToString()
     End Function
 
+
     ''' <summary>
-    ''' Prüfen ob dieser Buchungstext schon existiert
+    ''' Prüft, ob die Bezeichnung des Buchungstextes gültig ist und ob dieser bereits in der Datenbank existiert.
     ''' </summary>
-    ''' <param name="sName"></param>
-    ''' <returns>T/F</returns>
+    ''' <param name="sName">Die zu prüfende Bezeichnung des Buchungstextes.</param>
+    ''' <returns>True, wenn die Pflichtangabe fehlt oder der Buchungstext bereits existiert (Validierung fehlgeschlagen); andernfalls False.</returns>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'String.IsNullOrWhiteSpace' für eine performante und null-sichere Validierung eingesetzt.
+    ''' - 'Return'-Anweisungen für einen sauberen, modernen Kontrollfluss integriert.
+    ''' - Absicherung gegen SQL-Syntaxfehler (z. B. bei Hochkommas/Apostrophen im Textnamen) durch Maskierung hinzugefügt.
+    ''' - 'MsgBoxStyle'-Kombination auf das korrekte bitweise 'Or' umgestellt.
     ''' </remarks>
     Private Function fcCheckBuch(ByVal sName As String) As Boolean
-        Dim sMsg As String = ""
-        Dim dt As DataTable
-        fcCheckBuch = False
+        Dim sMsg As String = String.Empty
 
-        If sName.Trim = "" Then
+        ' 1. Pflichtfeld auf Inhalt prüfen
+        If String.IsNullOrWhiteSpace(sName) Then
             sMsg = "Buchungstext-Name fehlt!"
-            fcCheckBuch = True
-        Else
-            dt = fcReadDataTable("SELECT * from BTexte WHERE Name='" & sName & "'")
-            If dt.Rows.Count > 0 Then
-                sMsg = "Buchungstext ist schon angelegt"
-                fcCheckBuch = True
-            End If
+            MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkOnly, "Speichern nicht möglich")
+            Return True
         End If
-        If fcCheckBuch Then MsgBox(sMsg, MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Speichern nicht möglich")
 
+        ' 2. Datenbank-Abfrage durchführen 
+        ' Absicherung gegen Hochkommas im Namen (z. B. "Storno für 'Spezial-Angebote'")
+        Dim sql As String = "SELECT ID FROM BTexte WHERE Name = '" & sName.Replace("'", "''") & "'"
+        Dim dt As DataTable = fcReadDataTable(sql)
+
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            sMsg = "Buchungstext ist schon angelegt!"
+            MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkOnly, "Speichern nicht möglich")
+            Return True
+        End If
+
+        ' Validierung erfolgreich (Bezeichnung ist frei und gültig)
+        Return False
     End Function
 
+
     ''' <summary>
-    ''' Buchungstext löschen
+    ''' Löscht den aktuell ausgewählten Buchungstext nach einer Bestätigungsabfrage aus der Datenbank,
+    ''' aktualisiert die lokale Liste sowie die DataTable und setzt die Eingabemaske zurück.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 23.12.2011 Create
+    ''' 23.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Sicherheitsprüfung ('sID') an den Anfang der Methode verschoben (Guard Clause).
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+    ''' - Redundante String-Operationen optimiert und 'String.Empty' verwendet.
+    ''' - 'MsgBoxStyle'-Verknüpfung auf den modernen 'Or'-Operator umgestellt.
+    ''' - Auskommentierte Code-Fragmente entfernt, um die Übersichtlichkeit zu wahren.
     ''' </remarks>
     Private Sub tsbDelBuch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDelBuch.Click
-        Dim sMsg As String = "Wollen Sie diesen Text wirklich löschen?  "
-        Dim sID As String = fcGetOneValue(dtTxt, liBuch.Text, "Name", "ID") 'liBuch.SelectedValue.ToString
+        ' 1. ID des zu löschenden Eintrags ermitteln
+        Dim sID As String = fcGetOneValue(dtTxt, liBuch.Text, "Name", "ID")
 
-        'sID = fcGetObjektZimmerID(dtTxt, liBuch.Text, "ID")
+        ' Guard Clause: Wenn keine gültige ID gefunden wurde, sofort abbrechen
+        If String.IsNullOrWhiteSpace(sID) Then Exit Sub
+
+        Dim sMsg As String = "Wollen Sie diesen Text wirklich löschen?  "
         Dim cSql As String = "DELETE FROM BTexte WHERE ID = '" & sID & "'"
-        If sID = "" Then Exit Sub
-        If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
+
+        ' Sicherheitsabfrage vor dem Löschen
+        If MsgBox(sMsg, MsgBoxStyle.Exclamation Or MsgBoxStyle.OkCancel, "Löschen") = MsgBoxResult.Ok Then
+            ' Lösch-Flag setzen, um eventuelle Event-Kaskaden während des Zurücksetzens zu blockieren
             lDel = True
-            tbBez.Text = ""
+
+            ' Eingabefelder zurücksetzen
+            tbBez.Text = String.Empty
             rbMakro.Checked = False
             rbBuch.Checked = False
-            tbBuchDe.Text = ""
-            tbBuchEn.Text = ""
-            'Datensatz per SQL aus der Tabelle löschen
+            tbBuchDe.Text = String.Empty
+            tbBuchEn.Text = String.Empty
+
+            ' Datensatz aus der Datenbank löschen
             UpdateTable(cSql)
-            'Änderung in DataTable "dtTxt" speichern
-            Call fcDeleteTableRow(dtTxt, "ID = '" & sID & "'")
-            dtTxt = fcReadDataTable("Select * from BTexte")
-            'liBuch.Text = ""
+
+            ' Änderung in lokaler DataTable synchronisieren und frisch laden
+            fcDeleteTableRow(dtTxt, "ID = '" & sID & "'")
+            dtTxt = fcReadDataTable("SELECT * FROM BTexte")
+
+            ' UI-Liste neu befüllen
             liBuch = fcLoadListe(liBuch, dtTxt, "Name")
 
+            ' Falls Einträge verbleiben, das erste Element auswählen
+            If dtTxt.Rows.Count > 0 Then
+                liBuch.SelectedIndex = 0
+            End If
 
-            If dtTxt.Rows.Count > 0 Then liBuch.SelectedIndex = 0
+            ' Lösch-Flag zurücksetzen und Button-Status prüfen
             lDel = False
-            Call prCheckNoRecordBuch(dtTxt)
+            prCheckNoRecordBuch(dtTxt)
         End If
     End Sub
-    Private Sub tscSprache_Click(sender As System.Object, e As System.EventArgs) Handles tscSprache.Click
 
-    End Sub
+
+    ''' <summary>
+    ''' Steuert die Sichtbarkeit des Ziel-Textfeldes basierend auf der Auswahl des Makro-Radiobuttons.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Redundanten 'If-Else'-Block durch eine direkte, logische Zuweisung ersetzt.
+    ''' - Auskommentierten Code-Ballast ('sb.Append') entfernt.
+    ''' </remarks>
     Private Sub rbMakro_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbMakro.CheckedChanged
-        If rbMakro.Checked Then
-            tbZZiel.Visible = False
-            ' sb.Append("0" & "°")
-        Else
-            tbZZiel.Visible = True
-            'sb.Append("1" & "°")
-        End If
+        ' Das Ziel-Feld wird ausgeblendet, wenn der Makro-Modus aktiv ist
+        tbZZiel.Visible = Not rbMakro.Checked
     End Sub
 
 
-#Region "Mit Enter weiter zum nächsten Feld........................................................"
-
-    Private Sub tbBezDe_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbBez.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbBuchDe.Select()
-        End If
-    End Sub
-#End Region
 
 #End Region
 

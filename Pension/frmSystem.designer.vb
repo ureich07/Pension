@@ -59,28 +59,8 @@ Partial Class frmSystem
         Me.lbSMTP = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.tpAnschrift = New System.Windows.Forms.TabPage()
+        Me.gbBasisdaten = New System.Windows.Forms.GroupBox()
         Me.gpDir = New System.Windows.Forms.GroupBox()
-        Me.tbGKSatz4 = New System.Windows.Forms.TextBox()
-        Me.tbGKSatz3 = New System.Windows.Forms.TextBox()
-        Me.tbMwstSatz4 = New System.Windows.Forms.TextBox()
-        Me.tbMwstSatz3 = New System.Windows.Forms.TextBox()
-        Me.Label76 = New System.Windows.Forms.Label()
-        Me.Label75 = New System.Windows.Forms.Label()
-        Me.Label74 = New System.Windows.Forms.Label()
-        Me.Label73 = New System.Windows.Forms.Label()
-        Me.Label72 = New System.Windows.Forms.Label()
-        Me.tbGKSatz2 = New System.Windows.Forms.TextBox()
-        Me.tbMwstSatz2 = New System.Windows.Forms.TextBox()
-        Me.Label71 = New System.Windows.Forms.Label()
-        Me.lbRFIDPort = New System.Windows.Forms.Label()
-        Me.lbIPSchloss = New System.Windows.Forms.Label()
-        Me.lbNetUser = New System.Windows.Forms.Label()
-        Me.tbRFIDPort = New System.Windows.Forms.TextBox()
-        Me.tbIPSchloss = New System.Windows.Forms.TextBox()
-        Me.tbNetUser = New System.Windows.Forms.TextBox()
-        Me.Label67 = New System.Windows.Forms.Label()
-        Me.Label66 = New System.Windows.Forms.Label()
-        Me.Label65 = New System.Windows.Forms.Label()
         Me.tbDatevDir = New System.Windows.Forms.TextBox()
         Me.lbDatevDir = New System.Windows.Forms.Label()
         Me.cmdDatevDir = New System.Windows.Forms.Button()
@@ -93,18 +73,29 @@ Partial Class frmSystem
         Me.Label1 = New System.Windows.Forms.Label()
         Me.cmdAblageDir = New System.Windows.Forms.Button()
         Me.Label5 = New System.Windows.Forms.Label()
-        Me.gbBasisdaten = New System.Windows.Forms.GroupBox()
         Me.gbSteuer = New System.Windows.Forms.Panel()
+        Me.tbGKSatz4 = New System.Windows.Forms.TextBox()
         Me.tbGKS = New System.Windows.Forms.TextBox()
+        Me.tbGKSatz3 = New System.Windows.Forms.TextBox()
+        Me.Label76 = New System.Windows.Forms.Label()
         Me.lbGKS = New System.Windows.Forms.Label()
+        Me.Label75 = New System.Windows.Forms.Label()
+        Me.tbMwstSatz4 = New System.Windows.Forms.TextBox()
+        Me.Label72 = New System.Windows.Forms.Label()
         Me.Label70 = New System.Windows.Forms.Label()
+        Me.tbGKSatz2 = New System.Windows.Forms.TextBox()
+        Me.tbMwstSatz3 = New System.Windows.Forms.TextBox()
         Me.tbGetr = New System.Windows.Forms.TextBox()
         Me.tbGK19 = New System.Windows.Forms.TextBox()
+        Me.Label74 = New System.Windows.Forms.Label()
         Me.lbGK19 = New System.Windows.Forms.Label()
+        Me.Label73 = New System.Windows.Forms.Label()
         Me.lbGetr = New System.Windows.Forms.Label()
         Me.Label69 = New System.Windows.Forms.Label()
         Me.tbMwst3 = New System.Windows.Forms.TextBox()
+        Me.tbMwstSatz2 = New System.Windows.Forms.TextBox()
         Me.Label63 = New System.Windows.Forms.Label()
+        Me.Label71 = New System.Windows.Forms.Label()
         Me.lbMwst3 = New System.Windows.Forms.Label()
         Me.lbGK7 = New System.Windows.Forms.Label()
         Me.tbGK7 = New System.Windows.Forms.TextBox()
@@ -123,13 +114,22 @@ Partial Class frmSystem
         Me.tbWeb = New System.Windows.Forms.TextBox()
         Me.lbWeb = New System.Windows.Forms.Label()
         Me.gpDiverses = New System.Windows.Forms.GroupBox()
+        Me.lbRFIDPort = New System.Windows.Forms.Label()
+        Me.tbRFIDPort = New System.Windows.Forms.TextBox()
         Me.tbRNr = New System.Windows.Forms.TextBox()
+        Me.Label67 = New System.Windows.Forms.Label()
+        Me.lbIPSchloss = New System.Windows.Forms.Label()
         Me.lbRNr = New System.Windows.Forms.Label()
+        Me.tbIPSchloss = New System.Windows.Forms.TextBox()
+        Me.lbNetUser = New System.Windows.Forms.Label()
         Me.tbBK = New System.Windows.Forms.TextBox()
         Me.lbBK = New System.Windows.Forms.Label()
+        Me.tbNetUser = New System.Windows.Forms.TextBox()
         Me.Label59 = New System.Windows.Forms.Label()
         Me.tbKK = New System.Windows.Forms.TextBox()
+        Me.Label66 = New System.Windows.Forms.Label()
         Me.lbKK = New System.Windows.Forms.Label()
+        Me.Label65 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.tbUStID = New System.Windows.Forms.TextBox()
         Me.lbUStID = New System.Windows.Forms.Label()
@@ -505,8 +505,8 @@ Partial Class frmSystem
         Me.tpEMail.SuspendLayout()
         Me.gpEMail.SuspendLayout()
         Me.tpAnschrift.SuspendLayout()
-        Me.gpDir.SuspendLayout()
         Me.gbBasisdaten.SuspendLayout()
+        Me.gpDir.SuspendLayout()
         Me.gbSteuer.SuspendLayout()
         Me.gpDiverses.SuspendLayout()
         Me.tcSystem.SuspendLayout()
@@ -633,7 +633,7 @@ Partial Class frmSystem
         Me.tpEMail.Controls.Add(Me.gpEMail)
         Me.tpEMail.Location = New System.Drawing.Point(4, 22)
         Me.tpEMail.Name = "tpEMail"
-        Me.tpEMail.Size = New System.Drawing.Size(1053, 490)
+        Me.tpEMail.Size = New System.Drawing.Size(1053, 567)
         Me.tpEMail.TabIndex = 2
         Me.tpEMail.Text = "E-Mail"
         Me.tpEMail.UseVisualStyleBackColor = True
@@ -935,6 +935,42 @@ Partial Class frmSystem
         Me.tpAnschrift.Text = "Basisdaten"
         Me.tpAnschrift.UseVisualStyleBackColor = True
         '
+        'gbBasisdaten
+        '
+        Me.gbBasisdaten.Controls.Add(Me.gpDir)
+        Me.gbBasisdaten.Controls.Add(Me.gbSteuer)
+        Me.gbBasisdaten.Controls.Add(Me.Label58)
+        Me.gbBasisdaten.Controls.Add(Me.tbWeb)
+        Me.gbBasisdaten.Controls.Add(Me.lbWeb)
+        Me.gbBasisdaten.Controls.Add(Me.gpDiverses)
+        Me.gbBasisdaten.Controls.Add(Me.tbTel4)
+        Me.gbBasisdaten.Controls.Add(Me.lbTel4)
+        Me.gbBasisdaten.Controls.Add(Me.tbTel3)
+        Me.gbBasisdaten.Controls.Add(Me.lbTel3)
+        Me.gbBasisdaten.Controls.Add(Me.tbTel2)
+        Me.gbBasisdaten.Controls.Add(Me.lbTel2)
+        Me.gbBasisdaten.Controls.Add(Me.tbTel1)
+        Me.gbBasisdaten.Controls.Add(Me.lbTel1)
+        Me.gbBasisdaten.Controls.Add(Me.Label9)
+        Me.gbBasisdaten.Controls.Add(Me.tbOrt)
+        Me.gbBasisdaten.Controls.Add(Me.lbOrt)
+        Me.gbBasisdaten.Controls.Add(Me.tbPLZ)
+        Me.gbBasisdaten.Controls.Add(Me.lbPLZ)
+        Me.gbBasisdaten.Controls.Add(Me.tbStrasse)
+        Me.gbBasisdaten.Controls.Add(Me.lbStrasse)
+        Me.gbBasisdaten.Controls.Add(Me.tbFirma)
+        Me.gbBasisdaten.Controls.Add(Me.lbFirma)
+        Me.gbBasisdaten.Controls.Add(Me.lbLabelOrt)
+        Me.gbBasisdaten.Controls.Add(Me.lbLabelPLZ)
+        Me.gbBasisdaten.Controls.Add(Me.lbLabelStr)
+        Me.gbBasisdaten.Controls.Add(Me.lbLabelGebName)
+        Me.gbBasisdaten.Location = New System.Drawing.Point(15, 18)
+        Me.gbBasisdaten.Name = "gbBasisdaten"
+        Me.gbBasisdaten.Size = New System.Drawing.Size(934, 494)
+        Me.gbBasisdaten.TabIndex = 36
+        Me.gbBasisdaten.TabStop = False
+        Me.gbBasisdaten.Text = "Anschrift / Diverses"
+        '
         'gpDir
         '
         Me.gpDir.Controls.Add(Me.tbDatevDir)
@@ -955,186 +991,6 @@ Partial Class frmSystem
         Me.gpDir.TabIndex = 39
         Me.gpDir.TabStop = False
         Me.gpDir.Text = "Verzeichnisse"
-        '
-        'tbGKSatz4
-        '
-        Me.tbGKSatz4.Location = New System.Drawing.Point(193, 246)
-        Me.tbGKSatz4.Name = "tbGKSatz4"
-        Me.tbGKSatz4.Size = New System.Drawing.Size(198, 20)
-        Me.tbGKSatz4.TabIndex = 105
-        '
-        'tbGKSatz3
-        '
-        Me.tbGKSatz3.Location = New System.Drawing.Point(192, 220)
-        Me.tbGKSatz3.Name = "tbGKSatz3"
-        Me.tbGKSatz3.Size = New System.Drawing.Size(199, 20)
-        Me.tbGKSatz3.TabIndex = 104
-        '
-        'tbMwstSatz4
-        '
-        Me.tbMwstSatz4.Location = New System.Drawing.Point(193, 156)
-        Me.tbMwstSatz4.Name = "tbMwstSatz4"
-        Me.tbMwstSatz4.Size = New System.Drawing.Size(198, 20)
-        Me.tbMwstSatz4.TabIndex = 103
-        '
-        'tbMwstSatz3
-        '
-        Me.tbMwstSatz3.Location = New System.Drawing.Point(193, 130)
-        Me.tbMwstSatz3.Name = "tbMwstSatz3"
-        Me.tbMwstSatz3.Size = New System.Drawing.Size(198, 20)
-        Me.tbMwstSatz3.TabIndex = 102
-        '
-        'Label76
-        '
-        Me.Label76.AutoSize = True
-        Me.Label76.Location = New System.Drawing.Point(10, 249)
-        Me.Label76.Name = "Label76"
-        Me.Label76.Size = New System.Drawing.Size(107, 13)
-        Me.Label76.TabIndex = 101
-        Me.Label76.Text = "GKontosatz 4 Ü/S/G"
-        '
-        'Label75
-        '
-        Me.Label75.AutoSize = True
-        Me.Label75.Location = New System.Drawing.Point(10, 223)
-        Me.Label75.Name = "Label75"
-        Me.Label75.Size = New System.Drawing.Size(107, 13)
-        Me.Label75.TabIndex = 100
-        Me.Label75.Text = "GKontosatz 3 Ü/S/G"
-        '
-        'Label74
-        '
-        Me.Label74.AutoSize = True
-        Me.Label74.Location = New System.Drawing.Point(10, 159)
-        Me.Label74.Name = "Label74"
-        Me.Label74.Size = New System.Drawing.Size(132, 13)
-        Me.Label74.TabIndex = 99
-        Me.Label74.Text = "Mwstsatz 4 Ü/S/G/Datum"
-        '
-        'Label73
-        '
-        Me.Label73.AutoSize = True
-        Me.Label73.Location = New System.Drawing.Point(10, 133)
-        Me.Label73.Name = "Label73"
-        Me.Label73.Size = New System.Drawing.Size(132, 13)
-        Me.Label73.TabIndex = 98
-        Me.Label73.Text = "Mwstsatz 3 Ü/S/G/Datum"
-        '
-        'Label72
-        '
-        Me.Label72.AutoSize = True
-        Me.Label72.Location = New System.Drawing.Point(10, 194)
-        Me.Label72.Name = "Label72"
-        Me.Label72.Size = New System.Drawing.Size(104, 13)
-        Me.Label72.TabIndex = 97
-        Me.Label72.Text = "GKontsatz 2  Ü/S/G"
-        '
-        'tbGKSatz2
-        '
-        Me.tbGKSatz2.Location = New System.Drawing.Point(192, 190)
-        Me.tbGKSatz2.Name = "tbGKSatz2"
-        Me.tbGKSatz2.Size = New System.Drawing.Size(199, 20)
-        Me.tbGKSatz2.TabIndex = 96
-        '
-        'tbMwstSatz2
-        '
-        Me.tbMwstSatz2.Location = New System.Drawing.Point(193, 104)
-        Me.tbMwstSatz2.Name = "tbMwstSatz2"
-        Me.tbMwstSatz2.Size = New System.Drawing.Size(198, 20)
-        Me.tbMwstSatz2.TabIndex = 95
-        '
-        'Label71
-        '
-        Me.Label71.AutoSize = True
-        Me.Label71.Location = New System.Drawing.Point(10, 104)
-        Me.Label71.Name = "Label71"
-        Me.Label71.Size = New System.Drawing.Size(132, 13)
-        Me.Label71.TabIndex = 94
-        Me.Label71.Text = "Mwstsatz 2 Ü/S/G/Datum"
-        '
-        'lbRFIDPort
-        '
-        Me.lbRFIDPort.BackColor = System.Drawing.Color.White
-        Me.lbRFIDPort.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.lbRFIDPort.Location = New System.Drawing.Point(89, 291)
-        Me.lbRFIDPort.Name = "lbRFIDPort"
-        Me.lbRFIDPort.Size = New System.Drawing.Size(42, 20)
-        Me.lbRFIDPort.TabIndex = 93
-        Me.lbRFIDPort.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'lbIPSchloss
-        '
-        Me.lbIPSchloss.BackColor = System.Drawing.Color.White
-        Me.lbIPSchloss.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.lbIPSchloss.Location = New System.Drawing.Point(88, 262)
-        Me.lbIPSchloss.Name = "lbIPSchloss"
-        Me.lbIPSchloss.Size = New System.Drawing.Size(143, 20)
-        Me.lbIPSchloss.TabIndex = 92
-        Me.lbIPSchloss.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'lbNetUser
-        '
-        Me.lbNetUser.BackColor = System.Drawing.Color.White
-        Me.lbNetUser.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.lbNetUser.Location = New System.Drawing.Point(88, 232)
-        Me.lbNetUser.Name = "lbNetUser"
-        Me.lbNetUser.Size = New System.Drawing.Size(147, 20)
-        Me.lbNetUser.TabIndex = 91
-        Me.lbNetUser.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'tbRFIDPort
-        '
-        Me.tbRFIDPort.ForeColor = System.Drawing.Color.Blue
-        Me.tbRFIDPort.Location = New System.Drawing.Point(89, 291)
-        Me.tbRFIDPort.Name = "tbRFIDPort"
-        Me.tbRFIDPort.Size = New System.Drawing.Size(42, 20)
-        Me.tbRFIDPort.TabIndex = 90
-        Me.tbRFIDPort.Visible = False
-        '
-        'tbIPSchloss
-        '
-        Me.tbIPSchloss.ForeColor = System.Drawing.Color.Blue
-        Me.tbIPSchloss.Location = New System.Drawing.Point(88, 262)
-        Me.tbIPSchloss.Name = "tbIPSchloss"
-        Me.tbIPSchloss.Size = New System.Drawing.Size(143, 20)
-        Me.tbIPSchloss.TabIndex = 89
-        Me.tbIPSchloss.Visible = False
-        '
-        'tbNetUser
-        '
-        Me.tbNetUser.ForeColor = System.Drawing.Color.Blue
-        Me.tbNetUser.Location = New System.Drawing.Point(88, 233)
-        Me.tbNetUser.Name = "tbNetUser"
-        Me.tbNetUser.Size = New System.Drawing.Size(147, 20)
-        Me.tbNetUser.TabIndex = 88
-        Me.tbNetUser.Visible = False
-        '
-        'Label67
-        '
-        Me.Label67.AutoSize = True
-        Me.Label67.Location = New System.Drawing.Point(6, 292)
-        Me.Label67.Name = "Label67"
-        Me.Label67.Size = New System.Drawing.Size(54, 13)
-        Me.Label67.TabIndex = 87
-        Me.Label67.Text = "RFID Port"
-        '
-        'Label66
-        '
-        Me.Label66.AutoSize = True
-        Me.Label66.Location = New System.Drawing.Point(4, 265)
-        Me.Label66.Name = "Label66"
-        Me.Label66.Size = New System.Drawing.Size(53, 13)
-        Me.Label66.TabIndex = 86
-        Me.Label66.Text = "IP Schloß"
-        '
-        'Label65
-        '
-        Me.Label65.AutoSize = True
-        Me.Label65.Location = New System.Drawing.Point(4, 236)
-        Me.Label65.Name = "Label65"
-        Me.Label65.Size = New System.Drawing.Size(46, 13)
-        Me.Label65.TabIndex = 85
-        Me.Label65.Text = "NetUser"
         '
         'tbDatevDir
         '
@@ -1253,42 +1109,6 @@ Partial Class frmSystem
         Me.Label5.Text = "Ablage"
         Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'gbBasisdaten
-        '
-        Me.gbBasisdaten.Controls.Add(Me.gpDir)
-        Me.gbBasisdaten.Controls.Add(Me.gbSteuer)
-        Me.gbBasisdaten.Controls.Add(Me.Label58)
-        Me.gbBasisdaten.Controls.Add(Me.tbWeb)
-        Me.gbBasisdaten.Controls.Add(Me.lbWeb)
-        Me.gbBasisdaten.Controls.Add(Me.gpDiverses)
-        Me.gbBasisdaten.Controls.Add(Me.tbTel4)
-        Me.gbBasisdaten.Controls.Add(Me.lbTel4)
-        Me.gbBasisdaten.Controls.Add(Me.tbTel3)
-        Me.gbBasisdaten.Controls.Add(Me.lbTel3)
-        Me.gbBasisdaten.Controls.Add(Me.tbTel2)
-        Me.gbBasisdaten.Controls.Add(Me.lbTel2)
-        Me.gbBasisdaten.Controls.Add(Me.tbTel1)
-        Me.gbBasisdaten.Controls.Add(Me.lbTel1)
-        Me.gbBasisdaten.Controls.Add(Me.Label9)
-        Me.gbBasisdaten.Controls.Add(Me.tbOrt)
-        Me.gbBasisdaten.Controls.Add(Me.lbOrt)
-        Me.gbBasisdaten.Controls.Add(Me.tbPLZ)
-        Me.gbBasisdaten.Controls.Add(Me.lbPLZ)
-        Me.gbBasisdaten.Controls.Add(Me.tbStrasse)
-        Me.gbBasisdaten.Controls.Add(Me.lbStrasse)
-        Me.gbBasisdaten.Controls.Add(Me.tbFirma)
-        Me.gbBasisdaten.Controls.Add(Me.lbFirma)
-        Me.gbBasisdaten.Controls.Add(Me.lbLabelOrt)
-        Me.gbBasisdaten.Controls.Add(Me.lbLabelPLZ)
-        Me.gbBasisdaten.Controls.Add(Me.lbLabelStr)
-        Me.gbBasisdaten.Controls.Add(Me.lbLabelGebName)
-        Me.gbBasisdaten.Location = New System.Drawing.Point(15, 18)
-        Me.gbBasisdaten.Name = "gbBasisdaten"
-        Me.gbBasisdaten.Size = New System.Drawing.Size(934, 494)
-        Me.gbBasisdaten.TabIndex = 36
-        Me.gbBasisdaten.TabStop = False
-        Me.gbBasisdaten.Text = "Anschrift / Diverses"
-        '
         'gbSteuer
         '
         Me.gbSteuer.Controls.Add(Me.tbGKSatz4)
@@ -1332,6 +1152,13 @@ Partial Class frmSystem
         Me.gbSteuer.Size = New System.Drawing.Size(508, 316)
         Me.gbSteuer.TabIndex = 96
         '
+        'tbGKSatz4
+        '
+        Me.tbGKSatz4.Location = New System.Drawing.Point(193, 246)
+        Me.tbGKSatz4.Name = "tbGKSatz4"
+        Me.tbGKSatz4.Size = New System.Drawing.Size(198, 20)
+        Me.tbGKSatz4.TabIndex = 105
+        '
         'tbGKS
         '
         Me.tbGKS.ForeColor = System.Drawing.Color.Blue
@@ -1342,6 +1169,22 @@ Partial Class frmSystem
         Me.tbGKS.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.tbGKS.Visible = False
         '
+        'tbGKSatz3
+        '
+        Me.tbGKSatz3.Location = New System.Drawing.Point(192, 220)
+        Me.tbGKSatz3.Name = "tbGKSatz3"
+        Me.tbGKSatz3.Size = New System.Drawing.Size(199, 20)
+        Me.tbGKSatz3.TabIndex = 104
+        '
+        'Label76
+        '
+        Me.Label76.AutoSize = True
+        Me.Label76.Location = New System.Drawing.Point(10, 249)
+        Me.Label76.Name = "Label76"
+        Me.Label76.Size = New System.Drawing.Size(107, 13)
+        Me.Label76.TabIndex = 101
+        Me.Label76.Text = "GKontosatz 4 Ü/S/G"
+        '
         'lbGKS
         '
         Me.lbGKS.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
@@ -1351,6 +1194,31 @@ Partial Class frmSystem
         Me.lbGKS.TabIndex = 110
         Me.lbGKS.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
+        'Label75
+        '
+        Me.Label75.AutoSize = True
+        Me.Label75.Location = New System.Drawing.Point(10, 223)
+        Me.Label75.Name = "Label75"
+        Me.Label75.Size = New System.Drawing.Size(107, 13)
+        Me.Label75.TabIndex = 100
+        Me.Label75.Text = "GKontosatz 3 Ü/S/G"
+        '
+        'tbMwstSatz4
+        '
+        Me.tbMwstSatz4.Location = New System.Drawing.Point(193, 156)
+        Me.tbMwstSatz4.Name = "tbMwstSatz4"
+        Me.tbMwstSatz4.Size = New System.Drawing.Size(198, 20)
+        Me.tbMwstSatz4.TabIndex = 103
+        '
+        'Label72
+        '
+        Me.Label72.AutoSize = True
+        Me.Label72.Location = New System.Drawing.Point(10, 194)
+        Me.Label72.Name = "Label72"
+        Me.Label72.Size = New System.Drawing.Size(104, 13)
+        Me.Label72.TabIndex = 97
+        Me.Label72.Text = "GKontsatz 2  Ü/S/G"
+        '
         'Label70
         '
         Me.Label70.AutoSize = True
@@ -1359,6 +1227,20 @@ Partial Class frmSystem
         Me.Label70.Size = New System.Drawing.Size(63, 13)
         Me.Label70.TabIndex = 109
         Me.Label70.Text = "GK Speisen"
+        '
+        'tbGKSatz2
+        '
+        Me.tbGKSatz2.Location = New System.Drawing.Point(192, 190)
+        Me.tbGKSatz2.Name = "tbGKSatz2"
+        Me.tbGKSatz2.Size = New System.Drawing.Size(199, 20)
+        Me.tbGKSatz2.TabIndex = 96
+        '
+        'tbMwstSatz3
+        '
+        Me.tbMwstSatz3.Location = New System.Drawing.Point(193, 130)
+        Me.tbMwstSatz3.Name = "tbMwstSatz3"
+        Me.tbMwstSatz3.Size = New System.Drawing.Size(198, 20)
+        Me.tbMwstSatz3.TabIndex = 102
         '
         'tbGetr
         '
@@ -1380,6 +1262,15 @@ Partial Class frmSystem
         Me.tbGK19.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.tbGK19.Visible = False
         '
+        'Label74
+        '
+        Me.Label74.AutoSize = True
+        Me.Label74.Location = New System.Drawing.Point(10, 159)
+        Me.Label74.Name = "Label74"
+        Me.Label74.Size = New System.Drawing.Size(132, 13)
+        Me.Label74.TabIndex = 99
+        Me.Label74.Text = "Mwstsatz 4 Ü/S/G/Datum"
+        '
         'lbGK19
         '
         Me.lbGK19.BackColor = System.Drawing.SystemColors.Window
@@ -1389,6 +1280,15 @@ Partial Class frmSystem
         Me.lbGK19.Size = New System.Drawing.Size(43, 21)
         Me.lbGK19.TabIndex = 108
         Me.lbGK19.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'Label73
+        '
+        Me.Label73.AutoSize = True
+        Me.Label73.Location = New System.Drawing.Point(10, 133)
+        Me.Label73.Name = "Label73"
+        Me.Label73.Size = New System.Drawing.Size(132, 13)
+        Me.Label73.TabIndex = 98
+        Me.Label73.Text = "Mwstsatz 3 Ü/S/G/Datum"
         '
         'lbGetr
         '
@@ -1418,6 +1318,13 @@ Partial Class frmSystem
         Me.tbMwst3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.tbMwst3.Visible = False
         '
+        'tbMwstSatz2
+        '
+        Me.tbMwstSatz2.Location = New System.Drawing.Point(193, 104)
+        Me.tbMwstSatz2.Name = "tbMwstSatz2"
+        Me.tbMwstSatz2.Size = New System.Drawing.Size(198, 20)
+        Me.tbMwstSatz2.TabIndex = 95
+        '
         'Label63
         '
         Me.Label63.BackColor = System.Drawing.Color.Transparent
@@ -1427,6 +1334,15 @@ Partial Class frmSystem
         Me.Label63.TabIndex = 106
         Me.Label63.Text = "GK Getränke"
         Me.Label63.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'Label71
+        '
+        Me.Label71.AutoSize = True
+        Me.Label71.Location = New System.Drawing.Point(10, 104)
+        Me.Label71.Name = "Label71"
+        Me.Label71.Size = New System.Drawing.Size(132, 13)
+        Me.Label71.TabIndex = 94
+        Me.Label71.Text = "Mwstsatz 2 Ü/S/G/Datum"
         '
         'lbMwst3
         '
@@ -1632,6 +1548,25 @@ Partial Class frmSystem
         Me.gpDiverses.TabIndex = 38
         Me.gpDiverses.TabStop = False
         '
+        'lbRFIDPort
+        '
+        Me.lbRFIDPort.BackColor = System.Drawing.Color.White
+        Me.lbRFIDPort.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.lbRFIDPort.Location = New System.Drawing.Point(89, 291)
+        Me.lbRFIDPort.Name = "lbRFIDPort"
+        Me.lbRFIDPort.Size = New System.Drawing.Size(42, 20)
+        Me.lbRFIDPort.TabIndex = 93
+        Me.lbRFIDPort.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'tbRFIDPort
+        '
+        Me.tbRFIDPort.ForeColor = System.Drawing.Color.Blue
+        Me.tbRFIDPort.Location = New System.Drawing.Point(89, 291)
+        Me.tbRFIDPort.Name = "tbRFIDPort"
+        Me.tbRFIDPort.Size = New System.Drawing.Size(42, 20)
+        Me.tbRFIDPort.TabIndex = 90
+        Me.tbRFIDPort.Visible = False
+        '
         'tbRNr
         '
         Me.tbRNr.ForeColor = System.Drawing.Color.Blue
@@ -1641,6 +1576,25 @@ Partial Class frmSystem
         Me.tbRNr.TabIndex = 96
         Me.tbRNr.Visible = False
         '
+        'Label67
+        '
+        Me.Label67.AutoSize = True
+        Me.Label67.Location = New System.Drawing.Point(6, 292)
+        Me.Label67.Name = "Label67"
+        Me.Label67.Size = New System.Drawing.Size(54, 13)
+        Me.Label67.TabIndex = 87
+        Me.Label67.Text = "RFID Port"
+        '
+        'lbIPSchloss
+        '
+        Me.lbIPSchloss.BackColor = System.Drawing.Color.White
+        Me.lbIPSchloss.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.lbIPSchloss.Location = New System.Drawing.Point(88, 262)
+        Me.lbIPSchloss.Name = "lbIPSchloss"
+        Me.lbIPSchloss.Size = New System.Drawing.Size(143, 20)
+        Me.lbIPSchloss.TabIndex = 92
+        Me.lbIPSchloss.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
         'lbRNr
         '
         Me.lbRNr.Location = New System.Drawing.Point(88, 82)
@@ -1648,6 +1602,25 @@ Partial Class frmSystem
         Me.lbRNr.Size = New System.Drawing.Size(43, 21)
         Me.lbRNr.TabIndex = 96
         Me.lbRNr.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'tbIPSchloss
+        '
+        Me.tbIPSchloss.ForeColor = System.Drawing.Color.Blue
+        Me.tbIPSchloss.Location = New System.Drawing.Point(88, 262)
+        Me.tbIPSchloss.Name = "tbIPSchloss"
+        Me.tbIPSchloss.Size = New System.Drawing.Size(143, 20)
+        Me.tbIPSchloss.TabIndex = 89
+        Me.tbIPSchloss.Visible = False
+        '
+        'lbNetUser
+        '
+        Me.lbNetUser.BackColor = System.Drawing.Color.White
+        Me.lbNetUser.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.lbNetUser.Location = New System.Drawing.Point(88, 232)
+        Me.lbNetUser.Name = "lbNetUser"
+        Me.lbNetUser.Size = New System.Drawing.Size(147, 20)
+        Me.lbNetUser.TabIndex = 91
+        Me.lbNetUser.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'tbBK
         '
@@ -1669,6 +1642,15 @@ Partial Class frmSystem
         Me.lbBK.TabIndex = 102
         Me.lbBK.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
+        'tbNetUser
+        '
+        Me.tbNetUser.ForeColor = System.Drawing.Color.Blue
+        Me.tbNetUser.Location = New System.Drawing.Point(88, 233)
+        Me.tbNetUser.Name = "tbNetUser"
+        Me.tbNetUser.Size = New System.Drawing.Size(147, 20)
+        Me.tbNetUser.TabIndex = 88
+        Me.tbNetUser.Visible = False
+        '
         'Label59
         '
         Me.Label59.BackColor = System.Drawing.Color.Transparent
@@ -1689,6 +1671,15 @@ Partial Class frmSystem
         Me.tbKK.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.tbKK.Visible = False
         '
+        'Label66
+        '
+        Me.Label66.AutoSize = True
+        Me.Label66.Location = New System.Drawing.Point(4, 265)
+        Me.Label66.Name = "Label66"
+        Me.Label66.Size = New System.Drawing.Size(53, 13)
+        Me.Label66.TabIndex = 86
+        Me.Label66.Text = "IP Schloß"
+        '
         'lbKK
         '
         Me.lbKK.BackColor = System.Drawing.SystemColors.Window
@@ -1698,6 +1689,15 @@ Partial Class frmSystem
         Me.lbKK.Size = New System.Drawing.Size(43, 21)
         Me.lbKK.TabIndex = 99
         Me.lbKK.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'Label65
+        '
+        Me.Label65.AutoSize = True
+        Me.Label65.Location = New System.Drawing.Point(4, 236)
+        Me.Label65.Name = "Label65"
+        Me.Label65.Size = New System.Drawing.Size(46, 13)
+        Me.Label65.TabIndex = 85
+        Me.Label65.Text = "NetUser"
         '
         'Label3
         '
@@ -2051,7 +2051,7 @@ Partial Class frmSystem
         Me.tpKonto.Controls.Add(Me.lvKonto)
         Me.tpKonto.Location = New System.Drawing.Point(4, 22)
         Me.tpKonto.Name = "tpKonto"
-        Me.tpKonto.Size = New System.Drawing.Size(1053, 490)
+        Me.tpKonto.Size = New System.Drawing.Size(1053, 567)
         Me.tpKonto.TabIndex = 3
         Me.tpKonto.Text = "Kontodaten"
         Me.tpKonto.UseVisualStyleBackColor = True
@@ -2322,7 +2322,7 @@ Partial Class frmSystem
         Me.tpObjekte.Controls.Add(Me.tsObjekt)
         Me.tpObjekte.Location = New System.Drawing.Point(4, 22)
         Me.tpObjekte.Name = "tpObjekte"
-        Me.tpObjekte.Size = New System.Drawing.Size(1053, 490)
+        Me.tpObjekte.Size = New System.Drawing.Size(1053, 567)
         Me.tpObjekte.TabIndex = 5
         Me.tpObjekte.Text = "Objekte"
         Me.tpObjekte.UseVisualStyleBackColor = True
@@ -2663,7 +2663,7 @@ Partial Class frmSystem
         'Label94
         '
         Me.Label94.AutoSize = True
-        Me.Label94.Location = New System.Drawing.Point(774, 15)
+        Me.Label94.Location = New System.Drawing.Point(754, 15)
         Me.Label94.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label94.Name = "Label94"
         Me.Label94.Size = New System.Drawing.Size(32, 13)
@@ -2682,10 +2682,10 @@ Partial Class frmSystem
         '
         'tbDatei
         '
-        Me.tbDatei.Location = New System.Drawing.Point(809, 12)
+        Me.tbDatei.Location = New System.Drawing.Point(790, 12)
         Me.tbDatei.Margin = New System.Windows.Forms.Padding(2)
         Me.tbDatei.Name = "tbDatei"
-        Me.tbDatei.Size = New System.Drawing.Size(76, 20)
+        Me.tbDatei.Size = New System.Drawing.Size(95, 20)
         Me.tbDatei.TabIndex = 172
         '
         'tbSaveCode
@@ -2710,7 +2710,7 @@ Partial Class frmSystem
         'Label92
         '
         Me.Label92.AutoSize = True
-        Me.Label92.Location = New System.Drawing.Point(657, 132)
+        Me.Label92.Location = New System.Drawing.Point(638, 133)
         Me.Label92.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label92.Name = "Label92"
         Me.Label92.Size = New System.Drawing.Size(37, 13)
@@ -2720,7 +2720,7 @@ Partial Class frmSystem
         'Label91
         '
         Me.Label91.AutoSize = True
-        Me.Label91.Location = New System.Drawing.Point(657, 107)
+        Me.Label91.Location = New System.Drawing.Point(638, 108)
         Me.Label91.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label91.Name = "Label91"
         Me.Label91.Size = New System.Drawing.Size(37, 13)
@@ -2730,7 +2730,7 @@ Partial Class frmSystem
         'Label57
         '
         Me.Label57.AutoSize = True
-        Me.Label57.Location = New System.Drawing.Point(657, 84)
+        Me.Label57.Location = New System.Drawing.Point(638, 85)
         Me.Label57.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label57.Name = "Label57"
         Me.Label57.Size = New System.Drawing.Size(37, 13)
@@ -2740,7 +2740,7 @@ Partial Class frmSystem
         'Label56
         '
         Me.Label56.AutoSize = True
-        Me.Label56.Location = New System.Drawing.Point(657, 62)
+        Me.Label56.Location = New System.Drawing.Point(638, 63)
         Me.Label56.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label56.Name = "Label56"
         Me.Label56.Size = New System.Drawing.Size(37, 13)
@@ -2750,7 +2750,7 @@ Partial Class frmSystem
         'Label55
         '
         Me.Label55.AutoSize = True
-        Me.Label55.Location = New System.Drawing.Point(657, 38)
+        Me.Label55.Location = New System.Drawing.Point(638, 39)
         Me.Label55.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label55.Name = "Label55"
         Me.Label55.Size = New System.Drawing.Size(37, 13)
@@ -2762,7 +2762,7 @@ Partial Class frmSystem
         Me.tbTrans5.Location = New System.Drawing.Point(706, 128)
         Me.tbTrans5.Margin = New System.Windows.Forms.Padding(2)
         Me.tbTrans5.Name = "tbTrans5"
-        Me.tbTrans5.Size = New System.Drawing.Size(128, 20)
+        Me.tbTrans5.Size = New System.Drawing.Size(179, 20)
         Me.tbTrans5.TabIndex = 164
         '
         'tbTrans4
@@ -2770,7 +2770,7 @@ Partial Class frmSystem
         Me.tbTrans4.Location = New System.Drawing.Point(706, 105)
         Me.tbTrans4.Margin = New System.Windows.Forms.Padding(2)
         Me.tbTrans4.Name = "tbTrans4"
-        Me.tbTrans4.Size = New System.Drawing.Size(128, 20)
+        Me.tbTrans4.Size = New System.Drawing.Size(179, 20)
         Me.tbTrans4.TabIndex = 163
         '
         'tbTrans3
@@ -2778,7 +2778,7 @@ Partial Class frmSystem
         Me.tbTrans3.Location = New System.Drawing.Point(706, 82)
         Me.tbTrans3.Margin = New System.Windows.Forms.Padding(2)
         Me.tbTrans3.Name = "tbTrans3"
-        Me.tbTrans3.Size = New System.Drawing.Size(128, 20)
+        Me.tbTrans3.Size = New System.Drawing.Size(179, 20)
         Me.tbTrans3.TabIndex = 162
         '
         'tbTrans2
@@ -2786,7 +2786,7 @@ Partial Class frmSystem
         Me.tbTrans2.Location = New System.Drawing.Point(706, 59)
         Me.tbTrans2.Margin = New System.Windows.Forms.Padding(2)
         Me.tbTrans2.Name = "tbTrans2"
-        Me.tbTrans2.Size = New System.Drawing.Size(128, 20)
+        Me.tbTrans2.Size = New System.Drawing.Size(179, 20)
         Me.tbTrans2.TabIndex = 161
         '
         'tbTrans1
@@ -2794,7 +2794,7 @@ Partial Class frmSystem
         Me.tbTrans1.Location = New System.Drawing.Point(706, 36)
         Me.tbTrans1.Margin = New System.Windows.Forms.Padding(2)
         Me.tbTrans1.Name = "tbTrans1"
-        Me.tbTrans1.Size = New System.Drawing.Size(128, 20)
+        Me.tbTrans1.Size = New System.Drawing.Size(179, 20)
         Me.tbTrans1.TabIndex = 160
         '
         'tbZP10
@@ -2989,7 +2989,7 @@ Partial Class frmSystem
         '
         'tbZBettenKi
         '
-        Me.tbZBettenKi.Location = New System.Drawing.Point(617, 34)
+        Me.tbZBettenKi.Location = New System.Drawing.Point(603, 35)
         Me.tbZBettenKi.Margin = New System.Windows.Forms.Padding(2)
         Me.tbZBettenKi.Name = "tbZBettenKi"
         Me.tbZBettenKi.Size = New System.Drawing.Size(23, 20)
@@ -2997,7 +2997,7 @@ Partial Class frmSystem
         '
         'tbZBettenEr
         '
-        Me.tbZBettenEr.Location = New System.Drawing.Point(545, 34)
+        Me.tbZBettenEr.Location = New System.Drawing.Point(524, 34)
         Me.tbZBettenEr.Margin = New System.Windows.Forms.Padding(2)
         Me.tbZBettenEr.Name = "tbZBettenEr"
         Me.tbZBettenEr.Size = New System.Drawing.Size(24, 20)
@@ -3005,7 +3005,7 @@ Partial Class frmSystem
         '
         'tbZBettenMin
         '
-        Me.tbZBettenMin.Location = New System.Drawing.Point(459, 34)
+        Me.tbZBettenMin.Location = New System.Drawing.Point(448, 34)
         Me.tbZBettenMin.Margin = New System.Windows.Forms.Padding(2)
         Me.tbZBettenMin.Name = "tbZBettenMin"
         Me.tbZBettenMin.Size = New System.Drawing.Size(25, 20)
@@ -3014,7 +3014,7 @@ Partial Class frmSystem
         'Label79
         '
         Me.Label79.AutoSize = True
-        Me.Label79.Location = New System.Drawing.Point(573, 37)
+        Me.Label79.Location = New System.Drawing.Point(552, 39)
         Me.Label79.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label79.Name = "Label79"
         Me.Label79.Size = New System.Drawing.Size(42, 13)
@@ -3024,7 +3024,7 @@ Partial Class frmSystem
         'Label78
         '
         Me.Label78.AutoSize = True
-        Me.Label78.Location = New System.Drawing.Point(500, 37)
+        Me.Label78.Location = New System.Drawing.Point(477, 38)
         Me.Label78.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label78.Name = "Label78"
         Me.Label78.Size = New System.Drawing.Size(43, 13)
@@ -3034,7 +3034,7 @@ Partial Class frmSystem
         'Label77
         '
         Me.Label77.AutoSize = True
-        Me.Label77.Location = New System.Drawing.Point(432, 37)
+        Me.Label77.Location = New System.Drawing.Point(420, 39)
         Me.Label77.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label77.Name = "Label77"
         Me.Label77.Size = New System.Drawing.Size(24, 13)
@@ -3044,18 +3044,18 @@ Partial Class frmSystem
         'tbZNummer
         '
         Me.tbZNummer.ForeColor = System.Drawing.Color.Blue
-        Me.tbZNummer.Location = New System.Drawing.Point(71, 177)
+        Me.tbZNummer.Location = New System.Drawing.Point(65, 177)
         Me.tbZNummer.Name = "tbZNummer"
-        Me.tbZNummer.Size = New System.Drawing.Size(25, 20)
+        Me.tbZNummer.Size = New System.Drawing.Size(31, 20)
         Me.tbZNummer.TabIndex = 132
         '
         'chFeWo
         '
         Me.chFeWo.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.chFeWo.Enabled = False
-        Me.chFeWo.Location = New System.Drawing.Point(347, 59)
+        Me.chFeWo.Location = New System.Drawing.Point(345, 62)
         Me.chFeWo.Name = "chFeWo"
-        Me.chFeWo.Size = New System.Drawing.Size(256, 20)
+        Me.chFeWo.Size = New System.Drawing.Size(128, 20)
         Me.chFeWo.TabIndex = 131
         Me.chFeWo.Text = "FeWo / Zimmer"
         Me.chFeWo.UseVisualStyleBackColor = True
@@ -3095,7 +3095,7 @@ Partial Class frmSystem
         Me.coObjekt.FormattingEnabled = True
         Me.coObjekt.Location = New System.Drawing.Point(391, 9)
         Me.coObjekt.Name = "coObjekt"
-        Me.coObjekt.Size = New System.Drawing.Size(212, 21)
+        Me.coObjekt.Size = New System.Drawing.Size(235, 21)
         Me.coObjekt.TabIndex = 90
         '
         'lbZimmerID
@@ -5089,7 +5089,7 @@ Partial Class frmSystem
         Me.tpEdit.Location = New System.Drawing.Point(4, 22)
         Me.tpEdit.Name = "tpEdit"
         Me.tpEdit.Padding = New System.Windows.Forms.Padding(3)
-        Me.tpEdit.Size = New System.Drawing.Size(1053, 573)
+        Me.tpEdit.Size = New System.Drawing.Size(1053, 567)
         Me.tpEdit.TabIndex = 16
         Me.tpEdit.Text = "Editor"
         Me.tpEdit.UseVisualStyleBackColor = True
@@ -5229,10 +5229,10 @@ Partial Class frmSystem
         Me.gpEMail.ResumeLayout(False)
         Me.gpEMail.PerformLayout()
         Me.tpAnschrift.ResumeLayout(False)
-        Me.gpDir.ResumeLayout(False)
-        Me.gpDir.PerformLayout()
         Me.gbBasisdaten.ResumeLayout(False)
         Me.gbBasisdaten.PerformLayout()
+        Me.gpDir.ResumeLayout(False)
+        Me.gpDir.PerformLayout()
         Me.gbSteuer.ResumeLayout(False)
         Me.gbSteuer.PerformLayout()
         Me.gpDiverses.ResumeLayout(False)

@@ -726,18 +726,18 @@ Partial Class frmMain
         'tsbEinteilung
         '
         Me.tsbEinteilung.Name = "tsbEinteilung"
-        Me.tsbEinteilung.Size = New System.Drawing.Size(180, 22)
+        Me.tsbEinteilung.Size = New System.Drawing.Size(127, 22)
         Me.tsbEinteilung.Text = "Einteilung"
         '
         'ToolStripSeparator13
         '
         Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
-        Me.ToolStripSeparator13.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator13.Size = New System.Drawing.Size(124, 6)
         '
         'tsbPersonal
         '
         Me.tsbPersonal.Name = "tsbPersonal"
-        Me.tsbPersonal.Size = New System.Drawing.Size(180, 22)
+        Me.tsbPersonal.Size = New System.Drawing.Size(127, 22)
         Me.tsbPersonal.Text = "Personal"
         '
         'ToolStripSeparator5

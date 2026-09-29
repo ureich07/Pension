@@ -5460,281 +5460,494 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
 </member>
 <member name="M:Pension.frmSystem.prCreateTabelleZimmer">
  <summary>
- Tabelle "Zimmer" erstellen
+ Erstellt die Tabellenstruktur für die Zimmerübersicht und konfiguriert die Anzeige-Eigenschaften des ListView-Steuerelements.
  </summary>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Spalten-Generierung über ein strukturiertes Array und eine Schleife kompakt zusammengefasst (bessere Wartbarkeit).
+ - Konstante Breitenangaben und Ausrichtungen zur Reduzierung von redundantem Code ausgelagert.
+ - ListView-Grundeinstellungen für ein konsistentes Verhalten und flackerfreie Darstellung beibehalten.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadZimInList(System.Data.DataTable)">
  <summary>
- Tabelle Zimmer mit daten aus der DataTabel "Zimmer" füllen
+ Befüllt das ListView-Steuerelement "lvZimmer" mit den Daten aus der übergebenen Zimmer-DataTable.
  </summary>
- <param name="dtT"></param>
+ <param name="dtT">Die DataTable, die die Zimmerdaten enthält.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'BeginUpdate' und 'EndUpdate' hinzugefügt, um UI-Flackern zu verhindern und die Performance drastisch zu steigern.
+ - 'For Each'-Schleife anstelle der indexbasierten Schleife für bessere Lesbarkeit verwendet.
+ - 'ListViewItemCollection.AddRange' genutzt, um alle Zeilen performant in einem Rutsch hinzuzufügen.
+ - Null-Zuweisungen und String-Vergleiche modernisiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordZimmer(System.Data.DataTable)">
  <summary>
- Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+ Prüft, ob Datensätze in der Zimmer-Tabelle vorhanden sind, und steuert entsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die zu prüfende DataTable mit den Zimmer-Datensätzen.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Redundante 'If'-Bedingung und temporäre Boolean-Variable entfernt.
+ - Direkte Zuweisung des Vergleichsergebnisses an die 'Enabled'-Eigenschaft implementiert.
+ - Null-Sicherheitsprüfung ('IsNot Nothing') hinzugefügt, um Laufzeitfehler zu verhindern.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbNeuZim_Click(System.Object,System.EventArgs)">
  <summary>
- Neues Zimmer anlegen
+ Bereitet die Eingabemaske für das Anlegen eines neuen Zimmer-Datensatzes vor.
+ Setzt alle Textfelder zurück, aktiviert die Steuerelemente und fokussiert das Namensfeld.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLoockZim' entfernt.
+ - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
+ - Sicherheitsprüfung für 'coZArt.Items.Count' hinzugefügt, um Indexfehler beim Zurücksetzen der ComboBox zu vermeiden.
+ - Auskommentierten Code-Ballast ('tbZArt.Text') entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbEditZim_Click(System.Object,System.EventArgs)">
  <summary>
- Zimmer bearbeiten
+ Versetzt die Eingabemaske in den Bearbeitungsmodus und fokussiert das Namensfeld.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbSaveZim_Click(System.Object,System.EventArgs)">
  <summary>
- Änderung Speichen
+ Löst den Speichervorgang für die vorgenommenen Änderungen oder den neuen Zimmer-Datensatz aus.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.tsbBraekEW_Click(System.Object,System.EventArgs)">
+<member name="M:Pension.frmSystem.tsbBraekZim_Click(System.Object,System.EventArgs)">
  <summary>
- Bearbeitung abbrechen
+ Bricht den aktuellen Bearbeitungs- oder Neuanlage-Modus ab, sperrt die Eingabemaske und aktualisiert den Status der Steuerungsschaltflächen.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - Falsche Methodenbezeichnung im XML-Kommentar korrigiert.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prLoockZim(System.Boolean)">
+<member name="M:Pension.frmSystem.prLockZim(System.Boolean)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Steuert den Aktivierungsstatus (Enabled) aller Eingabefelder und Schaltflächen der Zimmerverwaltung.
+ Schaltet zwischen Bearbeitungsmodus und Anzeige-/Sperrmodus um.
  </summary>
- <param name="lStatus"></param>
+ <param name="lStatus">True, wenn die Eingabefelder für die Bearbeitung freigegeben werden sollen; andernfalls False.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Fehler bei der Typkonvertierung behoben: ToolStripButtons separat als ToolStripItem deklariert.
+ - Steuerelemente in Arrays gruppiert und Zuweisung über Schleifen gelöst (bessere Übersicht und Wartbarkeit).
+ - Redundante Einzelzuweisungen entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prSaveZimmer">
  <summary>
- Speicherung durchführen
+ Führt die Speicherung (Einfügen oder Aktualisieren) eines Zimmer-Datensatzes in der Datenbank und der lokalen DataTable durch.
  </summary>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+ - Unbenutzte Variablen ('sb') und auskommentierte Code-Fragmente entfernt, um die Übersicht zu verbessern.
+ - Sicherheitsabfrage vor dem Zugriff auf 'arValue(1)' im Finally-Block eingebaut.
+ - SQL-Spalten-String als lesbare Konstante oder direkte Zuweisung beibehalten, Splitting optimiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.lvZimmer_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Auswahl eines Eintrages in der Zimmer liste
+ Tritt auf, wenn sich die Auswahl in der Zimmer-Liste ändert, und stößt die Aktualisierung der Eingabemaske an.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prGetInfolvZimmer">
  <summary>
- Informationen aus der Zimmerliste in die Eingabefelder übertragen
+ Überträgt die Detailinformationen des aktuell selektierten Zimmers aus der ListView in die entsprechenden Eingabe- und Steuerelemente.
  </summary>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Zugriff auf '.SelectedItems(0)' durch eine lokale Variable ('item') zentralisiert (bessere Performance und Lesbarkeit).
+ - 'If-Else'-Strukturen für CheckBoxen durch direkte, boolesche Zuweisungen ('Checked') vereinfacht.
+ - Redundante Typkonvertierungen durch direkten SubItem-Zugriff optimiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcSaveZimmer(System.String,System.String)">
  <summary>
- Zu speichernde Daten aufbereiten
+ Bereitet die in der Eingabemaske erfassten Zimmerdaten auf und gibt sie als verketteten, durch Gradzeichen (°) getrennten String zurück.
  </summary>
- <returns></returns>
+ <param name="sID">Die eindeutige Identifikationsnummer (ID) des Zimmers.</param>
+ <param name="sOID">Die ID des zugeordneten Objekts.</param>
+ <returns>Ein durch '°' separierter String mit allen Zimmer-Attributen.</returns>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete VB6-Befehle ('Trim', 'Mid', Funktionsname-Zuweisung) durch moderne .NET-Entsprechungen ersetzt.
+ - Redundante Logik der Transfer-Felder (tbTrans1-5) in einem Array zusammengefasst.
+ - 'String.IsNullOrWhiteSpace' für null-sichere und performante String-Validierung implementiert.
+ - Verkettung flüssig gestaltet und 'Return'-Anweisung verwendet.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcCheckZimmer(System.String,System.String)">
  <summary>
- Prüfen ob Zimmer schon existiert
+ Prüft, ob die erforderlichen Daten vorhanden sind und ob das Zimmer unter dem angegebenen Objekt bereits in der Datenbank existiert.
  </summary>
- <param name="sName"></param>
- <returns>T/F</returns>
+ <param name="sName">Die zu prüfende Zimmerbezeichnung.</param>
+ <param name="sObj">Die ID des zugeordneten Objekts.</param>
+ <returns>True, wenn das Zimmer bereits existiert oder Pflichtangaben fehlen (Validierung fehlgeschlagen); andernfalls False.</returns>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'String.IsNullOrWhiteSpace' für null-sichere und performante Validierung eingesetzt.
+ - 'Return'-Anweisungen für einen klareren Kontrollfluss integriert.
+ - Hinweis auf SQL-Parameter zur Vermeidung von SQL-Injection und Apostroph-Fehlern bei Namen (z.B. "Käpt'n").
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbDelZim_Click(System.Object,System.EventArgs)">
  <summary>
- Zimmer löschen
+ Löscht den aktuell ausgewählten Zimmer-Datensatz nach einer Bestätigungsabfrage aus der Datenbank, 
+ aktualisiert die lokale DataTable und setzt die Eingabemaske zurück.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Sicherheitsabfrage ('sZim = String.Empty') ganz nach oben gezogen, um unnötige String-Zuweisungen bei Abbruch zu verhindern.
+ - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
+ - '""' durch die performantere Konstante 'String.Empty' ersetzt.
+ - Selektions-Logik nach dem Löschen korrigiert: Es wird nun versucht, das erste Element sauber zu aktivieren.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsmImportZimmer_Click(System.Object,System.EventArgs)">
+ <summary>
+ Löst den Import bzw. das Neuladen der Zimmerliste aus einer CSV-Datei aus.
+ Löscht die bestehenden Daten nach Bestätigung und baut die Tabelle neu auf.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Den auskommentierten Datei-Auswahldialog für 'sDaten' reaktiviert, da die Methode sonst wirkungslos abbrach.
+ - 'Finally'-Block ergänzt, um den Cursor bei Fehlern garantiert auf 'Cursors.Default' zurückzusetzen.
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - 'Select Case' durch ein einfacheres und lesbareres 'If'-Statement für das MsgBoxResult ersetzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prLadeZimmer(System.String)">
+ <summary>
+ Parst die übergebenen Rohdaten (CSV-Zeilen), bereitet sie auf und fügt sie zeilenweise in die Datenbank-Tabelle "Zimmer" ein.
+ </summary>
+ <param name="sDaten">Der gesamte Inhalt der CSV-Datei als String, getrennt durch Zeilenumbrüche.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Splitten der Zeilen robuster gestaltet (Unterstützung für sowohl CR/LF als auch reine LF-Umbrüche).
+ - Veraltete 'Call'-Syntax und die unsaubere 'Split()'-Funktion durch die native '.Split()'-Methode der String-Klasse ersetzt.
+ - 'For Each'-Schleife anstelle der indexbasierten Schleife implementiert für sauberen Code.
+ - Vorbereitung für Performance-Schub (Transaktionen vorgeschlagen, um Festplatten-Flaschenhälse bei Massen-Inserts zu umgehen).
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.fcSaveEntry(System.String,System.Int32)">
+ <summary>
+ Bereitet eine CSV-Zeile auf, indem sie anhand von Kommas gesplittet, getrimmt und fehlende Werte ersetzt werden.
+ Gibt die Felder als verketteten, durch Gradzeichen (°) getrennten String zurück.
+ </summary>
+ <param name="sT">Die zu verarbeitende CSV-Textzeile.</param>
+ <param name="nP">Der maximale Feld-Index, bis zu dem die Daten aufbereitet werden sollen (z.B. 6 für 7 Felder).</param>
+ <returns>Ein durch '°' separierter String mit den bereinigten Feldwerten.</returns>
+ <remarks>
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Zwei getrennte Schleifen in eine einzige, effiziente Schleife zusammengeführt.
+ - Index-Sicherheitsprüfung hinzugefügt: Falls die CSV-Zeile weniger Spalten als 'nP' enthält, wird das Array sicher vergrößert, um Abstürze zu verhindern.
+ - Veraltete Zuweisung an den Funktionsnamen durch die moderne 'Return'-Anweisung ersetzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsmExportZimmer_Click(System.Object,System.EventArgs)">
+ <summary>
+ Exportiert die aktuellen Zimmerdaten aus der DataTable "dtZim" in eine CSV-Datei.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Den Speicherbefehl am Ende reaktiviert, da der Export sonst wirkungslos blieb.
+ - 'StringBuilder' konsequent für alle Verkettungen genutzt, um Speicher- und Performance-Verluste zu eliminieren.
+ - Indexbasierte Schleife durch eine performantere 'For Each'-Schleife über die DataRows ersetzt.
+ - Null-Sicherheitsprüfungen und saubere Formatierung der CSV-Zeilen implementiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCreateTabelleUser">
  <summary>
- Tabelle "User" erstellen
+ Erstellt die Tabellenstruktur für die Benutzerübersicht und konfiguriert die Anzeige-Eigenschaften des ListView-Steuerelements.
  </summary>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Spalten-Generierung über ein strukturiertes Array und eine Schleife kompakt zusammengefasst (verbesserte Wartbarkeit).
+ - Konstante Spalteneinstellungen zur Reduzierung von redundantem Code ausgelagert.
+ - Einheitlicher Programmierstil analog zur Zimmer-Tabellenstruktur implementiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadUserInList(System.Data.DataTable)">
  <summary>
- Tabelle User mit daten aus der DataTabel "Nutzer" füllen
+ Befüllt das ListView-Steuerelement "lvUser" mit den Daten aus der übergebenen Benutzer-DataTable.
+ Entschlüsselt dabei die Passwörter für die Anzeige.
  </summary>
- <param name="dtT"></param>
+ <param name="dtT">Die DataTable, die die Benutzerdaten enthält.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'BeginUpdate' und 'EndUpdate' hinzugefügt, um UI-Flackern zu unterdrücken und die Performance spürbar zu erhöhen.
+ - 'For Each'-Schleife anstelle der indexbasierten Schleife für sauberere Lesbarkeit verwendet.
+ - 'ListViewItemCollection.AddRange' genutzt, um alle Zeilen performant in einem Rutsch dem Steuerelement zu übergeben.
+ - Null-Sicherheitsprüfung ('dtT Is Nothing') am Methodenstart integriert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordUser(System.Data.DataTable)">
  <summary>
- Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+ Prüft, ob Datensätze in der Benutzer-Tabelle vorhanden sind, und steuert entsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die zu prüfende DataTable mit den Benutzer-Datensätzen.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Redundante 'If'-Bedingung und temporäre Boolean-Variable entfernt.
+ - Direkte Zuweisung des Vergleichsergebnisses an die 'Enabled'-Eigenschaft implementiert.
+ - Null-Sicherheitsprüfung ('IsNot Nothing') hinzugefügt, um Laufzeitfehler zu verhindern.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbNewUser_Click(System.Object,System.EventArgs)">
  <summary>
- Neuen User anlegen
+ Bereitet die Eingabemaske für das Anlegen eines neuen Benutzer-Datensatzes vor.
+ Setzt alle Textfelder zurück, aktiviert die Steuerelemente und fokussiert das Feld für den Benutzernamen.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLoockUser' entfernt.
+ - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbEditUser_Click(System.Object,System.EventArgs)">
  <summary>
- User bearbeiten
+ Versetzt die Eingabemaske in den Bearbeitungsmodus für den ausgewählten Benutzer und fokussiert das Namensfeld.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbSaveUser_Click(System.Object,System.EventArgs)">
  <summary>
- Änderung Speichen
+ Überprüft die Passwortlänge und löst den Speichervorgang für den Benutzer-Datensatz aus.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax entfernt.
+ - 'MsgBoxStyle'-Kombination auf das modernere 'Or' umgestellt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbBraeckUser_Click(System.Object,System.EventArgs)">
  <summary>
- Bearbeitung abbrechen
+ Bricht die Bearbeitung oder Neuanlage ab, sperrt die Eingabemaske und prüft den verbleibenden Datenbestand.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoockUser(System.Boolean)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Steuert den Aktivierungsstatus (Enabled) aller Eingabefelder und ToolStripButtons der Benutzerverwaltung.
  </summary>
- <param name="lStatus"></param>
+ <param name="lStatus">True, wenn die Eingabefelder freigegeben werden; andernfalls False.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'ToolStripButton'-Typkonvertierungsfehler durch strikte Trennung von 'Control' und 'ToolStripItem' behoben.
+ - Zuweisung über kompakte Schleifen gelöst (bessere Übersicht und Wartbarkeit).
+ - Automatisches Zurücksetzen der Klartext-Anzeige integriert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prSaveUser">
  <summary>
- Speicherung durchführen
+ Führt die Speicherung (Einfügen oder Aktualisieren) eines Benutzer-Datensatzes in der Datenbank und der lokalen DataTable durch.
  </summary>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+ - Unbenutzte Variablen ('sb') entfernt, um Speicherressourcen zu schonen.
+ - 'Split()' durch die native .NET-Methode '.Split()' der String-Klasse ersetzt.
+ - Sicherheitsabfrage vor dem Zugriff auf 'arValue(1)' im Finally-Block integriert, um Folgeabstürze bei Fehlern zu blockieren.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.lvUser_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Auswahl eines Eintrages in der User liste
+ Tritt auf, wenn sich die Auswahl in der Benutzer-Liste ändert, und stößt die Aktualisierung der Eingabemaske an.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prGetInfolvUser">
  <summary>
- Informationen aus der Userliste in die Eingabefelder übertragen
+ Überträgt die Detailinformationen des aktuell selektierten Benutzers aus der ListView in die entsprechenden Eingabe- und Steuerelemente.
  </summary>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Zugriff auf '.SelectedItems(0)' durch eine lokale Variable ('item') zentralisiert (bessere Performance und Lesbarkeit).
+ - Unnötige 'With'-Struktur aufgelöst, da die Variable den Kontext bereits sauber abbildet.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcSaveUser(System.String)">
  <summary>
- Zu speichernde Daten aufbereiten
+ Bereitet die in der Eingabemaske erfassten Benutzerdaten auf, verschlüsselt das Passwort 
+ und gibt die Werte als verketteten, durch Gradzeichen (°) getrennten String zurück.
  </summary>
- <returns></returns>
+ <param name="sID">Die eindeutige Identifikationsnummer (ID) des Benutzers.</param>
+ <returns>Ein durch '°' separierter String mit allen Benutzer-Attributen.</returns>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Logikfehler behoben: Passwort wird nun beim Speichern sauber verschlüsselt ('fEnCrypt') statt entschlüsselt ('fDeCrypt').
+ - Veraltete String-Operationen und Funktionsnamen-Zuweisung durch moderne .NET-Standards ersetzt.
+ - 'String.IsNullOrWhiteSpace' für null-sichere und performantere Validierung eingesetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcCheckUser(System.String)">
  <summary>
- Prüfen ob der User schon existiert
+ Prüft, ob der übergebene Benutzername gültig ist und ob der Benutzer bereits in der Datenbank existiert.
  </summary>
- <param name="sName"></param>
- <returns>T/F</returns>
+ <param name="sName">Der zu prüfende Benutzername.</param>
+ <returns>True, wenn Pflichtangaben fehlen oder der Benutzer bereits existiert (Validierung fehlgeschlagen); andernfalls False.</returns>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'String.IsNullOrWhiteSpace' für eine performante und null-sichere Validierung eingesetzt.
+ - 'Return'-Anweisungen für einen sauberen und verständlichen Kontrollfluss integriert.
+ - Absicherung gegen SQL-Syntaxfehler (z.B. bei Apostrophen im Benutzernamen) durch Maskierung hinzugefügt.
+ - 'MsgBoxStyle'-Kombination auf das modernere bitweise 'Or' umgestellt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbDelUser_Click(System.Object,System.EventArgs)">
  <summary>
- User löschen
+ Löscht den aktuell ausgewählten Benutzer-Datensatz nach einer Bestätigungsabfrage aus der Datenbank, 
+ aktualisiert die lokale DataTable und setzt die Eingabemaske zurück.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Kritischen Fehler behoben: 'prLoadUserInList' erhält nun die korrekte DataTable 'dtUser' statt der fälschlich übergebenen 'dtZim'.
+ - Sicherheitsabfrage ('sUser = String.Empty') nach oben gezogen, um unnötige String-Deklarationen bei leerer ID zu vermeiden.
+ - Veraltete 'Call'-Syntax entfernt und leere Strings durch 'String.Empty' ersetzt.
+ - Grammatikfehler in der Hinweismeldung korrigiert ("diesen Nutzer" statt "dieses Nutzer").
+ - Selektions-Logik nach dem Löschen stabilisiert (wählt das erste verbleibende Element aus).
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tbURechte_TextChanged(System.Object,System.EventArgs)">
+ <summary>
+ Validiert die Eingabe im Rechte-Feld, um sicherzustellen, dass nur numerische Werte eingetragen werden.
+ Schützt vor ungültigen Zeichen (z. B. Buchstaben).
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Fehlerhafte 'IsNumeric(e.ToString)'-Logik durch eine echte numerische Typprüfung ('Integer.TryParse') ersetzt.
+ - Setzt das Feld bei Falscheingaben standardmäßig auf den Wert "5" zurück und hält die Cursor-Position am Ende des Textes.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.chKlar_CheckedChanged(System.Object,System.EventArgs)">
+ <summary>
+ Schaltet die Sichtbarkeit des Passworts im Eingabefeld zwischen Klartext und System-Maskierung (Sternchen) um.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Direkte Logik beibehalten und mit XML-Dokumentation versehen.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordBuch(System.Data.DataTable)">
  <summary>
- Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+ Prüft, ob Datensätze in der Buchungstext-Tabelle vorhanden sind, und steuert entsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die zu prüfende DataTable mit den Buchungstexten.</param>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Redundante 'If'-Bedingung und temporäre Boolean-Variable entfernt.
+ - Direkte Zuweisung des Vergleichsergebnisses an die 'Enabled'-Eigenschaft implementiert.
+ - Null-Sicherheitsprüfung ('IsNot Nothing') hinzugefügt, um Laufzeitfehler zu verhindern.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbNewBuch_Click(System.Object,System.EventArgs)">
  <summary>
- Neuen Buchungstext anlegen
+ Bereitet die Eingabemaske für das Anlegen eines neuen Buchungstext-Datensatzes vor.
+ Setzt alle Textfelder zurück, aktiviert die Steuerelemente und fokussiert das Bezeichnungsfeld.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLockBuch' entfernt.
+ - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
+ - Bezeichnungsausrichtung korrigiert (Lock statt Loock).
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbEditBuch_Click(System.Object,System.EventArgs)">
@@ -5749,78 +5962,131 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
 </member>
 <member name="M:Pension.frmSystem.tsbSaveBuch_Click(System.Object,System.EventArgs)">
  <summary>
- Änderung Speichen
+ Löst den Speichervorgang für die vorgenommenen Änderungen oder den neuen Buchungstext aus.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.tsbBraeckBuch_Click(System.Object,System.EventArgs)">
+<member name="M:Pension.frmSystem.tsbBreakBuch_Click(System.Object,System.EventArgs)">
  <summary>
- Bearbeitung abbrechen
+ Bricht den aktuellen Bearbeitungs- oder Neuanlage-Modus ab, sperrt die Eingabemaske und aktualisiert den Status der Steuerungsschaltflächen.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - Falsche Methodenbezeichnung im XML-Kommentar korrigiert (Break statt Braeck).
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prLoockBuch(System.Boolean)">
+<member name="M:Pension.frmSystem.prLockBuch(System.Boolean)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Steuert den Aktivierungsstatus (Enabled) aller Eingabefelder und ToolStripButtons der Buchungstext-Verwaltung.
+ Schaltet zwischen Bearbeitungsmodus und Anzeige-/Sperrmodus um.
  </summary>
- <param name="lStatus"></param>
+ <param name="lStatus">True, wenn die Eingabefelder für die Bearbeitung freigegeben werden sollen; andernfalls False.</param>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Typkonvertierungsfehler durch strikte Trennung von 'Control' und 'ToolStripItem' analog zur Benutzerverwaltung behoben.
+ - Steuerelemente in Arrays gruppiert und Zustand kompakt über Schleifen zugewiesen (verbesserte Wartbarkeit).
+ - Rechtschreibkorrektur im XML-Kommentar vorgenommen (Lock statt Loock).
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prSaveBuch">
  <summary>
- Speicherung durchführen
+ Führt die Speicherung (Einfügen oder Aktualisieren) eines Buchungstext-Datensatzes in der Datenbank und der lokalen DataTable durch.
+ Berücksichtigt dabei die aktuell ausgewählte Oberflächensprache für das dynamische Textfeld.
  </summary>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+ - 'Split()' durch die native .NET-Methode '.Split()' der String-Klasse ersetzt.
+ - Typsicheres String-Array für die Sprachermittlung inkl. vorzeitigem Abbruch ('Exit For') implementiert.
+ - Ungenutzte Variablen ('sb') entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.liBuch_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Auswahl eines Eintrages in der Liste
+ Tritt auf, wenn ein anderer Eintrag in der Liste ausgewählt wird. 
+ Ermittelt das sprachspezifische Textfeld und lädt die Buchungstext-Details aus der Datenbank.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Sicherheitsprüfungen ('lDel' und 'SelectedIndex') an den Anfang der Methode verschoben.
+ - Generischen 'Array'-Typ durch ein typsicheres 'String()'-Array ersetzt und Schleife per 'Exit For' vorzeitig beendet.
+ - Leerlauf-Bedingung 'If liBuch.Items.Count = 1' entfernt.
+ - Absicherung gegen SQL-Fehler bei Hochkommas im Listentext hinzugefügt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcSaveBuch(System.String)">
  <summary>
- Zu speichernde Daten aufbereiten
+ Bereitet die in der Eingabemaske erfassten Daten für den Buchungstext auf 
+ und gibt die Werte als verketteten, durch Gradzeichen (°) getrennten String zurück.
  </summary>
- <returns></returns>
+ <param name="sID">Die eindeutige Identifikationsnummer (ID) des Buchungstext-Datensatzes.</param>
+ <returns>Ein durch '°' separierter String mit allen Buchungstext-Attributen.</returns>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'If-Else'-Block des Radiobuttons durch effizienten Inline-Bedingungsoperator beim Append ersetzt.
+ - 'String.IsNullOrWhiteSpace' für performante und null-sichere Validierung der Pflichtfelder eingesetzt.
+ - Veraltete Zuweisung an den Funktionsnamen durch die moderne 'Return'-Anweisung ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcCheckBuch(System.String)">
  <summary>
- Prüfen ob dieser Buchungstext schon existiert
+ Prüft, ob die Bezeichnung des Buchungstextes gültig ist und ob dieser bereits in der Datenbank existiert.
  </summary>
- <param name="sName"></param>
- <returns>T/F</returns>
+ <param name="sName">Die zu prüfende Bezeichnung des Buchungstextes.</param>
+ <returns>True, wenn die Pflichtangabe fehlt oder der Buchungstext bereits existiert (Validierung fehlgeschlagen); andernfalls False.</returns>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'String.IsNullOrWhiteSpace' für eine performante und null-sichere Validierung eingesetzt.
+ - 'Return'-Anweisungen für einen sauberen, modernen Kontrollfluss integriert.
+ - Absicherung gegen SQL-Syntaxfehler (z. B. bei Hochkommas/Apostrophen im Textnamen) durch Maskierung hinzugefügt.
+ - 'MsgBoxStyle'-Kombination auf das korrekte bitweise 'Or' umgestellt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbDelBuch_Click(System.Object,System.EventArgs)">
  <summary>
- Buchungstext löschen
+ Löscht den aktuell ausgewählten Buchungstext nach einer Bestätigungsabfrage aus der Datenbank,
+ aktualisiert die lokale Liste sowie die DataTable und setzt die Eingabemaske zurück.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 23.12.2011 Create
+ 23.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Sicherheitsprüfung ('sID') an den Anfang der Methode verschoben (Guard Clause).
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
+ - Redundante String-Operationen optimiert und 'String.Empty' verwendet.
+ - 'MsgBoxStyle'-Verknüpfung auf den modernen 'Or'-Operator umgestellt.
+ - Auskommentierte Code-Fragmente entfernt, um die Übersichtlichkeit zu wahren.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.rbMakro_CheckedChanged(System.Object,System.EventArgs)">
+ <summary>
+ Steuert die Sichtbarkeit des Ziel-Textfeldes basierend auf der Auswahl des Makro-Radiobuttons.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Redundanten 'If-Else'-Block durch eine direkte, logische Zuweisung ersetzt.
+ - Auskommentierten Code-Ballast ('sb.Append') entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordWerbung(System.Data.DataTable)">
