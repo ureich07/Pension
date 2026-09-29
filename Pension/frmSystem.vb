@@ -756,7 +756,9 @@ Public Class frmSystem
     tbDatevDir.KeyPress, tbAblageDir.KeyPress, tbSaveDir.KeyPress,
     tbNetUser.KeyPress, tbIPSchloss.KeyPress, tbRFIDPort.KeyPress,
     tbMwstSatz2.KeyPress, tbGKSatz2.KeyPress, tbMwstSatz3.KeyPress, tbGKSatz3.KeyPress, tbMwstSatz4.KeyPress, tbGKSatz4.KeyPress,
-    tbSMTP.KeyPress, tbEMail.KeyPress, tbName.KeyPress, tbUName.KeyPress, tbPWort.KeyPress, tbTage.KeyPress
+    tbSMTP.KeyPress, tbEMail.KeyPress, tbName.KeyPress, tbUName.KeyPress, tbPWort.KeyPress, tbTage.KeyPress,
+    tbOStr.KeyPress, tbOHNr.KeyPress, tbOPLZ.KeyPress, tbOOrt.KeyPress,
+    tbOOrtsteil.KeyPress, tbOName.KeyPress, tbOTelefon.KeyPress
 
         ' Prüfen, ob die Eingabetaste (Enter) gedrückt wurde
         If e.KeyChar = Convert.ToChar(Keys.Enter) Then
@@ -818,6 +820,16 @@ Public Class frmSystem
                     Case "tbUName" : tbPWort.Select()
                     Case "tbPWort" : tbTage.Select()
                     Case "tbTage" : tbSMTP.Select()
+
+                ' --- Objekte Anschriftdaten ---
+                    Case "tbOName" : tbOStr.Select()
+                    Case "tbOStr" : tbOHNr.Select()
+                    Case "tbOHNr" : tbOPLZ.Select()
+                    Case "tbOPLZ" : tbOOrt.Select()
+                    Case "tbOOrt" : tbOOrtsteil.Select()
+                    Case "tbOOrtsteil" : tbOTelefon.Select()
+                    Case "tbOTelefon" : tbOName.Select()
+
                 End Select
 
             End If
@@ -1414,141 +1426,229 @@ Public Class frmSystem
 #Region "Objekte bearbeiten........................................................................"
 
     ''' <summary>
-    ''' Tabelle "Objekte" erstellen
+    ''' Erstellt und konfiguriert die Tabellenstruktur für das ListView-Steuerelement "lvObjekt".
+    ''' Definiert alle erforderlichen Spaltenköpfe, Sichtbarkeiten und das grundlegende Anzeige- und Sortierverhalten.
     ''' </summary>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - XML-Dokumentationskommentar nach modernem Standard erweitert.
+    ''' - Layout-Eigenschaften des ListView-Steuerelements gruppiert, um die Lesbarkeit des Codes zu erhöhen.
+    ''' - Erläuterung zur speziellen Spaltenbreite (-2) als Inline-Kommentar ergänzt.
     ''' </remarks>
     Private Sub prCreateTabelleObjekte()
         With lvObjekt
+            ' Bestehende Daten und Spalten vollständig zurücksetzen
             .Clear()
+
+            ' Spaltenköpfe definieren (Breite 0 blendet die Spalte für den Benutzer aus)
             .Columns.Add("Name", 150, HorizontalAlignment.Left)
             .Columns.Add("Strasse", 150, HorizontalAlignment.Left)
             .Columns.Add("HNr", 50, HorizontalAlignment.Left)
             .Columns.Add("PLZ", 50, HorizontalAlignment.Left)
             .Columns.Add("Ort", 150, HorizontalAlignment.Left)
             .Columns.Add("Ortsteil", 150, HorizontalAlignment.Left)
-            .Columns.Add("Telefon", -2, HorizontalAlignment.Left)
+            .Columns.Add("Telefon", -2, HorizontalAlignment.Left) ' -2 entspricht automatischer Anpassung an die Header-Breite
             .Columns.Add("RGB", 0, HorizontalAlignment.Left)
             .Columns.Add("ID", 0, HorizontalAlignment.Left)
+
+            ' Anzeige- und Interaktionsverhalten konfigurieren
+            .View = View.Details
             .FullRowSelect = True
             .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
+            .HeaderStyle = ColumnHeaderStyle.Nonclickable
             .HideSelection = False
             .MultiSelect = False
+
+            ' Sortierung und Steuerung festlegen
             .Sorting = SortOrder.Ascending
             .TabIndex = 0
-            .View = View.Details
         End With
     End Sub
 
     ''' <summary>
-    ''' Tabelle Objekte mit daten aus der DataTabel "Objekte" füllen
+    ''' Befüllt das ListView "lvObjekt" und die ComboBox "coObjekt" mit den Daten aus der übergebenen DataTable.
+    ''' Ignoriert dabei als gelöscht markierte Datensätze und optimiert die UI-Performance während des Ladevorgangs.
     ''' </summary>
-    ''' <param name="dtT"></param>
+    ''' <param name="dtT">Die DataTable "Objekte", welche die anzuzeigenden Objektdaten enthält.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'BeginUpdate' und 'EndUpdate' für 'lvObjekt' und 'coObjekt' hinzugefügt, um UI-Flackern zu verhindern und die Performance drastisch zu steigern.
+    ''' - Umstellung auf eine lesbarere 'For Each'-Schleife für die DataRows.
+    ''' - 'AddRange' verwendet, um Elemente gesammelt an die Steuerelemente zu übergeben.
+    ''' - Null-Validierung (DBNull) für Tabellenfelder integriert, um potenzielle Abstürze zu verhindern.
     ''' </remarks>
     Private Sub prLoadObjInList(ByVal dtT As DataTable)
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
-        If nMax < 0 Then Exit Sub
-        lvObjekt.Items.Clear()
-        coObjekt.Items.Clear()
-        For i = 0 To nMax
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                Dim lv As ListViewItem
-                With lvObjekt
-                    lv = .Items.Add(dtT.Rows(i).Item("Name").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Strasse").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("HNr").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("PLZ").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Ort").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Ortsteil").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Telefon").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("RGB").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("ID").ToString)
-                    coObjekt.Items.Add(dtT.Rows(i).Item("Name").ToString)
-                End With
+        ' Vorab-Prüfung: Wenn die Tabelle nicht existiert oder leer ist, direkt abbrechen
+        If dtT Is Nothing OrElse dtT.Rows.Count = 0 Then Exit Sub
+
+
+        ' Listen für das performante Block-Einfügen (AddRange) vorbereiten
+        Dim listViewItems As New List(Of ListViewItem)()
+        Dim comboBoxItems As New List(Of Object)()
+
+        ' UI-Zeichnen während des Ladevorgangs einfrieren
+        lvObjekt.BeginUpdate()
+        coObjekt.BeginUpdate()
+
+        Try
+            ' Bestehende Einträge vorab leeren
+            lvObjekt.Items.Clear()
+            coObjekt.Items.Clear()
+
+            ' Zeilen durchlaufen
+            For Each row As DataRow In dtT.Rows
+                ' Gelöschte Zeilen überspringen
+                If row.RowState <> DataRowState.Deleted Then
+
+                    ' Werte sicher auslesen (verhindert Fehler bei DBNull)
+                    Dim name As String = If(row("Name") Is DBNull.Value, String.Empty, row("Name").ToString())
+                    Dim strasse As String = If(row("Strasse") Is DBNull.Value, String.Empty, row("Strasse").ToString())
+                    Dim hNr As String = If(row("HNr") Is DBNull.Value, String.Empty, row("HNr").ToString())
+                    Dim plz As String = If(row("PLZ") Is DBNull.Value, String.Empty, row("PLZ").ToString())
+                    Dim ort As String = If(row("Ort") Is DBNull.Value, String.Empty, row("Ort").ToString())
+                    Dim ortsteil As String = If(row("Ortsteil") Is DBNull.Value, String.Empty, row("Ortsteil").ToString())
+                    Dim telefon As String = If(row("Telefon") Is DBNull.Value, String.Empty, row("Telefon").ToString())
+                    Dim rgb As String = If(row("RGB") Is DBNull.Value, String.Empty, row("RGB").ToString())
+                    Dim id As String = If(row("ID") Is DBNull.Value, String.Empty, row("ID").ToString())
+
+                    ' Neues ListViewItem erstellen und SubItems anhängen
+                    Dim lvItem As New ListViewItem(name)
+                    With lvItem.SubItems
+                        .Add(strasse)
+                        .Add(hNr)
+                        .Add(plz)
+                        .Add(ort)
+                        .Add(ortsteil)
+                        .Add(telefon)
+                        .Add(rgb)
+                        .Add(id)
+                    End With
+
+                    ' Elemente temporär in den Listen zwischenspeichern
+                    listViewItems.Add(lvItem)
+                    comboBoxItems.Add(name)
+                End If
+            Next
+
+            ' Alle Elemente gesammelt an die UI übergeben
+            If listViewItems.Count > 0 Then
+                lvObjekt.Items.AddRange(listViewItems.ToArray())
+                coObjekt.Items.AddRange(comboBoxItems.ToArray())
             End If
-        Next
+
+        Finally
+            ' UI-Zeichnen wieder aktivieren (wird auch im Fehlerfall ausgeführt)
+            lvObjekt.EndUpdate()
+            coObjekt.EndUpdate()
+        End Try
     End Sub
 
+
     ''' <summary>
-    ''' Neues Objekt anlegen
+    ''' Bereitet die Benutzeroberfläche für die Erfassung eines neuen Objekts vor.
+    ''' Setzt den Bearbeitungsmodus, leert alle Eingabefelder und setzt den Fokus auf das Namensfeld.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (z. B. der ToolStripButton).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Aufruf von 'prLoockObj' entfernt.
+    ''' - Leere Strings durch 'String.Empty' ersetzt.
+    ''' - 'tbOName.Select()' durch die präzisere Methode 'tbOName.Focus()' ersetzt.
+    ''' - Inline-Kommentare zur Dokumentation des Ablaufs hinzugefügt.
     ''' </remarks>
     Private Sub tsbNewObj_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNewObj.Click
+        ' Flag für den Neuerstellungs-Modus setzen
         lNew = True
-        tbOName.Text = ""
-        tbOStr.Text = ""
-        tbOHNr.Text = ""
-        tbOPLZ.Text = ""
-        tbOOrt.Text = ""
-        tbOOrtsteil.Text = ""
-        tbOTelefon.Text = ""
-        Call prLoockObj(True)
-        tbOName.Select()
+
+        ' Eingabemaske vollständig leeren
+        tbOName.Text = String.Empty
+        tbOStr.Text = String.Empty
+        tbOHNr.Text = String.Empty
+        tbOPLZ.Text = String.Empty
+        tbOOrt.Text = String.Empty
+        tbOOrtsteil.Text = String.Empty
+        tbOTelefon.Text = String.Empty
+
+        ' Steuerelemente für die Bearbeitung freischalten
+        prLoockObj(True)
+
+        ' Fokus direkt in das erste Eingabefeld setzen
+        tbOName.Focus()
     End Sub
 
+
     ''' <summary>
-    ''' Objekt bearbeiten
+    ''' Schaltet die Benutzeroberfläche in den Bearbeitungsmodus für das aktuell gewählte Objekt.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax entfernt.
+    ''' - 'tbOName.Select()' durch das empfohlene 'tbOName.Focus()' ersetzt.
     ''' </remarks>
     Private Sub tsbEditObj_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEditObj.Click
-        Call prLoockObj(True)
-        tbOName.Select()
+        prLoockObj(True)
+        tbOName.Focus()
         lNew = False
     End Sub
 
     ''' <summary>
-    ''' Änderung Speichen
+    ''' Löst den Speichervorgang für das neu angelegte oder bearbeitete Objekt aus.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'Call'-Schlüsselwort beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub tsbSaveObj_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveObj.Click
-        Call prSaveObj()
+        prSaveObj()
     End Sub
 
     ''' <summary>
-    ''' Bearbeitung abbrechen
+    ''' Bricht den aktuellen Bearbeitungs- oder Neuerstellungsmodus ab und stellt den vorherigen Zustand wieder her.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'Call'-Syntax bei allen internen Methodenaufrufen entfernt.
     ''' </remarks>
     Private Sub tsbBraeckObj_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBraeckObj.Click
-        Call prLoockObj(False)
-        Call prCheckNoRecordObjekt(dtObj)
+        prLoockObj(False)
+        prCheckNoRecordObjekt(dtObj)
         lNew = False
     End Sub
 
     ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
+    ''' Steuert den Aktivierungszustand (Enabled) der Menüleisten-Buttons, Eingabefelder und Listen-Steuerelemente.
     ''' </summary>
-    ''' <param name="lStatus"></param>
+    ''' <param name="lStatus">Gibt an, ob sich die Maske im Bearbeitungsmodus befindet (True = Eingabe freigeschaltet, Listen gesperrt).</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Code zur besseren Übersichtlichkeit in Aktions-Buttons und Eingabemasken-Steuerelemente unterteilt.
     ''' </remarks>
     Private Sub prLoockObj(ByVal lStatus As Boolean)
+        ' Interaktions- und Aktionsbuttons steuern
         tsbEditObj.Enabled = Not lStatus
         tsbNewObj.Enabled = Not lStatus
         tsbSaveObj.Enabled = lStatus
         tsbBraeckObj.Enabled = lStatus
         tsbDelObj.Enabled = Not lStatus
+
+        ' Hauptliste sperren oder freigeben
         lvObjekt.Enabled = Not lStatus
+
+        ' Eingabefelder und Farb-Button sperren oder freigeben
         tbOName.Enabled = lStatus
         tbOStr.Enabled = lStatus
         tbOHNr.Enabled = lStatus
@@ -1557,247 +1657,336 @@ Public Class frmSystem
         tbOOrtsteil.Enabled = lStatus
         tbOTelefon.Enabled = lStatus
         btColorObjekt.Enabled = lStatus
-
     End Sub
 
+
     ''' <summary>
-    ''' Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+    ''' Überprüft, ob in der übergebenen DataTable Datensätze vorhanden sind, und steuert 
+    ''' dementsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
     ''' </summary>
-    ''' <param name="dt"></param>
+    ''' <param name="dt">Die zu prüfende DataTable (z. B. "dtObj").</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Null-Prüfung integriert, um Abstürze bei nicht instanziierten Tabellen zu verhindern.
+    ''' - Temporäre Boolean-Variable entfernt und durch eine performante, direkte Zuweisung des Vergleichsergebnisses ersetzt.
     ''' </remarks>
     Private Sub prCheckNoRecordObjekt(ByVal dt As DataTable)
-        Dim lNo As Boolean = False
-        If dt.Rows.Count > 0 Then lNo = True
-        tsbEditObj.Enabled = lNo
-        tsbDelObj.Enabled = lNo
+        ' Prüfen, ob die Tabelle existiert und Zeilen enthält
+        Dim hasRecords As Boolean = (dt IsNot Nothing AndAlso dt.Rows.Count > 0)
+
+        ' Buttons direkt basierend auf dem Prüfergebnis aktivieren oder deaktivieren
+        tsbEditObj.Enabled = hasRecords
+        tsbDelObj.Enabled = hasRecords
     End Sub
 
     ''' <summary>
-    ''' Prüfen ob Objekt schon existiert
+    ''' Überprüft, ob die Objektbezeichnung gültig ist und ob das Objekt bereits in der Datenbank existiert.
+    ''' Zeigt bei Fehlern eine entsprechende Warnmeldung an.
     ''' </summary>
-    ''' <param name="sName"></param>
-    ''' <returns>T/F</returns>
+    ''' <param name="sName">Der zu prüfende Objektname.</param>
+    ''' <returns>True, wenn das Objekt ungültig ist oder bereits existiert; andernfalls False.</returns>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'String.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
+    ''' - Veraltete 'MsgBox'-Syntax durch das moderne 'MessageBox.Show' ersetzt.
+    ''' - Einfache Anführungszeichen im SQL-String verdoppelt, um Syntaxfehler/Abstürze bei Sonderzeichen zu verhindern.
+    ''' - Logik auf das modernere 'Return'-Schlüsselwort umgestellt.
     ''' </remarks>
     Private Function fcCheckObjekt(ByVal sName As String) As Boolean
-        Dim sMsg As String = ""
-        Dim dt As DataTable
-        fcCheckObjekt = False
+        Dim sMsg As String = String.Empty
+        Dim isInvalid As Boolean = False
 
-        If sName.Trim = "" Then
+        ' 1. Prüfung: Ist der Name leer oder besteht er nur aus Leerzeichen?
+        If String.IsNullOrWhiteSpace(sName) Then
             sMsg = "Objektbezeichnung fehlt!"
-            fcCheckObjekt = True
+            isInvalid = True
         Else
-            dt = fcReadDataTable("SELECT * from Objekte WHERE Name='" & sName & "'")
-            If dt.Rows.Count > 0 Then
-                sMsg = "Objekt ist schon angelegt"
-                fcCheckObjekt = True
+            ' Maskierung von einfachen Anführungszeichen zur Vermeidung von SQL-Syntaxfehlern
+            Dim safeName As String = sName.Replace("'", "''")
+
+            ' 2. Prüfung: Existiert der Name bereits in der Datenbank?
+            Dim dt As DataTable = fcReadDataTable("SELECT Name FROM Objekte WHERE Name = '" & safeName & "'")
+
+            If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                sMsg = "Objekt ist schon angelegt!"
+                isInvalid = True
             End If
         End If
-        If fcCheckObjekt Then MsgBox(sMsg, MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Speichern nicht möglich")
 
+        ' Wenn eine Validierung fehlgeschlagen ist, Meldung ausgeben
+        If isInvalid Then
+            MessageBox.Show(sMsg, "Speichern nicht möglich", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        End If
+
+        Return isInvalid
     End Function
 
     ''' <summary>
-    ''' Speicherung durchführen
+    ''' Führt die Speicherung (Insert oder Update) eines Objekts sowohl in der Datenbank 
+    ''' als auch in der lokalen DataTable durch und aktualisiert anschließend die Benutzeroberfläche.
     ''' </summary>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Unbenutzten 'StringBuilder' entfernt.
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - Auf native .NET '.Split'-Methoden umgestellt.
+    ''' - Logik zur UI-Aktualisierung im 'Finally'-Block präzisiert.
     ''' </remarks>
     Private Sub prSaveObj()
-        Dim sb As New StringBuilder
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        Dim cBedingung As String = ""
+        Dim sqlText As String = String.Empty
+        Dim arFields() As String
+        Dim arValue() As String
+        Dim cBedingung As String = String.Empty
         Dim sName As String = tbOName.Text
         Dim sID As String = lbObjektID.Text
+        Dim isSaveSuccessful As Boolean = False
 
+        ' Bei Neuanlage Validierung prüfen und ID generieren
         If lNew Then
             If fcCheckObjekt(sName) Then Exit Sub
             sID = fcGetTimeID(Date.Today)
         End If
 
         Try
+            ' Feldnamen definieren und splitten
             sqlText = "ID,Name,Strasse,HNr,PLZ,Ort,Ortsteil,Telefon,RGB"
-            arFields = Split(sqlText, ",")
-            sqlText = fcSaveObjekt(sID)
-            arValue = Split(sqlText, "°")
+            arFields = sqlText.Split(","c)
 
+            ' Werte über Hilfsfunktion ermitteln und splitten
+            sqlText = fcSaveObjekt(sID)
+            arValue = sqlText.Split("°"c)
+
+            ' 1. Speichern in der Datenbank
             If lNew Then
-                Call fcInsertCommand("Objekte", arFields, arValue)
+                fcInsertCommand("Objekte", arFields, arValue)
             Else
                 cBedingung = " WHERE ID='" & sID & "'"
-                Call fcUpdateCommand("Objekte", arFields, arValue, cBedingung)
-            End If
-            'DataTable aktualisieren
-            If lNew Then
-                'Datensatz in DataTable "dtObj" speichern
-                Call fcInsertTable(dtObj, arFields, arValue)
-            Else
-                'Datensatz in DataTable "dtObj" speichern
-                cBedingung = "ID Like '" & sID & "'"
-                Call fcUpdateTable(dtObj, arFields, arValue, cBedingung)
+                fcUpdateCommand("Objekte", arFields, arValue, cBedingung)
             End If
 
+            ' 2. Lokale DataTable aktualisieren
+            If lNew Then
+                fcInsertTable(dtObj, arFields, arValue)
+            Else
+                cBedingung = "ID Like '" & sID & "'"
+                fcUpdateTable(dtObj, arFields, arValue, cBedingung)
+            End If
+
+            ' Status zurücksetzen und Erfolg flaggen
             lNew = False
+            isSaveSuccessful = True
 
         Catch ex As Exception
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         Finally
-            Call prLoadObjInList(dtObj)
-            Call prCheckNoRecordObjekt(dtObj)
-            Call prLoockObj(False)
-            Call prSelectEntry(lvObjekt, arValue(1))
+            ' Die UI wird nur aktualisiert, wenn das Speichern vorbereitet oder geglückt ist
+            prLoadObjInList(dtObj)
+            prCheckNoRecordObjekt(dtObj)
+            prLoockObj(False)
+
+            ' Den gespeicherten Eintrag in der Liste selektieren (Index 1 entspricht dem Namen im Array)
+            If isSaveSuccessful AndAlso arValue.Length > 1 Then
+                prSelectEntry(lvObjekt, arValue(1))
+            End If
         End Try
     End Sub
 
     ''' <summary>
-    ''' Zu speichernde Daten aufbereiten
+    ''' Bereitet die Formulardaten für den Speichervorgang vor, indem leere Felder mit Standardwerten 
+    ''' versehen und alle Werte mit dem Trennzeichen '°' zu einem Gesamtstring verkettet werden.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="sID">Die eindeutige ID des Objekts.</param>
+    ''' <returns>Ein mit '°' separierter String, der alle aufbereiteten Felddaten enthält.</returns>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'String.IsNullOrWhiteSpace' für die Null- und Leerzeilenprüfung implementiert.
+    ''' - UI-Steuerelemente werden beim Speichern nicht mehr manipuliert (kein direktes Zurückschreiben von " " in die TextBoxen).
+    ''' - Effiziente 'StringBuilder.Append'-Verkettung umgesetzt.
+    ''' - Logik auf das modernere 'Return'-Schlüsselwort umgestellt.
     ''' </remarks>
     Private Function fcSaveObjekt(ByVal sID As String) As String
-        Dim sb As New StringBuilder
-        If tbOStr.Text.Trim = "" Then tbOStr.Text = " "
-        If tbOHNr.Text.Trim = "" Then tbOHNr.Text = " "
-        If tbOPLZ.Text.Trim = "" Then tbOPLZ.Text = " "
-        If tbOOrt.Text.Trim = "" Then tbOOrt.Text = " "
-        If tbOOrtsteil.Text.Trim = "" Then tbOOrtsteil.Text = " "
-        If tbOTelefon.Text.Trim = "" Then tbOTelefon.Text = " "
-        If lbRGBString.Text.Trim = "" Then lbRGBString.Text = "0,0,0"
+        Dim sb As New StringBuilder()
 
-        sb.Append(sID & "°")
-        sb.Append(tbOName.Text & "°")
-        sb.Append(tbOStr.Text & "°")
-        sb.Append(tbOHNr.Text & "°")
-        sb.Append(tbOPLZ.Text & "°")
-        sb.Append(tbOOrt.Text & "°")
-        sb.Append(tbOOrtsteil.Text & "°")
-        sb.Append(tbOTelefon.Text & "°")
-        sb.Append(lbRGBString.Text)
-        fcSaveObjekt = sb.ToString
+        ' Werte lokal auslesen und Standardwerte setzen (verhindert das Manipulieren der Benutzeroberfläche)
+        Dim sName As String = tbOName.Text
+        Dim sStrasse As String = If(String.IsNullOrWhiteSpace(tbOStr.Text), " ", tbOStr.Text)
+        Dim sHNr As String = If(String.IsNullOrWhiteSpace(tbOHNr.Text), " ", tbOHNr.Text)
+        Dim sPLZ As String = If(String.IsNullOrWhiteSpace(tbOPLZ.Text), " ", tbOPLZ.Text)
+        Dim sOrt As String = If(String.IsNullOrWhiteSpace(tbOOrt.Text), " ", tbOOrt.Text)
+        Dim sOrtsteil As String = If(String.IsNullOrWhiteSpace(tbOOrtsteil.Text), " ", tbOOrtsteil.Text)
+        Dim sTelefon As String = If(String.IsNullOrWhiteSpace(tbOTelefon.Text), " ", tbOTelefon.Text)
+        Dim sRGB As String = If(String.IsNullOrWhiteSpace(lbRGBString.Text), "0,0,0", lbRGBString.Text)
+
+        ' String mit dem Trennzeichen '°' zusammensetzen
+        sb.Append(sID).Append("°")
+        sb.Append(sName).Append("°")
+        sb.Append(sStrasse).Append("°")
+        sb.Append(sHNr).Append("°")
+        sb.Append(sPLZ).Append("°")
+        sb.Append(sOrt).Append("°")
+        sb.Append(sOrtsteil).Append("°")
+        sb.Append(sTelefon).Append("°")
+        sb.Append(sRGB)
+
+        Return sb.ToString()
     End Function
 
     ''' <summary>
-    ''' Auswahl eines Eintrages in der Objekt liste
+    ''' Reagiert auf den Auswahlwechsel in der Objektliste "lvObjekt".
+    ''' Ruft die Detailinformationen des selektierten Objekts ab, sofern ein Element ausgewählt ist.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (das ListView-Steuerelement).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' - Sicherheitsabfrage (SelectedItems.Count) hinzugefügt, um leere Ereignis-Aufrufe beim Wechsel der Auswahl zu unterdrücken.
     ''' </remarks>
     Private Sub lvObjekt_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvObjekt.SelectedIndexChanged
-        Call prGetInfolvObjekt()
+        ' Nur ausführen, wenn tatsächlich ein Eintrag ausgewählt wurde
+        ' Verhindert Fehler und Flackern, wenn Einträge im ListView die Selektion verlieren
+        If lvObjekt.SelectedItems.Count > 0 Then
+            prGetInfolvObjekt()
+        End If
     End Sub
 
     ''' <summary>
-    ''' Informationen aus der Objektliste in die Eingabefelder übertragen
+    ''' Überträgt die Detailinformationen des aktuell selektierten Listen-Eintrags aus "lvObjekt" 
+    ''' in die entsprechenden Eingabefelder und setzt die Hintergrundfarbe des Farb-Buttons.
     ''' </summary>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Das selektierte ListViewItem in einer lokalen Variable zwischengespeichert, um den Code zu verkürzen und Zugriffe zu beschleunigen.
+    ''' - Sicherheitsabfrage der SubItem-Anzahl integriert, um IndexOutOfRange-Ausnahmen zu verhindern.
+    ''' - 'Call'-Befehle bei Farbfunktion nicht vorhanden, Code-Struktur durch Gruppierung aufgeräumt.
     ''' </remarks>
     Private Sub prGetInfolvObjekt()
+        ' Prüfen, ob überhaupt ein Eintrag selektiert ist
+        If lvObjekt.SelectedItems.Count = 0 Then Exit Sub
 
-        With lvObjekt
-            If .SelectedItems.Count <> 0 Then
-                tbOName.Text = .SelectedItems(0).SubItems(0).Text
-                tbOStr.Text = .SelectedItems(0).SubItems(1).Text
-                tbOHNr.Text = .SelectedItems(0).SubItems(2).Text
-                tbOPLZ.Text = .SelectedItems(0).SubItems(3).Text
-                tbOOrt.Text = .SelectedItems(0).SubItems(4).Text
-                tbOOrtsteil.Text = .SelectedItems(0).SubItems(5).Text
-                tbOTelefon.Text = .SelectedItems(0).SubItems(6).Text
-                lbRGBString.Text = .SelectedItems(0).SubItems(7).Text
-                lbObjektID.Text = .SelectedItems(0).SubItems(8).Text
-                btColorObjekt.BackColor = fcStringRGB(lbRGBString.Text)
-            End If
-        End With
+        ' Das erste ausgewählte Element für den performanten Zugriff zwischenspeichern
+        Dim selectedItem As ListViewItem = lvObjekt.SelectedItems(0)
+
+        ' Sicherheitsprüfung: Hat das Element die erwartete Mindestanzahl an Spalten (SubItems)?
+        If selectedItem.SubItems.Count >= 9 Then
+            ' Textfelder mit den Daten aus den jeweiligen Spalten befüllen
+            tbOName.Text = selectedItem.SubItems(0).Text
+            tbOStr.Text = selectedItem.SubItems(1).Text
+            tbOHNr.Text = selectedItem.SubItems(2).Text
+            tbOPLZ.Text = selectedItem.SubItems(3).Text
+            tbOOrt.Text = selectedItem.SubItems(4).Text
+            tbOOrtsteil.Text = selectedItem.SubItems(5).Text
+            tbOTelefon.Text = selectedItem.SubItems(6).Text
+
+            ' Versteckte IDs und Systemdaten übertragen
+            lbRGBString.Text = selectedItem.SubItems(7).Text
+            lbObjektID.Text = selectedItem.SubItems(8).Text
+
+            ' Hintergrundfarbe des Buttons anhand des gespeicherten RGB-Strings anpassen
+            btColorObjekt.BackColor = fcStringRGB(lbRGBString.Text)
+        End If
     End Sub
 
     ''' <summary>
-    ''' Objekt löschen
+    ''' Löscht das aktuell ausgewählte Objekt sowie alle verknüpften Zimmer 
+    ''' sowohl aus der Datenbank als auch aus den lokalen DataTables nach einer Sicherheitsabfrage.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - 'MsgBox' durch das moderne 'MessageBox.Show' mit expliziter Ja/Nein-Abfrage ersetzt.
+    ''' - 'String.IsNullOrEmpty' für ID-Validierung implementiert.
+    ''' - UI-Fokus auf '.Focus()' umgestellt und Selektionslogik für das Nachfolge-Element korrigiert.
+    ''' - 'vbCrLf' durch 'Environment.NewLine' ersetzt.
     ''' </remarks>
     Private Sub tsbDelObj_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDelObj.Click
-        Dim sMsg As String = "Wollen Sie dieses Objekt wirklich löschen?  " & vbCrLf & _
-                             "Die Zimmer dieses Objektes werden auch gelöscht!"
         Dim sObj As String = lbObjektID.Text
-        Dim cSql As String = "DELETE FROM Objekte WHERE ID = '" & sObj & "'"
-        If sObj = "" Then Exit Sub
-        If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
-            'Datensatz per SQL aus der Tabelle löschen
+
+        ' Vorab-Prüfung: Wenn keine ID vorhanden ist, Aktion abbrechen
+        If String.IsNullOrEmpty(sObj) Then Exit Sub
+
+        ' Sicherheitsabfrage für den Benutzer definieren
+        Dim sMsg As String = "Wollen Sie dieses Objekt wirklich löschen?" & Environment.NewLine &
+                         "Die Zimmer dieses Objektes werden ebenfalls gelöscht!"
+
+        ' Abfrage anzeigen (Ja/Nein-Schaltflächen sind für destruktive Aktionen sicherer als OK/Abbrechen)
+        If MessageBox.Show(sMsg, "Objekt löschen", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+
+            ' 1. Objekt aus der Datenbank löschen
+            Dim cSql As String = "DELETE FROM Objekte WHERE ID = '" & sObj & "'"
             UpdateTable(cSql)
-            'Änderung in DataTable "dtObj" speichern
-            Call fcDeleteTableRow(dtObj, "ID = '" & sObj & "'")
-            tbOName.Text = ""
-            tbOStr.Text = ""
-            tbOHNr.Text = ""
-            tbOPLZ.Text = ""
-            tbOOrt.Text = ""
-            tbOOrtsteil.Text = ""
-            tbOTelefon.Text = ""
-            lbObjektID.Text = ""
-            Call prLoadObjInList(dtObj)
-            'Zimmer löschen
+
+            ' 2. Objekt aus der lokalen DataTable "dtObj" entfernen
+            fcDeleteTableRow(dtObj, "ID = '" & sObj & "'")
+
+            ' Eingabemaske vollständig leeren
+            tbOName.Text = String.Empty
+            tbOStr.Text = String.Empty
+            tbOHNr.Text = String.Empty
+            tbOPLZ.Text = String.Empty
+            tbOOrt.Text = String.Empty
+            tbOOrtsteil.Text = String.Empty
+            tbOTelefon.Text = String.Empty
+            lbObjektID.Text = String.Empty
+
+            ' Hauptliste aktualisieren
+            prLoadObjInList(dtObj)
+
+            ' 3. Zugehörige Zimmer aus der Datenbank löschen
             cSql = "DELETE FROM Zimmer WHERE ID = '" & sObj & "'"
             UpdateTable(cSql)
-            Call fcDeleteTableRow(dtZim, "ID = '" & sObj & "'")
-            lvObjekt.Select()
-            If lvObjekt.Items.Count > 0 Then lvObjekt.TopItem.Selected = True
+
+            ' 4. Zugehörige Zimmer aus der lokalen DataTable "dtZim" entfernen
+            fcDeleteTableRow(dtZim, "ID = '" & sObj & "'")
+
+            ' Fokus zurück auf die Liste setzen
+            lvObjekt.Focus()
+
+            ' Falls noch Einträge vorhanden sind, automatisch das erste Element selektieren
+            If lvObjekt.Items.Count > 0 Then
+                lvObjekt.Items(0).Selected = True
+            End If
         End If
     End Sub
 
+    ''' <summary>
+    ''' Öffnet einen Farbauswahldialog, um die Hintergrundfarbe des Buttons zu ändern.
+    ''' Überträgt die gewählte Farbe als RGB-String in das dazugehörige Label.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (der Button "btColorObjekt").</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 29.09.2026 - Code-Optimierung:
+    ''' - 'Using'-Block für den ColorDialog implementiert, um eine saubere Ressourcenfreigabe (Dispose) zu garantieren.
+    ''' - Namespace-Angabe beim DialogResult gekürzt.
+    ''' </remarks>
     Private Sub btColorObjekt_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btColorObjekt.Click
-        Dim cd As New ColorDialog
-        cd.Color = btColorObjekt.BackColor
-        cd.FullOpen = True
-        If cd.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            btColorObjekt.BackColor = cd.Color
-            lbRGBString.Text = fcRGBString(cd.Color)
-        End If
+        ' Mithilfe von 'Using' wird der Dialog nach der Nutzung direkt wieder aus dem Speicher entfernt
+        Using cd As New ColorDialog()
+            cd.Color = btColorObjekt.BackColor
+            cd.FullOpen = True
+
+            ' Wenn der Benutzer die Farbauswahl mit OK bestätigt
+            If cd.ShowDialog() = DialogResult.OK Then
+                btColorObjekt.BackColor = cd.Color
+                lbRGBString.Text = fcRGBString(cd.Color)
+            End If
+        End Using
     End Sub
+
 
 #Region "Mit Enter weiter zum nächsten Feld........................................................"
-
-    Private Sub tbOName_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbOName.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbOStr.Select()
-        End If
-    End Sub
-    Private Sub tbOStr_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbOStr.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbOHNr.Select()
-        End If
-    End Sub
-    Private Sub tbOHNr_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbOHNr.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbOPLZ.Select()
-        End If
-    End Sub
-    Private Sub tbOPLZ_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbOPLZ.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbOOrt.Select()
-        End If
-    End Sub
-    Private Sub tbOOrt_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbOOrt.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbOOrtsteil.Select()
-        End If
-    End Sub
-    Private Sub tbOOrtsteil_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbOOrtsteil.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(13) Then
-            tbOName.Select()
-        End If
-    End Sub
+    ' ist in der Hauptrotine  "TextBox_KeyPress" enthalten, um die Navigation zwischen Eingabefeldern zu erleichtern.
 #End Region
 
 #End Region

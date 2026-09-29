@@ -5251,132 +5251,211 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
 </member>
 <member name="M:Pension.frmSystem.prCreateTabelleObjekte">
  <summary>
- Tabelle "Objekte" erstellen
+ Erstellt und konfiguriert die Tabellenstruktur für das ListView-Steuerelement "lvObjekt".
+ Definiert alle erforderlichen Spaltenköpfe, Sichtbarkeiten und das grundlegende Anzeige- und Sortierverhalten.
  </summary>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - XML-Dokumentationskommentar nach modernem Standard erweitert.
+ - Layout-Eigenschaften des ListView-Steuerelements gruppiert, um die Lesbarkeit des Codes zu erhöhen.
+ - Erläuterung zur speziellen Spaltenbreite (-2) als Inline-Kommentar ergänzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadObjInList(System.Data.DataTable)">
  <summary>
- Tabelle Objekte mit daten aus der DataTabel "Objekte" füllen
+ Befüllt das ListView "lvObjekt" und die ComboBox "coObjekt" mit den Daten aus der übergebenen DataTable.
+ Ignoriert dabei als gelöscht markierte Datensätze und optimiert die UI-Performance während des Ladevorgangs.
  </summary>
- <param name="dtT"></param>
+ <param name="dtT">Die DataTable "Objekte", welche die anzuzeigenden Objektdaten enthält.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'BeginUpdate' und 'EndUpdate' für 'lvObjekt' und 'coObjekt' hinzugefügt, um UI-Flackern zu verhindern und die Performance drastisch zu steigern.
+ - Umstellung auf eine lesbarere 'For Each'-Schleife für die DataRows.
+ - 'AddRange' verwendet, um Elemente gesammelt an die Steuerelemente zu übergeben.
+ - Null-Validierung (DBNull) für Tabellenfelder integriert, um potenzielle Abstürze zu verhindern.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbNewObj_Click(System.Object,System.EventArgs)">
  <summary>
- Neues Objekt anlegen
+ Bereitet die Benutzeroberfläche für die Erfassung eines neuen Objekts vor.
+ Setzt den Bearbeitungsmodus, leert alle Eingabefelder und setzt den Fokus auf das Namensfeld.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses (z. B. der ToolStripButton).</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Aufruf von 'prLoockObj' entfernt.
+ - Leere Strings durch 'String.Empty' ersetzt.
+ - 'tbOName.Select()' durch die präzisere Methode 'tbOName.Focus()' ersetzt.
+ - Inline-Kommentare zur Dokumentation des Ablaufs hinzugefügt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbEditObj_Click(System.Object,System.EventArgs)">
  <summary>
- Objekt bearbeiten
+ Schaltet die Benutzeroberfläche in den Bearbeitungsmodus für das aktuell gewählte Objekt.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax entfernt.
+ - 'tbOName.Select()' durch das empfohlene 'tbOName.Focus()' ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbSaveObj_Click(System.Object,System.EventArgs)">
  <summary>
- Änderung Speichen
+ Löst den Speichervorgang für das neu angelegte oder bearbeitete Objekt aus.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'Call'-Schlüsselwort beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbBraeckObj_Click(System.Object,System.EventArgs)">
  <summary>
- Bearbeitung abbrechen
+ Bricht den aktuellen Bearbeitungs- oder Neuerstellungsmodus ab und stellt den vorherigen Zustand wieder her.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'Call'-Syntax bei allen internen Methodenaufrufen entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoockObj(System.Boolean)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Steuert den Aktivierungszustand (Enabled) der Menüleisten-Buttons, Eingabefelder und Listen-Steuerelemente.
  </summary>
- <param name="lStatus"></param>
+ <param name="lStatus">Gibt an, ob sich die Maske im Bearbeitungsmodus befindet (True = Eingabe freigeschaltet, Listen gesperrt).</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Code zur besseren Übersichtlichkeit in Aktions-Buttons und Eingabemasken-Steuerelemente unterteilt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordObjekt(System.Data.DataTable)">
  <summary>
- Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+ Überprüft, ob in der übergebenen DataTable Datensätze vorhanden sind, und steuert 
+ dementsprechend die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die zu prüfende DataTable (z. B. "dtObj").</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Null-Prüfung integriert, um Abstürze bei nicht instanziierten Tabellen zu verhindern.
+ - Temporäre Boolean-Variable entfernt und durch eine performante, direkte Zuweisung des Vergleichsergebnisses ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcCheckObjekt(System.String)">
  <summary>
- Prüfen ob Objekt schon existiert
+ Überprüft, ob die Objektbezeichnung gültig ist und ob das Objekt bereits in der Datenbank existiert.
+ Zeigt bei Fehlern eine entsprechende Warnmeldung an.
  </summary>
- <param name="sName"></param>
- <returns>T/F</returns>
+ <param name="sName">Der zu prüfende Objektname.</param>
+ <returns>True, wenn das Objekt ungültig ist oder bereits existiert; andernfalls False.</returns>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'String.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
+ - Veraltete 'MsgBox'-Syntax durch das moderne 'MessageBox.Show' ersetzt.
+ - Einfache Anführungszeichen im SQL-String verdoppelt, um Syntaxfehler/Abstürze bei Sonderzeichen zu verhindern.
+ - Logik auf das modernere 'Return'-Schlüsselwort umgestellt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prSaveObj">
  <summary>
- Speicherung durchführen
+ Führt die Speicherung (Insert oder Update) eines Objekts sowohl in der Datenbank 
+ als auch in der lokalen DataTable durch und aktualisiert anschließend die Benutzeroberfläche.
  </summary>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Unbenutzten 'StringBuilder' entfernt.
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - Auf native .NET '.Split'-Methoden umgestellt.
+ - Logik zur UI-Aktualisierung im 'Finally'-Block präzisiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcSaveObjekt(System.String)">
  <summary>
- Zu speichernde Daten aufbereiten
+ Bereitet die Formulardaten für den Speichervorgang vor, indem leere Felder mit Standardwerten 
+ versehen und alle Werte mit dem Trennzeichen '°' zu einem Gesamtstring verkettet werden.
  </summary>
- <returns></returns>
+ <param name="sID">Die eindeutige ID des Objekts.</param>
+ <returns>Ein mit '°' separierter String, der alle aufbereiteten Felddaten enthält.</returns>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'String.IsNullOrWhiteSpace' für die Null- und Leerzeilenprüfung implementiert.
+ - UI-Steuerelemente werden beim Speichern nicht mehr manipuliert (kein direktes Zurückschreiben von " " in die TextBoxen).
+ - Effiziente 'StringBuilder.Append'-Verkettung umgesetzt.
+ - Logik auf das modernere 'Return'-Schlüsselwort umgestellt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.lvObjekt_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Auswahl eines Eintrages in der Objekt liste
+ Reagiert auf den Auswahlwechsel in der Objektliste "lvObjekt".
+ Ruft die Detailinformationen des selektierten Objekts ab, sofern ein Element ausgewählt ist.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses (das ListView-Steuerelement).</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+ - Sicherheitsabfrage (SelectedItems.Count) hinzugefügt, um leere Ereignis-Aufrufe beim Wechsel der Auswahl zu unterdrücken.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prGetInfolvObjekt">
  <summary>
- Informationen aus der Objektliste in die Eingabefelder übertragen
+ Überträgt die Detailinformationen des aktuell selektierten Listen-Eintrags aus "lvObjekt" 
+ in die entsprechenden Eingabefelder und setzt die Hintergrundfarbe des Farb-Buttons.
  </summary>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Das selektierte ListViewItem in einer lokalen Variable zwischengespeichert, um den Code zu verkürzen und Zugriffe zu beschleunigen.
+ - Sicherheitsabfrage der SubItem-Anzahl integriert, um IndexOutOfRange-Ausnahmen zu verhindern.
+ - 'Call'-Befehle bei Farbfunktion nicht vorhanden, Code-Struktur durch Gruppierung aufgeräumt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbDelObj_Click(System.Object,System.EventArgs)">
  <summary>
- Objekt löschen
+ Löscht das aktuell ausgewählte Objekt sowie alle verknüpften Zimmer 
+ sowohl aus der Datenbank als auch aus den lokalen DataTables nach einer Sicherheitsabfrage.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - 'MsgBox' durch das moderne 'MessageBox.Show' mit expliziter Ja/Nein-Abfrage ersetzt.
+ - 'String.IsNullOrEmpty' für ID-Validierung implementiert.
+ - UI-Fokus auf '.Focus()' umgestellt und Selektionslogik für das Nachfolge-Element korrigiert.
+ - 'vbCrLf' durch 'Environment.NewLine' ersetzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.btColorObjekt_Click(System.Object,System.EventArgs)">
+ <summary>
+ Öffnet einen Farbauswahldialog, um die Hintergrundfarbe des Buttons zu ändern.
+ Überträgt die gewählte Farbe als RGB-String in das dazugehörige Label.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses (der Button "btColorObjekt").</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 18.12.2011 - Create
+ 29.09.2026 - Code-Optimierung:
+ - 'Using'-Block für den ColorDialog implementiert, um eine saubere Ressourcenfreigabe (Dispose) zu garantieren.
+ - Namespace-Angabe beim DialogResult gekürzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCreateTabelleZimmer">
