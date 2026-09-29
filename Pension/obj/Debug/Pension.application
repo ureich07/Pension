@@ -7,14 +7,14 @@
     <framework targetVersion="4.8" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Pension.exe.manifest" size="10371">
+    <dependentAssembly dependencyType="install" codebase="Pension.exe.manifest" size="17254">
       <assemblyIdentity name="Pension.exe" version="2.0.0.3" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>uJpfxL6x9AKwMZITkybLI+K8k9FLD7jVHhqHFrYXyW8=</dsig:DigestValue>
+        <dsig:DigestValue>swJCd/JADRtaiGf8RKUJHmmGHyb8kwO+lGHKLKh53rw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

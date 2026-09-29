@@ -4759,6 +4759,11 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltete VB6-Funktionen ('Val', 'Str', 'CDate', 'Int') bereinigt und ungenutzte Variablen entfernt.
  </remarks>
 </member>
+<member name="M:Pension.frmSystem.#ctor">
+ <summary>
+ Konstruktor der Form
+ </summary>
+</member>
 <member name="M:Pension.frmSystem.frmSystem_Load(System.Object,System.EventArgs)">
  <summary>
  Wird beim Laden des System-Formulars ausgelöst. Initialisiert die Benutzeroberfläche, 

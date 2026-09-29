@@ -2,7 +2,7 @@ Imports System.Text
 Imports System.Net.Mail
 
 Public Class frmSystem
-
+    Inherits System.Windows.Forms.Form
     Dim arUsers(0) As String
     Dim lUser As Boolean = False
     Dim lEdit As Boolean = False
@@ -15,9 +15,11 @@ Public Class frmSystem
     Dim sDAK As String
     Dim lStart As Boolean = True
     Dim arDruckZimmer As Array
-    Dim sLanguage1 As Array = Split(ReadOneValueFromSystemDb("Language"), vbCrLf)
-    Dim sLanguage As Array = Split(sLanguage1(0), ";")
-    Dim arText As Array = Split(ReadOneValueFromSystemDb("Language"), vbCrLf)
+
+    ' HIER GEÄNDERT: Nur deklarieren, noch nicht befüllen!
+    Dim sLanguage1() As String
+    Dim sLanguage() As String
+    Dim arText() As String
     Dim arFeld As Array
     Dim arFeld1 As Array
     Dim arFeld2(1, 1) As String
@@ -25,7 +27,13 @@ Public Class frmSystem
     Dim y As Integer = 1
 
 
-
+    ''' <summary>
+    ''' Konstruktor der Form
+    ''' </summary>
+    Public Sub New()
+        ' Dieser Aufruf ist für den Designer zwingend erforderlich.
+        InitializeComponent()
+    End Sub
 #Region "Form Load................................................................................."
 
     ''' <summary>
@@ -42,6 +50,12 @@ Public Class frmSystem
     ''' - Anordnung der Aufrufe beibehalten, um die logische Initialisierungsreihenfolge nicht zu gefährden.
     ''' </remarks>
     Private Sub frmSystem_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        ' WICHTIG: Verhindert, dass der Visual Studio Designer versucht, 
+        ' zur Design-Zeit Daten zu laden oder Tabellen zu erstellen!
+        If Me.DesignMode Then Exit Sub
+        sLanguage1 = Split(ReadOneValueFromSystemDb("Language"), vbCrLf)
+        sLanguage = Split(sLanguage1(0), ";")
+        arText = Split(ReadOneValueFromSystemDb("Language"), vbCrLf)
         ' Steuerelemente der Benutzeroberfläche sichtbar schalten
         tsZimmer.Visible = True
         tsObjekt.Visible = True
@@ -344,7 +358,6 @@ Public Class frmSystem
     Private Sub cmdDatevDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDatevDir.Click
         tbDatevDir.Text = fcGetDirectory(tbDatevDir.Text)
     End Sub
-
 
     ''' <summary>
     ''' Steuert die Aktivierung der Aktionsschaltflächen und die Sichtbarkeit sowie Bearbeitbarkeit 
@@ -772,20 +785,20 @@ Public Class frmSystem
 
                 ' Fokus-Routing basierend auf der aktuellen TextBox
                 Select Case currentTextBox.Name
-                ' --- Anschriftdaten ---
+                    ' --- Anschriftdaten ---
                     Case "tbFirma" : tbStrasse.Select()
                     Case "tbStrasse" : tbPLZ.Select()
                     Case "tbPLZ" : tbOrt.Select()
                     Case "tbOrt" : tbWeb.Select()
                     Case "tbWeb" : tbTel1.Select()
 
-                ' --- Telefonnummern ---
+                    ' --- Telefonnummern ---
                     Case "tbTel1" : tbTel2.Select()
                     Case "tbTel2" : tbTel3.Select()
                     Case "tbTel3" : tbTel4.Select()
                     Case "tbTel4" : tbMwst3.Select()
 
-                ' --- Steuern / Bank---
+                    ' --- Steuern / Bank---
                     Case "tbMwst3" : tbMwst2.Select()
                     Case "tbMwst2" : tbMwst1.Select()
                     Case "tbMwst1" : tbFrue.Select()
@@ -806,16 +819,16 @@ Public Class frmSystem
                     Case "tbKK" : tbBK.Select()
                     Case "tbBK" : tbNetUser.Select()
 
-                ' --- Türschloss ---
+                    ' --- Türschloss ---
                     Case "tbNetUser" : tbIPSchloss.Select()
                     Case "tbIPSchloss" : tbRFIDPort.Select()
                     Case "tbRFIDPort" : tbDatevDir.Select()
-                ' --- Verzeichnisse ---
+                    ' --- Verzeichnisse ---
                     Case "tbDatevDir" : tbAblageDir.Select()
                     Case "tbAblageDir" : tbSaveDir.Select()
                     Case "tbSaveDir" : tbFirma.Select()
 
-                ' --- E-Mail & Server (Tab 2) ---
+                    ' --- E-Mail & Server (Tab 2) ---
                     Case "tbSMTP" : tbEMail.Select()
                     Case "tbEMail" : tbName.Select()
                     Case "tbName" : tbUName.Select()
@@ -823,7 +836,7 @@ Public Class frmSystem
                     Case "tbPWort" : tbTage.Select()
                     Case "tbTage" : tbSMTP.Select()
 
-                ' --- Objekte Anschriftdaten ---
+                    ' --- Objekte Anschriftdaten ---
                     Case "tbOName" : tbOStr.Select()
                     Case "tbOStr" : tbOHNr.Select()
                     Case "tbOHNr" : tbOPLZ.Select()
@@ -3560,6 +3573,12 @@ Public Class frmSystem
     ''' - Absicherung gegen SQL-Fehler bei Hochkommas im Listentext hinzugefügt.
     ''' </remarks>
     Private Sub liBuch_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles liBuch.SelectedIndexChanged
+        ' WICHTIG: Wenn die IDE (Visual Studio) das Event im Designer aufruft, sofort abbrechen!
+        If Me.DesignMode Then Exit Sub
+
+        ' Zusätzliche Null-Prüfung für globale Objekte, die im Designer leer sind
+        If sLanguage Is Nothing OrElse dtTxt Is Nothing Then Exit Sub
+
         ' Vorab-Prüfungen: Wenn gelöscht wird oder nichts selektiert ist, sofort abbrechen
         If lDel OrElse liBuch.SelectedIndex = -1 Then Exit Sub
 

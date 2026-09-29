@@ -1712,7 +1712,7 @@ Partial Class frmSystem
         'tbUStID
         '
         Me.tbUStID.ForeColor = System.Drawing.Color.Blue
-        Me.tbUStID.Location = New System.Drawing.Point(88, 131)
+        Me.tbUStID.Location = New System.Drawing.Point(88, 132)
         Me.tbUStID.Name = "tbUStID"
         Me.tbUStID.Size = New System.Drawing.Size(193, 20)
         Me.tbUStID.TabIndex = 90
@@ -3541,7 +3541,7 @@ Partial Class frmSystem
         Me.paBuch.Controls.Add(Me.Label46)
         Me.paBuch.Location = New System.Drawing.Point(140, 40)
         Me.paBuch.Name = "paBuch"
-        Me.paBuch.Size = New System.Drawing.Size(685, 355)
+        Me.paBuch.Size = New System.Drawing.Size(685, 485)
         Me.paBuch.TabIndex = 10
         '
         'Label62
@@ -3587,7 +3587,7 @@ Partial Class frmSystem
         '
         'Label47
         '
-        Me.Label47.Location = New System.Drawing.Point(16, 197)
+        Me.Label47.Location = New System.Drawing.Point(16, 277)
         Me.Label47.Name = "Label47"
         Me.Label47.Size = New System.Drawing.Size(100, 33)
         Me.Label47.TabIndex = 5
@@ -3597,10 +3597,10 @@ Partial Class frmSystem
         'tbBuchEn
         '
         Me.tbBuchEn.Enabled = False
-        Me.tbBuchEn.Location = New System.Drawing.Point(122, 197)
+        Me.tbBuchEn.Location = New System.Drawing.Point(122, 277)
         Me.tbBuchEn.Multiline = True
         Me.tbBuchEn.Name = "tbBuchEn"
-        Me.tbBuchEn.Size = New System.Drawing.Size(547, 145)
+        Me.tbBuchEn.Size = New System.Drawing.Size(547, 193)
         Me.tbBuchEn.TabIndex = 4
         '
         'tbBuchDe
@@ -3609,7 +3609,7 @@ Partial Class frmSystem
         Me.tbBuchDe.Location = New System.Drawing.Point(122, 47)
         Me.tbBuchDe.Multiline = True
         Me.tbBuchDe.Name = "tbBuchDe"
-        Me.tbBuchDe.Size = New System.Drawing.Size(547, 144)
+        Me.tbBuchDe.Size = New System.Drawing.Size(547, 224)
         Me.tbBuchDe.TabIndex = 3
         '
         'tbBez
@@ -3644,7 +3644,7 @@ Partial Class frmSystem
         Me.liBuch.FormattingEnabled = True
         Me.liBuch.Location = New System.Drawing.Point(15, 40)
         Me.liBuch.Name = "liBuch"
-        Me.liBuch.Size = New System.Drawing.Size(120, 355)
+        Me.liBuch.Size = New System.Drawing.Size(120, 485)
         Me.liBuch.Sorted = True
         Me.liBuch.TabIndex = 9
         '
