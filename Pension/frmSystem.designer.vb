@@ -4393,7 +4393,7 @@ Partial Class frmSystem
         '
         Me.tbNormal.Location = New System.Drawing.Point(212, 82)
         Me.tbNormal.Name = "tbNormal"
-        Me.tbNormal.Size = New System.Drawing.Size(68, 20)
+        Me.tbNormal.Size = New System.Drawing.Size(92, 20)
         Me.tbNormal.TabIndex = 138
         Me.tbNormal.Text = "Name"
         '
@@ -4411,7 +4411,7 @@ Partial Class frmSystem
         Me.tbProvision.ForeColor = System.Drawing.Color.Blue
         Me.tbProvision.Location = New System.Drawing.Point(230, 39)
         Me.tbProvision.Name = "tbProvision"
-        Me.tbProvision.Size = New System.Drawing.Size(50, 20)
+        Me.tbProvision.Size = New System.Drawing.Size(74, 20)
         Me.tbProvision.TabIndex = 133
         Me.tbProvision.Text = "0.00"
         Me.tbProvision.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
@@ -4442,7 +4442,7 @@ Partial Class frmSystem
         Me.tbWEMail.ForeColor = System.Drawing.Color.Blue
         Me.tbWEMail.Location = New System.Drawing.Point(15, 319)
         Me.tbWEMail.Name = "tbWEMail"
-        Me.tbWEMail.Size = New System.Drawing.Size(265, 20)
+        Me.tbWEMail.Size = New System.Drawing.Size(289, 20)
         Me.tbWEMail.TabIndex = 129
         Me.tbWEMail.Visible = False
         '
@@ -4491,7 +4491,7 @@ Partial Class frmSystem
         Me.tbBetreff.ForeColor = System.Drawing.Color.Blue
         Me.tbBetreff.Location = New System.Drawing.Point(360, 13)
         Me.tbBetreff.Name = "tbBetreff"
-        Me.tbBetreff.Size = New System.Drawing.Size(265, 20)
+        Me.tbBetreff.Size = New System.Drawing.Size(422, 20)
         Me.tbBetreff.TabIndex = 120
         Me.tbBetreff.Visible = False
         '

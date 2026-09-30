@@ -4876,6 +4876,41 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - XML-Dokumentation vervollständigt.
  </remarks>
 </member>
+<member name="M:Pension.frmSystem.prSelectFirstListBoxItemIfNeeded(System.Windows.Forms.ListBox)">
+ <summary>
+ Wählt automatisch den ersten Eintrag in einer ListBox aus, sofern Datensätze vorhanden sind und aktuell keine Auswahl existiert.
+ </summary>
+ <param name="listBox">Die ListBox, deren Auswahl gesteuert werden soll (z. B. liBuch oder liWerbung).</param>
+ <remarks>
+ 30.09.2026 - Code-Optimierung:
+ - Logik als eigenständige, wiederverwendbare Prozedur extrahiert.
+ - Durch die Übergabe als 'ListBox' kann die Methode flexibel für alle Listen im Formular genutzt werden.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prSelectFirstListViewItemIfNeeded(System.Windows.Forms.ListView)">
+ <summary>
+ Wählt automatisch den ersten Eintrag in einer ListView aus, sofern Einträge vorhanden sind und aktuell keine Auswahl existiert.
+ </summary>
+ <param name="listView">Die ListView, deren Auswahl gesteuert werden soll.</param>
+ <remarks>
+ 30.09.2026 - Code-Optimierung:
+ - Eigenständige Methode für ListView-Steuerelemente erstellt.
+ - Nutzt 'SelectedIndices.Count', um plattformunabhängig und null-sicher eine fehlende Auswahl zu erkennen.
+ - Setzt sowohl 'Selected' als auch 'Focused', damit das Element in der UI visuell hervorgehoben wird.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tcSystem_SelectedIndexChanged(System.Object,System.EventArgs)">
+ <summary>
+ Reagiert auf den Wechsel des aktiven Reiters im TabControl 'tcSystem' und stößt die jeweiligen Aktualisierungen an.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 30.09.2026 - Erstellt:
+ - Ereignis-Steuerung für den Tab-Wechsel implementiert.
+ - 'SelectedTab'-Abfrage über Select Case zur einfachen Erweiterung strukturiert.
+ </remarks>
+</member>
 <member name="M:Pension.frmSystem.tsmClose_Click(System.Object,System.EventArgs)">
  <summary>
  Formular wird über das Menüelement geschlossen.
@@ -6096,238 +6131,483 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordWerbung(System.Data.DataTable)">
  <summary>
- Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+ Prüft, ob Datensätze vorhanden sind, und steuert die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die zu prüfende DataTable mit den Werbedaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 24.09.2026 - Code-Optimierung:
+ - Logik vereinfacht: Zuweisung des Boolean-Status direkt aus dem Vergleichsausdruck ohne temporäre Variable.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbWNeu_Click(System.Object,System.EventArgs)">
  <summary>
- Neue Werbung anlegen
+ Bereitet die Benutzeroberfläche für das Anlegen einer neuen Werbung vor.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 24.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbWEdit_Click(System.Object,System.EventArgs)">
  <summary>
- Werbung bearbeiten
+ Bereitet die Benutzeroberfläche für das Bearbeiten einer bestehenden Werbung vor und lädt die aktuellen Werte in die Textfelder.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 24.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbWSave_Click(System.Object,System.EventArgs)">
  <summary>
- Änderung Speichen
+ Löst das Speichern der vorgenommenen Änderungen an der Werbung aus.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 24.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbWBreack_Click(System.Object,System.EventArgs)">
  <summary>
- Bearbeitung abbrechen
+ Bricht die aktuelle Bearbeitung ab und setzt den Zustand der Benutzeroberfläche zurück.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
-  26.01.2012 Create
+ 26.01.2012 - Create
+ 24.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoockWerbung(System.Boolean)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Steuert die Aktivierung und Sichtbarkeit der Eingabefelder sowie der Funktionstasten basierend auf dem aktuellen Bearbeitungsstatus.
  </summary>
- <param name="lStatus"></param>
+ <param name="lStatus">Gibt an, ob sich das Formular im Bearbeitungsmodus (True) oder im Ansichtsmodus (False) befindet.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 24.09.2026 - Code-Optimierung:
+ - Rechtschreibfehler im Methodennamen beibehalten (Kompatibilität), interne Steuerung logisch strukturiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prSaveWerbung">
  <summary>
- Speicherung durchführen
+ Führt die Speicherung oder Aktualisierung des Werbedatensatzes in der Datenbank und der lokalen DataTable durch.
  </summary>
  <remarks>
- 26.01.2012 Create
- 01.04.2012 Insert Format Provision
+ 26.01.2012 - Create
+ 01.04.2012 - Insert Format Provision
+ 24.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - 'tbWerbung.Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
+ - Nicht verwendete Variable 'sb' (StringBuilder) und 'sName' entfernt.
+ - 'Like'-Operator bei der ID-Filterung der DataTable durch präzisen '='-Operator ersetzt.
+ - Inline-Kommentare zur Dokumentation der Logikschritte hinzugefügt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcSaveWerbung(System.String)">
  <summary>
- Datensatz zur Speicherung zusammenstellen
+ Stellt die Formulardaten zu einem mit Trennzeichen (°) separierten String für die Speicherung zusammen.
  </summary>
- <param name="sID"></param>
+ <param name="sID">Die eindeutige Identifikationsnummer des Werbedatensatzes.</param>
+ <returns>Ein mit '°' separierter String, der alle Feldwerte enthält.</returns>
  <remarks>
- 26.01.2012 Create
- 01.04.2012 Insert Format Provision
+ 26.01.2012 - Create
+ 01.04.2012 - Insert Format Provision
+ 24.09.2026 - Code-Optimierung:
+ - 'Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
+ - UI-Entkopplung: Standardwerte werden direkt im Speicher (StringBuilder) gesetzt, anstatt die Textbox-Inhalte der UI mit Leerzeichen zu überschreiben.
+ - 'fcSaveWerbung = ...' durch die moderne 'Return'-Anweisung ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.liWerbung_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Auswahl eines Eintrages in der Liste
+ Reagiert auf die Auswahl eines Eintrags in der Liste und lädt die dazugehörigen Detailinformationen.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
- 01.04.2012 Insert Format Provision
+ 26.01.2012 - Create
+ 01.04.2012 - Insert Format Provision
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+ - Sicherheitsabfrage hinzugefügt: Verarbeitet die Auswahl nur, wenn der Index gültig ist (>-1).
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prGetInfoWerbung(System.String)">
  <summary>
- Ausgweählte Daten darstellen
+ Lädt die detaillierten Daten der ausgewählten Werbung aus der Datenbank und stellt sie in der UI dar.
  </summary>
- <param name="sID"></param>
+ <param name="sID">Die eindeutige Identifikationsnummer der anzuzeigenden Werbung.</param>
  <remarks>
- 26.01.2012 Create
- 01.04.2012 Insert Format Provision
+ 26.01.2012 - Create
+ 01.04.2012 - Insert Format Provision
+ 30.09.2026 - Code-Optimierung:
+ - Rechtschreibfehler im XML-Kommentar korrigiert.
+ - Datenzugriff durch direkte Typkonvertierung (.ToString) optimiert.
+ - Hintergrundfarbe wird nur zugewiesen, wenn Daten vorhanden sind.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbWDel_Click(System.Object,System.EventArgs)">
  <summary>
- Werbung löschen
+ Löscht den aktuell ausgewählten Werbedatensatz nach einer Sicherheitsabfrage aus der Datenbank und aktualisiert die Anzeige.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - 'sID = ""' durch performanteres 'String.IsNullOrEmpty' ersetzt und an den Methodenstart verschoben (Early Exit).
+ - Fehlerhaften Aufruf 'prCheckNoRecordBuch' auf die korrekte Methode 'prCheckNoRecordWerbung' umgestellt.
+ - Ablauflogik zur Vermeidung von unnötigen String-Operationen strukturiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tbProvision_LostFocus(System.Object,System.EventArgs)">
+ <summary>
+ Formatiert den eingegebenen Wert im Provisionsfeld automatisch als Dezimalzahl, sobald das Feld den Fokus verliert.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 30.09.2026 - Code-Dokumentation:
+ - XML-Kommentar für konsistente Projektdokumentation hinzugefügt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tbNormal_TextChanged(System.Object,System.EventArgs)">
+ <summary>
+ Öffnet bei einem Klick auf das Farbfeld den Windows-Farbdialog und weist die gewählte Farbe als Hintergrund sowie als RGB-String zu.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 30.09.2026 - Code-Optimierung:
+ - XML-Kommentar hinzugefügt.
+ - 'ColorDialog' in einen 'Using'-Block eingebettet, um eine saubere Freigabe der Systemressourcen (Dispose) zu garantieren.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadComboZimmer">
  <summary>
- Combofeld Zimmer
+ Lädt die verfügbaren Zimmer in die ToolStripComboBoxen, initialisiert die Jahresauswahl 
+ und stößt das Laden der zugehörigen Preise an.
  </summary>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax entfernt.
+ - 'dtZim.Rows.Count - 1' Absturzsicherung hinzugefügt (Null- / Leerprüfung der DataTable).
+ - 'tsbPZimmer1' wurde vor dem Befüllen nicht geleert – '.Items.Clear()' hinzugefügt, um doppelte Einträge bei erneutem Laden zu verhindern.
+ - Performance-Optimierung durch direkte Verwendung von DataRow-Objekten in der Schleife.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsbPZimmer_Click(System.Object,System.EventArgs)">
+ <summary>
+ Reagiert auf die Textänderung der Zimmer-Auswahl, aktualisiert die Anzeige-IDs und lädt die Preistabelle neu.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 30.09.2026 - Code-Optimierung:
+ - XML-Kommentar hinzugefügt.
+ - Event-Parameter korrekter typisiert (System.Object, System.EventArgs) entsprechend den .NET-Konventionen.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCreateTabellePreise">
  <summary>
- Tabelle "Preise" erstellen
+ Initialisiert das Layout und die Spaltenstruktur der Preis-ListView 'lvPreise'.
  </summary>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Steuerelement-Eigenschaften logisch nach Anzeige- und Verhaltensregeln gruppiert.
+ - Spaltenbreiten für eine ausgewogene UI angepasst (Verkleinerung extrem breiter Spalten).
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadPreiseInList">
  <summary>
- Tabelle User mit daten aus der DataTabel "Preise" füllen
+ Füllt die ListView 'lvPreise' mit den Preisdaten aus der DataTable 'dtPre' basierend auf der gewählten Zimmer-ID.
  </summary>
- <param name="dtT"></param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Auf performantere 'For Each'-Schleife umgestellt und 'dtPre.Rows(i)' durch direkte DataRow-Referenz ersetzt.
+ - nMax kleiner 0 -Prüfung durch saubere 'Rows.Count = 0'-Prüfung ersetzt.
+ - Redundanten 'With lvPreise'-Block innerhalb der Schleife entfernt, um den Scope sauber zu halten.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.fcPreisUm(System.String)">
+ <summary>
+ Konvertiert eine mit Pipe (|) getrennte Kette von Cent-Preisen in eine formatierte Euro-Preis-Kette.
+ </summary>
+ <param name="sPreisGruppe">Der umzuwandelnde String mit den Rohpreisen (z. B. "1000|2500").</param>
+ <returns>Ein formatierter String mit den umgerechneten Preisen (z. B. "10.00 | 25.00 |").</returns>
+ <remarks>
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Übergabeparameter von 'ByRef' auf den sichereren Standard 'ByVal' geändert.
+ - String-Verkettung in der Schleife durch ein hocheffizientes 'StringBuilder'-Objekt ersetzt.
+ - Fehleranfälliges 'Mid' und alte Zuweisung durch modernes 'Return' und '.ToString().Trim()' ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordPreise(System.Data.DataTable)">
  <summary>
- Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+ Prüft, ob Preisdatensätze vorhanden sind, steuert die Aktivierung der Bearbeiten- und Löschen-Schaltflächen 
+ und selektiert bei vorhandenen Daten automatisch den ersten Eintrag in der Tabelle.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die zu prüfende DataTable mit den Preisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Logik vereinfacht: Direkte Zuweisung des Boolean-Status ohne temporäre Variable.
+ - UI-Erweiterung: Ruft bei vorhandenen Datensätzen automatisch 'prSelectFirstListViewItemIfNeeded' auf, um den ersten Eintrag in 'lvPreise' auszuwählen.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbPNeu_Click(System.Object,System.EventArgs)">
  <summary>
- Neue Preise anlegen
+ Bereitet die Benutzeroberfläche für das Anlegen eines neuen Preisdatensatzes vor, indem alle Eingabefelder zurückgesetzt werden.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax entfernt.
+ - Massenzuweisungen der durchnummerierten Textboxen (Preise und Dauer) über strukturierte Arrays und Schleifen zusammengefasst.
+ - Übersichtlichkeit und Wartbarkeit bei Feldänderungen drastisch erhöht.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbPEdit_Click(System.Object,System.EventArgs)">
  <summary>
- Werbung bearbeiten
+ Bereitet die Benutzeroberfläche für das Bearbeiten der bestehenden Preise vor.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbPSave_Click(System.Object,System.EventArgs)">
  <summary>
- Änderung Speichen
+ Löst das Speichern der vorgenommenen Änderungen an den Preisen aus.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Rechtschreibfehler im XML-Kommentar korrigiert.
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbPBreak_Click(System.Object,System.EventArgs)">
  <summary>
- Bearbeitung abbrechen
+ Bricht die aktuelle Bearbeitung ab und setzt den Zustand der Benutzeroberfläche zurück.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
-  26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei den Methodenaufrufen entfernt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prCheckPreis">
+ <summary>
+ Setzt den Auswahlstatus (Checked) für alle Preis-Checkboxen standardmäßig auf Aktiv.
+ </summary>
+ <remarks>
+ 30.09.2026 - Code-Optimierung:
+ - XML-Kommentar hinzugefügt.
+ - Massenzuweisung der Checkboxen 'chP1' bis 'chP7' über eine wartbare Array-Schleife gelöst.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoockPreise(System.Boolean)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Steuert die Aktivierung und Sperrung aller Navigationselemente, Auswahllisten und Eingabefelder für die Preise.
  </summary>
- <param name="lStatus"></param>
+ <param name="lStatus">Gibt an, ob sich das Formular im Bearbeitungsmodus (True) oder im Ansichtsmodus (False) befindet.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Rechtschreibfehler im Methodennamen beibehalten (Kompatibilität).
+ - Doppelte Zuweisungen entfernt und gemeinsame Logik in 'prSetEingabefelderStatus' ausgelagert.
  </remarks>
+</member>
+<member name="M:Pension.frmSystem.prLoockPreise1(System.Boolean)">
+ <summary>
+ Steuert eine reduzierte Auswahl an Eingabefeldern und Speicher-Buttons, ohne die Navigationsleisten zu verändern.
+ </summary>
+ <param name="lStatus">Gibt an, ob die Felder aktiviert (True) oder gesperrt (False) werden sollen.</param>
+ <remarks>
+ 30.09.2026 - Code-Optimierung:
+ - XML-Kommentar für konsistente Projektdokumentation hinzugefügt.
+ - Redundante Doppelzuweisungen entfernt und Core-Logik mit 'prLoockPreise' vereinheitlicht.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prSetEingabefelderStatus(System.Boolean)">
+ <summary>
+ Interne Hilfsmethode zur Aktivierung/Deaktivierung der Daten- und Preisfelder, um Code-Duplikate zu vermeiden.
+ </summary>
 </member>
 <member name="M:Pension.frmSystem.lvPreise_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Auswahl eines Eintrages in der Preisliste
+ Reagiert auf die Auswahl eines Eintrags in der Preisliste und stößt das Laden der Details an.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+ - Sicherheitsabfrage erweitert: Bricht den Vorgang auch ab, wenn die Auswahl im Grid temporär aufgehoben wurde.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prGetInfolvPreise">
  <summary>
- Informationen aus der Preisliste in die Eingabefelder übertragen
+ Überträgt die detaillierten Informationen des ausgewählten Preislisteneintrags in die jeweiligen Eingabefelder der UI.
  </summary>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Massenzuweisung der Arrays (Preise und Dauer) über Index-Schleifen abgesichert, um 'IndexOutOfRangeException' bei unvollständigen Datensätzen zu verhindern.
+ - UI-Steuerelemente über strukturierte Arrays angesprochen, um den Code kompakt und wartbar zu halten.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.fcSaveEvent">
+ <summary>
+ Überprüft, ob das aktuell eingegebene Event bereits in der Systemdatenbank existiert, 
+ fügt es bei Bedarf hinzu und aktualisiert die Auswahl-ComboBox.
+ </summary>
+ <remarks>
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Datentyp von 'Function' zu 'Sub' korrigiert (da kein Rückgabewert existiert).
+ - Erste Suchschleife durch ein performantes '.Contains' ersetzt.
+ - 'StringSplitOptions.RemoveEmptyEntries' hinzugefügt, um leere Fragmente (\n) oder doppelte Zeilenumbrüche sauber zu filtern.
+ - 'String.IsNullOrWhiteSpace'-Prüfung integriert, um das Speichern leerer Eventnamen zu verhindern.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prSavePreise">
  <summary>
- Speicherung durchführen
+ Führt die Speicherung oder Aktualisierung des Preisdatensatzes in der Datenbank und der lokalen DataTable durch.
  </summary>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - Ungenutzte 'StringBuilder'-Variable entfernt.
+ - 'Like'-Operator bei der ID-Filterung der DataTable durch präzisen '='-Operator ersetzt.
+ - Absicherung im 'Finally'-Block integriert, falls 'arValue' vor dem Fehler nicht initialisiert wurde.
+ - 'fcSaveEvent()' logisch sauber am Ende der erfolgreichen Speicherung platziert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcSavePreise(System.String)">
  <summary>
- Zu speichernde Daten aufbereiten
+ Bereitet die eingegebenen Preis- und Dauerdaten vor, berechnet die Cent-Beträge und stellt sie als verketteten String bereit.
  </summary>
- <returns></returns>
+ <param name="sID">Die eindeutige Identifikationsnummer des Preisdatensatzes.</param>
+ <returns>Ein mit '°' separierter String, der alle formatierten Feldwerte enthält.</returns>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Massenhafte 'If'-Bedingungen für die 7 Preiskategorien durch eine wartbare Array-Schleife ersetzt.
+ - 'Text.Trim = ""' durch 'String.IsNullOrWhiteSpace' ersetzt.
+ - Implizite String-Multiplikation durch sichere numerische Konvertierung via 'Val()' behoben.
+ - 'fcSavePreise = ...' durch moderne 'Return'-Anweisung ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbPDel_Click(System.Object,System.EventArgs)">
  <summary>
- Preis löschen
+ Löscht den aktuell ausgewählten Preisdatensatz nach einer Sicherheitsabfrage aus der Datenbank und aktualisiert die Anzeige.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - 'sID = ""' durch 'String.IsNullOrEmpty' ersetzt und an den Methodenstart vorgezogen (Early Exit).
+ - Massenhafte Textbox-Leerungen über eine kompakte Array-Schleife für alle 7 Preisfelder vereinheitlicht.
+ - Fehlerhaften '.TopItem.Selected'-Aufruf durch die sichere Methode 'prSelectFirstListViewItemIfNeeded' ersetzt.
+ - Veraltete 'Call'-Syntax entfernt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.chP_Generic_CheckedChanged(System.Object,System.EventArgs)">
+ <summary>
+ Universeller Event-Handler für alle sieben Preis-Checkboxen.
+ Schaltet das jeweils zugehörige Textfeld basierend auf dem Auswahlstatus frei oder sperrt es.
+ </summary>
+</member>
+<member name="M:Pension.frmSystem.tsbPCopy_Click(System.Object,System.EventArgs)">
+ <summary>
+ Kopiert bestehende Preiselemente für ein ausgewähltes Zimmer in ein zukünftiges Jahr 
+ und berechnet die Werte auf Cent-Basis neu.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - 'With lvPreise' aus der performancerelevanten i-Schleife nach oben herausgezogen.
+ - String-Zusammenbau bei den Preisen durch ein effizientes 'StringBuilder'-Objekt optimiert.
+ - Unnötige 'Mid'-Funktion bei der String-Längen-Kürzung durch modernes '.Length - 1' ersetzt.
+ - Event-Parameter konform auf 'ByVal' und korrekte .NET-Typen umgestellt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsbPZimmerCopyJahr_Click(System.Object,System.EventArgs)">
+ <summary>
+ Kopiert alle Preise des aktuellen Zimmers aus dem ausgewählten Basisjahr in ein zukünftiges Jahr 
+ und berechnet die Werte auf Cent-Basis neu.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Absturzsicherung hinzugefügt für den Fall, dass 'lvPreise' keine Einträge enthält.
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+ - Preis-Verkettung in der inneren Schleife auf performantes 'StringBuilder'-Objekt umgestellt.
+ - 'String.Format' für eine saubere und lesbare SQL-Wert-Generierung implementiert.
+ - Parameter auf korrekte .NET-Typen typisiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tbPreis_Generic_KeyPress(System.Object,System.Windows.Forms.KeyPressEventArgs)">
+ <summary>
+ Validiert die Tastatureingaben für alle Preis-Textfelder und erlaubt nur numerische Zeichen sowie Steuerzeichen.
+ </summary>
+ <param name="sender">Die TextBox, in der das Zeichen eingegeben wurde.</param>
+ <param name="e">Die Ereignisdaten mit dem eingegebenen Zeichen.</param>
+ <remarks>
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Alle einzelnen KeyPress-Events in einer einzigen, generischen Methode zusammengefasst.
+ - 'tbPreis6' und 'tbPreis7' direkt im 'Handles'-Block ergänzt, da diese im Originalcode fehlten.
+ - Veraltete 'Call'-Syntax entfernt und 'sender' dynamisch an die Prüffunktion übergeben.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tbPreis_Generic_Leave(System.Object,System.EventArgs)">
+ <summary>
+ Formatiert den Inhalt des Preis-Textfeldes automatisch als Dezimalzahl, sobald das Feld verlassen wird.
+ </summary>
+ <param name="sender">Die TextBox, die den Fokus verloren hat.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Alle einzelnen Leave-Events in einer einzigen, generischen Methode zusammengefasst.
+ - 'tbPreis6' und 'tbPreis7' direkt mit abgesichert.
+ - Castet den 'sender' dynamisch, um die Formatierung fehlerfrei auf das aktive Feld anzuwenden.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCreateTabelleSasion">
@@ -6340,10 +6620,14 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
 </member>
 <member name="M:Pension.frmSystem.prLoadSaisonInList">
  <summary>
- Tabelle Saison mit daten aus der Datei "Saison.ini" füllen
+ Füllt die ListView 'lvSasion' mit den Saisondaten aus der Konfigurationsdatei und formatiert die Zeilen farblich.
  </summary>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 30.09.2026 - Code-Optimierung:
+ - Zeilenumbruch-Splitting robuster gestaltet, um leere Fragmente (\n) abzufangen.
+ - Index-Zähler für die Hintergrundfarbe ('BackColor') entkoppelt, damit Leerzeilen im Array das Grid nicht verschieben.
+ - Fehlerhaften '.TopItem.Selected'-Aufruf durch die neue, sichere Methode 'prSelectFirstListViewItemIfNeeded' ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prGetInfolvSaison">

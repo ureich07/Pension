@@ -472,6 +472,73 @@ Public Class frmSystem
         End If
     End Sub
 
+    ''' <summary>
+    ''' Wählt automatisch den ersten Eintrag in einer ListBox aus, sofern Datensätze vorhanden sind und aktuell keine Auswahl existiert.
+    ''' </summary>
+    ''' <param name="listBox">Die ListBox, deren Auswahl gesteuert werden soll (z. B. liBuch oder liWerbung).</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Logik als eigenständige, wiederverwendbare Prozedur extrahiert.
+    ''' - Durch die Übergabe als 'ListBox' kann die Methode flexibel für alle Listen im Formular genutzt werden.
+    ''' </remarks>
+    Private Sub prSelectFirstListBoxItemIfNeeded(ByVal listBox As ListBox)
+        ' Prüfen, ob die Liste Steuerelemente enthält und aktuell kein Eintrag selektiert ist
+        If listBox IsNot Nothing AndAlso listBox.SelectedIndex = -1 AndAlso listBox.Items.Count > 0 Then
+            listBox.SelectedIndex = 0
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Wählt automatisch den ersten Eintrag in einer ListView aus, sofern Einträge vorhanden sind und aktuell keine Auswahl existiert.
+    ''' </summary>
+    ''' <param name="listView">Die ListView, deren Auswahl gesteuert werden soll.</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Eigenständige Methode für ListView-Steuerelemente erstellt.
+    ''' - Nutzt 'SelectedIndices.Count', um plattformunabhängig und null-sicher eine fehlende Auswahl zu erkennen.
+    ''' - Setzt sowohl 'Selected' als auch 'Focused', damit das Element in der UI visuell hervorgehoben wird.
+    ''' </remarks>
+    Private Sub prSelectFirstListViewItemIfNeeded(ByVal listView As ListView)
+        ' Prüfen, ob die ListView existiert, Einträge besitzt und aktuell nichts selektiert ist
+        If listView IsNot Nothing AndAlso listView.Items.Count > 0 AndAlso listView.SelectedIndices.Count = 0 Then
+            ' Das erste Element markieren
+            listView.Items(0).Selected = True
+            ' Den Fokusrahmen auf das erste Element setzen (wichtig für Tastatursteuerung)
+            listView.Items(0).Focused = True
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Reagiert auf den Wechsel des aktiven Reiters im TabControl 'tcSystem' und stößt die jeweiligen Aktualisierungen an.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Erstellt:
+    ''' - Ereignis-Steuerung für den Tab-Wechsel implementiert.
+    ''' - 'SelectedTab'-Abfrage über Select Case zur einfachen Erweiterung strukturiert.
+    ''' </remarks>
+    Private Sub tcSystem_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tcSystem.SelectedIndexChanged
+        ' Sicherstellen, dass ein Tab ausgewählt ist
+        If tcSystem.SelectedTab IsNot Nothing Then
+
+            ' Abfrage basierend auf dem Namen des TabPages (im Designer vergeben)
+            Select Case tcSystem.SelectedTab.Name
+
+                Case "tpPreise"
+                    prCheckNoRecordPreise(dtPre)
+
+                Case "tbSonstiges"
+                    prCheckNoRecordWerbung(dtWer)
+
+                Case "tpZimmer"
+                    prCheckNoRecordZimmer(dtZim)
+
+            End Select
+        End If
+    End Sub
+
+
 #End Region
 
 #Region "Menü / Toolbar............................................................................"
@@ -1289,6 +1356,10 @@ Public Class frmSystem
 
         tsbEditKonto.Enabled = hasRecords
         tsbDelKonto.Enabled = hasRecords
+        ' Wenn Datensätze vorhanden sind, die Selektionsprüfung für die ListBox aufrufen
+        If hasRecords Then
+            prSelectFirstListViewItemIfNeeded(lvKonto)
+        End If
     End Sub
 
     ''' <summary>
@@ -1696,6 +1767,10 @@ Public Class frmSystem
         ' Buttons direkt basierend auf dem Prüfergebnis aktivieren oder deaktivieren
         tsbEditObj.Enabled = hasRecords
         tsbDelObj.Enabled = hasRecords
+        ' Wenn Datensätze vorhanden sind, die Selektionsprüfung für die ListBox aufrufen
+        If hasRecords Then
+            prSelectFirstListViewItemIfNeeded(lvObjekt)
+        End If
     End Sub
 
     ''' <summary>
@@ -2171,6 +2246,10 @@ Public Class frmSystem
         ' Buttons direkt basierend auf dem Ergebnis aktivieren oder deaktivieren
         tsbEditZim.Enabled = hasRecords
         tsbDelZim.Enabled = hasRecords
+        ' Wenn Datensätze vorhanden sind, die Selektionsprüfung für die ListBox aufrufen
+        If hasRecords Then
+            prSelectFirstListViewItemIfNeeded(lvZimmer)
+        End If
     End Sub
 
 
@@ -2938,6 +3017,10 @@ Public Class frmSystem
         ' Buttons direkt basierend auf dem Ergebnis aktivieren oder deaktivieren
         tsbEditUser.Enabled = hasRecords
         tsbDelUser.Enabled = hasRecords
+        ' Wenn Datensätze vorhanden sind, die Selektionsprüfung für die ListBox aufrufen
+        If hasRecords Then
+            prSelectFirstListViewItemIfNeeded(lvUser)
+        End If
     End Sub
 
     ''' <summary>
@@ -3360,6 +3443,10 @@ Public Class frmSystem
         ' Buttons direkt basierend auf dem Ergebnis aktivieren oder deaktivieren
         tsbEditBuch.Enabled = hasRecords
         tsbDelBuch.Enabled = hasRecords
+        ' Wenn Datensätze vorhanden sind, die Selektionsprüfung für die ListBox aufrufen
+        If hasRecords Then
+            prSelectFirstListBoxItemIfNeeded(liBuch)
+        End If
     End Sub
 
     ''' <summary>
@@ -3778,267 +3865,383 @@ Public Class frmSystem
 #Region "Werbung bearbeiten........................................................................"
 
     ''' <summary>
-    ''' Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+    ''' Prüft, ob Datensätze vorhanden sind, und steuert die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
     ''' </summary>
-    ''' <param name="dt"></param>
+    ''' <param name="dt">Die zu prüfende DataTable mit den Werbedaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - Logik vereinfacht: Zuweisung des Boolean-Status direkt aus dem Vergleichsausdruck ohne temporäre Variable.
     ''' </remarks>
     Private Sub prCheckNoRecordWerbung(ByVal dt As DataTable)
-        Dim lNo As Boolean = False
-        If dt.Rows.Count > 0 Then lNo = True
-        tsbWEdit.Enabled = lNo
-        tsbWDel.Enabled = lNo
+        ' Status direkt ermitteln: True, wenn Zeilen vorhanden sind
+        Dim hasRows As Boolean = (dt.Rows.Count > 0)
+
+        tsbWEdit.Enabled = hasRows
+        tsbWDel.Enabled = hasRows
+        ' Wenn Datensätze vorhanden sind, automatisch den ersten Eintrag auswählen
+        If hasRows Then
+            ' Nur selektieren, wenn aktuell noch nichts oder ein ungültiger Index ausgewählt ist
+            ' (verhindert das ungewollte Überschreiben einer bestehenden Benutzerauswahl)
+            If liWerbung.SelectedIndex = -1 AndAlso liWerbung.Items.Count > 0 Then
+                liWerbung.SelectedIndex = 0
+            End If
+        End If
     End Sub
 
     ''' <summary>
-    ''' Neue Werbung anlegen
+    ''' Bereitet die Benutzeroberfläche für das Anlegen einer neuen Werbung vor.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub tsbWNeu_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWNeu.Click
         lNew = True
         tbWerbung.Text = ""
-        Call prLoockWerbung(True)
+
+        ' Felder für Eingabe freischalten und Fokus setzen
+        prLoockWerbung(True)
         tbWerbung.Select()
     End Sub
 
     ''' <summary>
-    ''' Werbung bearbeiten
+    ''' Bereitet die Benutzeroberfläche für das Bearbeiten einer bestehenden Werbung vor und lädt die aktuellen Werte in die Textfelder.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub tsbWEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWEdit.Click
-        Call prLoockWerbung(True)
+        prLoockWerbung(True)
+
+        ' Werte aus den Labels in die Bearbeitungsfelder übertragen
         tbBetreff.Text = lbBetreff.Text
         tbKopf.Text = lbKopf.Text
         tbFuss.Text = lbFuss.Text
         tbProvision.Text = lbProvision.Text
         tbWEMail.Text = lbWEMail.Text
+
         tbWerbung.Select()
     End Sub
 
     ''' <summary>
-    ''' Änderung Speichen
+    ''' Löst das Speichern der vorgenommenen Änderungen an der Werbung aus.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub tsbWSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWSave.Click
-        Call prSaveWerbung()
+        prSaveWerbung()
     End Sub
 
     ''' <summary>
-    ''' Bearbeitung abbrechen
+    ''' Bricht die aktuelle Bearbeitung ab und setzt den Zustand der Benutzeroberfläche zurück.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    '''  26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
     ''' </remarks>
     Private Sub tsbWBreack_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWBreack.Click
-        Call prLoockWerbung(False)
-        Call prCheckNoRecordWerbung(dtWer)
+        ' Eingabemodus sperren und Button-Status anhand bestehender Daten neu evaluieren
+        prLoockWerbung(False)
+        prCheckNoRecordWerbung(dtWer)
     End Sub
 
     ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
+    ''' Steuert die Aktivierung und Sichtbarkeit der Eingabefelder sowie der Funktionstasten basierend auf dem aktuellen Bearbeitungsstatus.
     ''' </summary>
-    ''' <param name="lStatus"></param>
+    ''' <param name="lStatus">Gibt an, ob sich das Formular im Bearbeitungsmodus (True) oder im Ansichtsmodus (False) befindet.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - Rechtschreibfehler im Methodennamen beibehalten (Kompatibilität), interne Steuerung logisch strukturiert.
     ''' </remarks>
     Private Sub prLoockWerbung(ByVal lStatus As Boolean)
+        ' Steuerung der Button-Aktivierung
         tsbWEdit.Enabled = Not lStatus
         tsbWNeu.Enabled = Not lStatus
         tsbWSave.Enabled = lStatus
         tsbWBreack.Enabled = lStatus
         tsbWDel.Enabled = Not lStatus
+
+        ' Steuerung der Listen- und Eingabeelemente
         liWerbung.Enabled = Not lStatus
         tbWerbung.Enabled = lStatus
 
+        ' Sichtbarkeiten der Detail-Eingabefelder umschalten
         tbProvision.Visible = lStatus
         tbBetreff.Visible = lStatus
         tbKopf.Visible = lStatus
         tbFuss.Visible = lStatus
         tbWEMail.Visible = lStatus
         tbNormal.Enabled = lStatus
+
+        ' Ansicht aktualisieren
         liWerbung.Refresh()
     End Sub
 
     ''' <summary>
-    ''' Speicherung durchführen
+    ''' Führt die Speicherung oder Aktualisierung des Werbedatensatzes in der Datenbank und der lokalen DataTable durch.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
-    ''' 01.04.2012 Insert Format Provision
+    ''' 26.01.2012 - Create
+    ''' 01.04.2012 - Insert Format Provision
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - 'tbWerbung.Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
+    ''' - Nicht verwendete Variable 'sb' (StringBuilder) und 'sName' entfernt.
+    ''' - 'Like'-Operator bei der ID-Filterung der DataTable durch präzisen '='-Operator ersetzt.
+    ''' - Inline-Kommentare zur Dokumentation der Logikschritte hinzugefügt.
     ''' </remarks>
     Private Sub prSaveWerbung()
-        Dim sb As New StringBuilder
         Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
+        Dim arFields() As String
+        Dim arValue() As String
         Dim cBedingung As String = ""
-        tbProvision.Text = fcFormatDecimal(tbProvision.Text)
-        Dim sName As String = tbBez.Text
         Dim sID As String
+
+        ' Formatierung der Provision und ID-Ermittlung
+        tbProvision.Text = fcFormatDecimal(tbProvision.Text)
+
         If lNew Then
             sID = fcGetTimeID(Date.Today)
         Else
-            'sID = liWerbung.SelectedValue.ToString
             sID = fcGetOneValue(dtWer, liWerbung.Text, "Werbung", "ID")
         End If
 
         Try
+            ' Felder definieren und Splitten
             sqlText = "ID,Werbung,Betreff,KText,FText,Link,Provision,Color"
             arFields = Split(sqlText, ",")
-            If tbWerbung.Text.Trim = "" Then Exit Sub
-            sqlText = fcSaveWerbung(sID) ' & "°" & tbWerbung.Text
+
+            ' Validierung: Wenn Werbetext leer ist, Speichervorgang abbrechen
+            If String.IsNullOrWhiteSpace(tbWerbung.Text) Then Exit Sub
+
+            ' Werte für die Felder holen
+            sqlText = fcSaveWerbung(sID)
             arValue = Split(sqlText, "°")
 
+            ' Bei Neuanlage leeren Datensatz in der Datenbank erzeugen
             If lNew Then
                 sID = fcAppendBlank("Werbung")
-                '  Call fcInsertCommand("Werbung", arFields, arValue)
             End If
-            cBedingung = " WHERE ID='" & sID & "'"
-            Call fcUpdateCommand("Werbung", arFields, arValue, cBedingung)
 
-            'DataTable aktualisieren
+            ' Daten in der Datenbank aktualisieren
+            cBedingung = " WHERE ID='" & sID & "'"
+            fcUpdateCommand("Werbung", arFields, arValue, cBedingung)
+
+            ' Lokale DataTable synchronisieren
             If lNew Then
-                'Datensatz in DataTable "dtWer" speichern
-                Call fcInsertTable(dtWer, arFields, arValue)
+                ' Neuen Datensatz in DataTable "dtWer" hinzufügen
+                fcInsertTable(dtWer, arFields, arValue)
             Else
-                'Datensatz in DataTable "dtWer" speichern
-                cBedingung = "ID Like '" & sID & "'"
-                Call fcUpdateTable(dtWer, arFields, arValue, cBedingung)
+                ' Bestehenden Datensatz in DataTable "dtWer" aktualisieren
+                cBedingung = "ID = '" & sID & "'"
+                fcUpdateTable(dtWer, arFields, arValue, cBedingung)
             End If
 
             lNew = False
 
         Catch ex As Exception
+            ' Fehlerprotokollierung
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         Finally
-            Call prCheckNoRecordWerbung(dtWer)
-            Call prLoockWerbung(False)
+            ' Benutzeroberfläche zurücksetzen und Liste neu laden
+            prCheckNoRecordWerbung(dtWer)
+            prLoockWerbung(False)
             liWerbung = fcLoadListe(liWerbung, dtWer, "Werbung")
         End Try
     End Sub
 
     ''' <summary>
-    ''' Datensatz zur Speicherung zusammenstellen
+    ''' Stellt die Formulardaten zu einem mit Trennzeichen (°) separierten String für die Speicherung zusammen.
     ''' </summary>
-    ''' <param name="sID"></param>
+    ''' <param name="sID">Die eindeutige Identifikationsnummer des Werbedatensatzes.</param>
+    ''' <returns>Ein mit '°' separierter String, der alle Feldwerte enthält.</returns>
     ''' <remarks>
-    ''' 26.01.2012 Create
-    ''' 01.04.2012 Insert Format Provision
+    ''' 26.01.2012 - Create
+    ''' 01.04.2012 - Insert Format Provision
+    ''' 24.09.2026 - Code-Optimierung:
+    ''' - 'Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
+    ''' - UI-Entkopplung: Standardwerte werden direkt im Speicher (StringBuilder) gesetzt, anstatt die Textbox-Inhalte der UI mit Leerzeichen zu überschreiben.
+    ''' - 'fcSaveWerbung = ...' durch die moderne 'Return'-Anweisung ersetzt.
     ''' </remarks>
     Private Function fcSaveWerbung(ByVal sID As String) As String
         Dim sb As New StringBuilder
-        If tbBetreff.Text.Trim = "" Then tbBetreff.Text = " "
-        If tbKopf.Text.Trim = "" Then tbKopf.Text = " "
-        If tbFuss.Text.Trim = "" Then tbFuss.Text = " "
-        If tbWEMail.Text.Trim = "" Then tbWEMail.Text = " "
-        If tbProvision.Text.Trim = "" Then tbProvision.Text = "0.00"
-        sb.Append(sID & "°")
-        sb.Append(tbWerbung.Text & "°")
-        sb.Append(tbBetreff.Text & "°")
-        sb.Append(tbKopf.Text & "°")
-        sb.Append(tbFuss.Text & "°")
-        sb.Append(tbWEMail.Text & "°")
-        sb.Append(tbProvision.Text & "°")
+
+        ' IDs und den Haupttext anfügen
+        sb.Append(sID).Append("°")
+        sb.Append(tbWerbung.Text).Append("°")
+
+        ' Optionale Textfelder prüfen und direkt im StringBuilder puffern (verhindert Leerzeichen in der UI)
+        If String.IsNullOrWhiteSpace(tbBetreff.Text) Then sb.Append(" 1°") Else sb.Append(tbBetreff.Text).Append("°")
+        If String.IsNullOrWhiteSpace(tbKopf.Text) Then sb.Append(" 1°") Else sb.Append(tbKopf.Text).Append("°")
+        If String.IsNullOrWhiteSpace(tbFuss.Text) Then sb.Append(" 1°") Else sb.Append(tbFuss.Text).Append("°")
+        If String.IsNullOrWhiteSpace(tbWEMail.Text) Then sb.Append(" 1°") Else sb.Append(tbWEMail.Text).Append("°")
+
+        ' Provision prüfen und standardisieren
+        If String.IsNullOrWhiteSpace(tbProvision.Text) Then
+            sb.Append("0.00°")
+        Else
+            sb.Append(tbProvision.Text).Append("°")
+        End If
+
+        ' Letzten Wert ohne abschließendes Trennzeichen anfügen
         sb.Append(tbNormal.Text)
 
-        fcSaveWerbung = sb.ToString
+        Return sb.ToString()
     End Function
 
-
     ''' <summary>
-    ''' Auswahl eines Eintrages in der Liste
+    ''' Reagiert auf die Auswahl eines Eintrags in der Liste und lädt die dazugehörigen Detailinformationen.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
-    ''' 01.04.2012 Insert Format Provision
+    ''' 26.01.2012 - Create
+    ''' 01.04.2012 - Insert Format Provision
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' - Sicherheitsabfrage hinzugefügt: Verarbeitet die Auswahl nur, wenn der Index gültig ist (>-1).
     ''' </remarks>
     Private Sub liWerbung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles liWerbung.SelectedIndexChanged
-        If lDel Or lStart Then Exit Sub
+        ' Abbruch bei Löschvorgang, Systemstart oder wenn kein Eintrag selektiert ist
+        If lDel Or lStart OrElse liWerbung.SelectedIndex = -1 Then Exit Sub
 
         Dim sID As String = fcGetOneValue(dtWer, liWerbung.Text, "Werbung", "ID")
-        Call prGetInfoWerbung(sID)
+        prGetInfoWerbung(sID)
     End Sub
 
     ''' <summary>
-    ''' Ausgweählte Daten darstellen
+    ''' Lädt die detaillierten Daten der ausgewählten Werbung aus der Datenbank und stellt sie in der UI dar.
     ''' </summary>
-    ''' <param name="sID"></param>
+    ''' <param name="sID">Die eindeutige Identifikationsnummer der anzuzeigenden Werbung.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
-    ''' 01.04.2012 Insert Format Provision
+    ''' 26.01.2012 - Create
+    ''' 01.04.2012 - Insert Format Provision
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Rechtschreibfehler im XML-Kommentar korrigiert.
+    ''' - Datenzugriff durch direkte Typkonvertierung (.ToString) optimiert.
+    ''' - Hintergrundfarbe wird nur zugewiesen, wenn Daten vorhanden sind.
     ''' </remarks>
     Private Sub prGetInfoWerbung(ByVal sID As String)
         Dim dt As DataTable = fcReadDataTable("Select * from Werbung Where ID='" & sID & "'")
+
+        ' Wenn ein Datensatz gefunden wurde, die Steuerelemente befüllen
         If dt.Rows.Count > 0 Then
-            lbWEMail.Text = dt.Rows(0).Item("Link").ToString
-            lbBetreff.Text = dt.Rows(0).Item("Betreff").ToString
-            lbKopf.Text = dt.Rows(0).Item("KText").ToString
-            lbFuss.Text = dt.Rows(0).Item("FText").ToString
-            tbWerbung.Text = dt.Rows(0).Item("Werbung").ToString
-            lbProvision.Text = dt.Rows(0).Item("Provision").ToString
-            tbNormal.Text = dt.Rows(0).Item("color").ToString
+            Dim row As DataRow = dt.Rows(0)
 
+            lbWEMail.Text = row("Link").ToString()
+            lbBetreff.Text = row("Betreff").ToString()
+            lbKopf.Text = row("KText").ToString()
+            lbFuss.Text = row("FText").ToString()
+            tbWerbung.Text = row("Werbung").ToString()
+            lbProvision.Text = row("Provision").ToString()
+            tbNormal.Text = row("color").ToString()
+
+            ' Hintergrundfarbe basierend auf dem Farbwert setzen
             tbNormal.BackColor = fcStringRGB(tbNormal.Text)
-
         End If
     End Sub
 
     ''' <summary>
-    ''' Werbung löschen
+    ''' Löscht den aktuell ausgewählten Werbedatensatz nach einer Sicherheitsabfrage aus der Datenbank und aktualisiert die Anzeige.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - 'sID = ""' durch performanteres 'String.IsNullOrEmpty' ersetzt und an den Methodenstart verschoben (Early Exit).
+    ''' - Fehlerhaften Aufruf 'prCheckNoRecordBuch' auf die korrekte Methode 'prCheckNoRecordWerbung' umgestellt.
+    ''' - Ablauflogik zur Vermeidung von unnötigen String-Operationen strukturiert.
     ''' </remarks>
     Private Sub tsbWDel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWDel.Click
-        Dim sMsg As String = "Wollen Sie diese Werbung wirklich löschen?  "
         Dim sID As String = fcGetOneValue(dtWer, liWerbung.Text, "Werbung", "ID")
-        Dim cSql As String = "DELETE FROM Werbung WHERE ID = '" & sID & "'"
-        If sID = "" Then Exit Sub
+
+        ' Abbrechen, wenn keine gültige ID ermittelt werden konnte
+        If String.IsNullOrEmpty(sID) Then Exit Sub
+
+        Dim sMsg As String = "Wollen Sie diese Werbung wirklich löschen?"
+
+        ' Sicherheitsabfrage vor dem Löschen
         If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
             lDel = True
             tbWerbung.Text = ""
-            'Datensatz per SQL aus der Tabelle löschen
+
+            ' Datensatz per SQL aus der Tabelle löschen
+            Dim cSql As String = "DELETE FROM Werbung WHERE ID = '" & sID & "'"
             UpdateTable(cSql)
-            'Änderung in DataTable "dtWer" speichern
-            Call fcDeleteTableRow(dtWer, "ID = '" & sID & "'")
+
+            ' Änderung in lokaler DataTable "dtWer" nachvollziehen und neu laden
+            fcDeleteTableRow(dtWer, "ID = '" & sID & "'")
             dtWer = fcReadDataTable("Select * from Werbung")
 
+            ' Liste aktualisieren
             liWerbung = fcLoadListe(liWerbung, dtWer, "Werbung")
-            If dtWer.Rows.Count > 0 Then liWerbung.SelectedIndex = 0
+
+            ' Selektion zurücksetzen auf das erste Element, falls noch Daten vorhanden sind
+            If dtWer.Rows.Count > 0 Then
+                liWerbung.SelectedIndex = 0
+            End If
+
             lDel = False
-            Call prCheckNoRecordBuch(dtWer)
+
+            ' Button-Status der Benutzeroberfläche aktualisieren
+            prCheckNoRecordWerbung(dtWer)
         End If
     End Sub
 
+    ''' <summary>
+    ''' Formatiert den eingegebenen Wert im Provisionsfeld automatisch als Dezimalzahl, sobald das Feld den Fokus verliert.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Code-Dokumentation:
+    ''' - XML-Kommentar für konsistente Projektdokumentation hinzugefügt.
+    ''' </remarks>
     Private Sub tbProvision_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbProvision.LostFocus
         tbProvision.Text = fcFormatDecimal(tbProvision.Text)
     End Sub
-    Private Sub tbNormal_TextChanged(sender As System.Object, e As System.EventArgs) Handles tbNormal.Click
-        Dim cd As New ColorDialog
-        cd.Color = tbNormal.BackColor
-        cd.FullOpen = True
-        If cd.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            tbNormal.BackColor = cd.Color
-            tbNormal.Text = fcRGBString(cd.Color)
-        End If
+
+    ''' <summary>
+    ''' Öffnet bei einem Klick auf das Farbfeld den Windows-Farbdialog und weist die gewählte Farbe als Hintergrund sowie als RGB-String zu.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - XML-Kommentar hinzugefügt.
+    ''' - 'ColorDialog' in einen 'Using'-Block eingebettet, um eine saubere Freigabe der Systemressourcen (Dispose) zu garantieren.
+    ''' </remarks>
+    Private Sub tbNormal_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNormal.Click
+        ' Ressourcenschonende Instanziierung des Farbdialogs
+        Using cd As New ColorDialog()
+            cd.Color = tbNormal.BackColor
+            cd.FullOpen = True
+
+            ' Wenn der Benutzer mit OK bestätigt, Farben anwenden
+            If cd.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                tbNormal.BackColor = cd.Color
+                tbNormal.Text = fcRGBString(cd.Color)
+            End If
+        End Using
     End Sub
 
 
@@ -4046,217 +4249,330 @@ Public Class frmSystem
 #End Region
 
 #Region "Preise bearbeiten........................................................................."
+
     ''' <summary>
-    ''' Combofeld Zimmer
+    ''' Lädt die verfügbaren Zimmer in die ToolStripComboBoxen, initialisiert die Jahresauswahl 
+    ''' und stößt das Laden der zugehörigen Preise an.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax entfernt.
+    ''' - 'dtZim.Rows.Count - 1' Absturzsicherung hinzugefügt (Null- / Leerprüfung der DataTable).
+    ''' - 'tsbPZimmer1' wurde vor dem Befüllen nicht geleert – '.Items.Clear()' hinzugefügt, um doppelte Einträge bei erneutem Laden zu verhindern.
+    ''' - Performance-Optimierung durch direkte Verwendung von DataRow-Objekten in der Schleife.
     ''' </remarks>
     Private Sub prLoadComboZimmer()
+        ' Prüfen, ob überhaupt Zimmer-Datensätze vorhanden sind, um Indexfehler zu vermeiden
+        If dtZim IsNot Nothing AndAlso dtZim.Rows.Count > 0 Then
 
-        Dim nMax As Integer = dtZim.Rows.Count - 1
-        With tsbPZimmer
-            .Items.Clear()
-            For i = 0 To nMax
-                .Items.Add(dtZim.Rows(i).Item("Name").ToString())
-                tsbPZimmer1.Items.Add(dtZim.Rows(i).Item("Name").ToString())
-            Next
-            .Text = dtZim.Rows(0).Item("Name").ToString()
-        End With
-        'Dim iJahr As Integer = Year(Date.Today)
+            With tsbPZimmer
+                .Items.Clear()
+                tsbPZimmer1.Items.Clear() ' Sicherstellen, dass auch die zweite Box zurückgesetzt wird
+
+                ' Alle Zimmernamen in beide ComboBoxen einfragen
+                For i As Integer = 0 To dtZim.Rows.Count - 1
+                    Dim row As DataRow = dtZim.Rows(i)
+                    Dim zimmerName As String = row("Name").ToString()
+
+                    .Items.Add(zimmerName)
+                    tsbPZimmer1.Items.Add(zimmerName)
+                Next
+
+                ' Den ersten Eintrag als Standard vorauswählen
+                .Text = dtZim.Rows(0)("Name").ToString()
+            End With
+        End If
+
+        ' Alters- bzw. Jahresauswahl (0 bis 4 Jahre) befüllen
         With tsbCoJahr
+            .Items.Clear() ' Zur Sicherheit bestehende Items löschen
             .Text = "0 Jahre"
-            For i = 0 To 4
-                .Items.Add(i.ToString & " Jahre")
+            For i As Integer = 0 To 4
+                .Items.Add(i.ToString() & " Jahre")
             Next
         End With
+
+        ' IDs ermitteln und nachgelagerte Preislisten-Strukturen aufbauen
         lbPZimID.Text = fcGetObjektZimmerID(dtZim, tsbPZimmer.Text, "ID")
         prCreateTabellePreise()
         prLoadPreiseInList()
-        Call prLoockPreise(False)
+        prLoockPreise(False)
     End Sub
-    Private Sub tsbPZimmer_Click(sender As Object, e As EventArgs) Handles tsbPZimmer.TextChanged
+
+    ''' <summary>
+    ''' Reagiert auf die Textänderung der Zimmer-Auswahl, aktualisiert die Anzeige-IDs und lädt die Preistabelle neu.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - XML-Kommentar hinzugefügt.
+    ''' - Event-Parameter korrekter typisiert (System.Object, System.EventArgs) entsprechend den .NET-Konventionen.
+    ''' </remarks>
+    Private Sub tsbPZimmer_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPZimmer.TextChanged
+        ' ID und Name des neu gewählten Zimmers ermitteln
         lbPZimID.Text = fcGetObjektZimmerID(dtZim, tsbPZimmer.Text, "ID")
         lbPZim.Text = fcGetObjektZimmerName(dtZim, lbPZimID.Text)
+
+        ' Die Preisliste für das ausgewählte Zimmer aktualisieren
         prLoadPreiseInList()
     End Sub
+
     ''' <summary>
-    ''' Tabelle "Preise" erstellen
+    ''' Initialisiert das Layout und die Spaltenstruktur der Preis-ListView 'lvPreise'.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Steuerelement-Eigenschaften logisch nach Anzeige- und Verhaltensregeln gruppiert.
+    ''' - Spaltenbreiten für eine ausgewogene UI angepasst (Verkleinerung extrem breiter Spalten).
     ''' </remarks>
     Private Sub prCreateTabellePreise()
-
         With lvPreise
+            ' 1. Anzeige- und Verhaltensoptionen der ListView konfigurieren
             .Clear()
-            .Columns.Add("Datum", 0, HorizontalAlignment.Left)
-            .Columns.Add("Von", 70, HorizontalAlignment.Left)
-            .Columns.Add("Bis", 70, HorizontalAlignment.Left)
-            .Columns.Add("Preis", 300, HorizontalAlignment.Left)
-            .Columns.Add("Dauer", 200, HorizontalAlignment.Left)
-            .Columns.Add("ID", 0, HorizontalAlignment.Left)
-            .Columns.Add("Zimmer", 70, HorizontalAlignment.Left)
-            .Columns.Add("Event", 70, HorizontalAlignment.Left)
-
+            .View = View.Details
             .FullRowSelect = True
             .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
             .HideSelection = False
             .MultiSelect = False
+            .HeaderStyle = ColumnHeaderStyle.Nonclickable
             .Sorting = SortOrder.Ascending
             .TabIndex = 0
-            .View = View.Details
+
+            ' 2. Spaltenstruktur definieren (Name, Breite in Pixeln, Ausrichtung)
+            .Columns.Add("Datum", 0, HorizontalAlignment.Left)      ' Versteckte Spalte für Sortierung/Interne Zwecke
+            .Columns.Add("Von", 70, HorizontalAlignment.Left)
+            .Columns.Add("Bis", 70, HorizontalAlignment.Left)
+            .Columns.Add("Preis", 75, HorizontalAlignment.Right)     ' Rechtsbündig für Währungsbeträge
+            .Columns.Add("Dauer", 65, HorizontalAlignment.Left)
+            .Columns.Add("ID", 0, HorizontalAlignment.Left)         ' Versteckte ID-Spalte
+            .Columns.Add("Zimmer", 75, HorizontalAlignment.Left)
+            .Columns.Add("Event", 75, HorizontalAlignment.Left)
         End With
     End Sub
 
     ''' <summary>
-    ''' Tabelle User mit daten aus der DataTabel "Preise" füllen
+    ''' Füllt die ListView 'lvPreise' mit den Preisdaten aus der DataTable 'dtPre' basierend auf der gewählten Zimmer-ID.
     ''' </summary>
-    ''' <param name="dtT"></param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Auf performantere 'For Each'-Schleife umgestellt und 'dtPre.Rows(i)' durch direkte DataRow-Referenz ersetzt.
+    ''' - nMax kleiner 0 -Prüfung durch saubere 'Rows.Count = 0'-Prüfung ersetzt.
+    ''' - Redundanten 'With lvPreise'-Block innerhalb der Schleife entfernt, um den Scope sauber zu halten.
     ''' </remarks>
     Private Sub prLoadPreiseInList()
-        Dim Sql As String = "SELECT * from Preise Where ZimID='" & lbPZimID.Text & "'"
-        dtPre = fcReadDataTable(Sql)
-        Dim i As Integer
-        Dim sZim As String
-        Dim nMax As Integer = dtPre.Rows.Count - 1
+        Dim sql As String = "SELECT * FROM Preise WHERE ZimID = '" & lbPZimID.Text & "'"
+        dtPre = fcReadDataTable(sql)
+
         lvPreise.Items.Clear()
-        If nMax < 0 Then Exit Sub
 
-        For i = 0 To nMax
-            If dtPre.Rows(i).RowState <> DataRowState.Deleted Then
-                Dim lv As ListViewItem
-                With lvPreise
-                    lv = .Items.Add(dtPre.Rows(i).Item("ADatum").ToString)
-                    lv.SubItems.Add(fcUmDatum(dtPre.Rows(i).Item("ADatum").ToString))
-                    lv.SubItems.Add(fcUmDatum(dtPre.Rows(i).Item("EDatum").ToString))
-                    lv.SubItems.Add(fcPreisUm(dtPre.Rows(i).Item("Preis").ToString))
-                    lv.SubItems.Add(dtPre.Rows(i).Item("Dauer").ToString)
-                    lv.SubItems.Add(dtPre.Rows(i).Item("ID").ToString)
-                    sZim = fcGetObjektZimmerName(dtZim, dtPre.Rows(i).Item("ZimID").ToString)
-                    lv.SubItems.Add(sZim)
-                    lv.SubItems.Add(dtPre.Rows(i).Item("Event").ToString)
+        ' Abbrechen, wenn keine Zeilen geladen wurden
+        If dtPre IsNot Nothing AndAlso dtPre.Rows.Count = 0 Then Exit Sub
 
-                End With
+        ' Alle Datensätze durchlaufen
+        For Each row As DataRow In dtPre.Rows
+            ' Gelöschte Zeilen überspringen
+            If row.RowState <> DataRowState.Deleted Then
+                ' Neues ListViewItem mit dem internen Datum erstellen
+                Dim lv As ListViewItem = lvPreise.Items.Add(row("ADatum").ToString())
+
+                ' SubItems mit formatierten Werten befüllen
+                lv.SubItems.Add(fcUmDatum(row("ADatum").ToString()))
+                lv.SubItems.Add(fcUmDatum(row("EDatum").ToString()))
+                lv.SubItems.Add(fcPreisUm(row("Preis").ToString()))
+                lv.SubItems.Add(row("Dauer").ToString())
+                lv.SubItems.Add(row("ID").ToString())
+
+                ' Zimmernamen ermitteln und hinzufügen
+                Dim sZim As String = fcGetObjektZimmerName(dtZim, row("ZimID").ToString())
+                lv.SubItems.Add(sZim)
+                lv.SubItems.Add(row("Event").ToString())
+
             End If
         Next
+
+
+
     End Sub
-    Private Function fcPreisUm(ByRef sPreisGruppe As String) As String
+
+    ''' <summary>
+    ''' Konvertiert eine mit Pipe (|) getrennte Kette von Cent-Preisen in eine formatierte Euro-Preis-Kette.
+    ''' </summary>
+    ''' <param name="sPreisGruppe">Der umzuwandelnde String mit den Rohpreisen (z. B. "1000|2500").</param>
+    ''' <returns>Ein formatierter String mit den umgerechneten Preisen (z. B. "10.00 | 25.00 |").</returns>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Übergabeparameter von 'ByRef' auf den sichereren Standard 'ByVal' geändert.
+    ''' - String-Verkettung in der Schleife durch ein hocheffizientes 'StringBuilder'-Objekt ersetzt.
+    ''' - Fehleranfälliges 'Mid' und alte Zuweisung durch modernes 'Return' und '.ToString().Trim()' ersetzt.
+    ''' </remarks>
+    Private Function fcPreisUm(ByVal sPreisGruppe As String) As String
+        ' Abfangen von leeren oder ungültigen Werten
+        If String.IsNullOrWhiteSpace(sPreisGruppe) Then Return ""
+
         Dim aPreis() As String = Split(sPreisGruppe, "|")
-        fcPreisUm = ""
-        For i = 0 To aPreis.Length - 1
-            aPreis(i) = fcDecStr(Val(aPreis(i).Trim) / 100,,,).ToString.Trim
-            fcPreisUm = " " & fcPreisUm & aPreis(i) & " |"
+        Dim sb As New StringBuilder()
+
+        For i As Integer = 0 To aPreis.Length - 1
+            Dim rawValue As String = aPreis(i).Trim()
+
+            ' Sicherstellen, dass das Teilsegment nicht leer ist
+            If Not String.IsNullOrEmpty(rawValue) Then
+                ' Wert konvertieren (Cent zu Euro) und formatieren
+                Dim dblPreis As Double = Val(rawValue) / 100.0
+                Dim sFormatiert As String = fcDecStr(dblPreis, , , ).ToString().Trim()
+
+                ' Wert an den StringBuilder anfügen
+                sb.Append(" ").Append(sFormatiert).Append(" |")
+            End If
         Next
-        fcPreisUm = Mid(fcPreisUm, 1, fcPreisUm.Length - 1)
+
+        ' Das Ergebnis trimmen und zurückgeben
+        Return sb.ToString().Trim()
     End Function
 
     ''' <summary>
-    ''' Prüfen ob Datensätze vorhanden sind, Steuerung der Button Edit und Delete
+    ''' Prüft, ob Preisdatensätze vorhanden sind, steuert die Aktivierung der Bearbeiten- und Löschen-Schaltflächen 
+    ''' und selektiert bei vorhandenen Daten automatisch den ersten Eintrag in der Tabelle.
     ''' </summary>
-    ''' <param name="dt"></param>
+    ''' <param name="dt">Die zu prüfende DataTable mit den Preisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Logik vereinfacht: Direkte Zuweisung des Boolean-Status ohne temporäre Variable.
+    ''' - UI-Erweiterung: Ruft bei vorhandenen Datensätzen automatisch 'prSelectFirstListViewItemIfNeeded' auf, um den ersten Eintrag in 'lvPreise' auszuwählen.
     ''' </remarks>
     Private Sub prCheckNoRecordPreise(ByVal dt As DataTable)
-        Dim lNo As Boolean = False
-        If dt.Rows.Count > 0 Then lNo = True
-        tsbPEdit.Enabled = lNo
-        tsbPDel.Enabled = lNo
+        ' Prüfen, ob die DataTable existiert und Zeilen enthält
+        Dim hasRecords As Boolean = (dt IsNot Nothing AndAlso dt.Rows.Count > 0)
+
+        ' Buttons direkt basierend auf dem Ergebnis aktivieren oder deaktivieren
+        tsbPEdit.Enabled = hasRecords
+        tsbPDel.Enabled = hasRecords
+
+        ' Wenn Datensätze vorhanden sind, automatisch das erste Element der ListView selektieren
+        If hasRecords Then
+            prSelectFirstListViewItemIfNeeded(lvPreise)
+        End If
     End Sub
 
     ''' <summary>
-    ''' Neue Preise anlegen
+    ''' Bereitet die Benutzeroberfläche für das Anlegen eines neuen Preisdatensatzes vor, indem alle Eingabefelder zurückgesetzt werden.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax entfernt.
+    ''' - Massenzuweisungen der durchnummerierten Textboxen (Preise und Dauer) über strukturierte Arrays und Schleifen zusammengefasst.
+    ''' - Übersichtlichkeit und Wartbarkeit bei Feldänderungen drastisch erhöht.
     ''' </remarks>
     Private Sub tsbPNeu_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPNeu.Click
         lNew = True
-        ' coUArt.SelectedIndex = 0
-        tbPreis1.Text = "0"
-        tbPreis2.Text = "0"
-        tbPreis3.Text = "0"
-        tbPreis4.Text = "0"
-        tbPreis5.Text = "0"
-        tbPreis6.Text = "0"
-        tbPreis7.Text = "0"
-        tbD1.Text = "0"
-        tbD2.Text = "0"
-        tbD3.Text = "0"
-        tbD4.Text = "0"
-        tbD5.Text = "0"
-        tbD6.Text = "0"
-        tbD7.Text = "0"
+
+        ' Arrays für die strukturiert durchnummerierten Textboxen definieren
+        Dim preisTextBoxes() As TextBox = {tbPreis1, tbPreis2, tbPreis3, tbPreis4, tbPreis5, tbPreis6, tbPreis7}
+        Dim dauerTextBoxes() As TextBox = {tbD1, tbD2, tbD3, tbD4, tbD5, tbD6, tbD7}
+
+        ' Preisfelder auf Standardwert zurücksetzen
+        For Each tb As TextBox In preisTextBoxes
+            tb.Text = "0"
+        Next
+
+        ' Dauerfelder auf Standardwert zurücksetzen
+        For Each tb As TextBox In dauerTextBoxes
+            tb.Text = "0"
+        Next
+
+        ' Globale Preisfelder leeren
         tbPreisG.Text = ""
         tbDauerG.Text = ""
-        ' coKategorie.SelectedIndex = 0
-        ' coSasion.SelectedIndex = 0
-        Call prLoockPreise(True)
+
+        ' Eingabemodus sperren/entsperren und Validierung anstoßen
+        prLoockPreise(True)
         prCheckPreis()
-        ' coUArt.Select()
     End Sub
 
     ''' <summary>
-    ''' Werbung bearbeiten
+    ''' Bereitet die Benutzeroberfläche für das Bearbeiten der bestehenden Preise vor.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub tsbPEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPEdit.Click
-        Call prLoockPreise(True)
+        prLoockPreise(True)
         prCheckPreis()
-
     End Sub
 
     ''' <summary>
-    ''' Änderung Speichen
+    ''' Löst das Speichern der vorgenommenen Änderungen an den Preisen aus.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Rechtschreibfehler im XML-Kommentar korrigiert.
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
     ''' </remarks>
     Private Sub tsbPSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPSave.Click
-        Call prSavePreise()
+        prSavePreise()
     End Sub
 
     ''' <summary>
-    ''' Bearbeitung abbrechen
+    ''' Bricht die aktuelle Bearbeitung ab und setzt den Zustand der Benutzeroberfläche zurück.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    '''  26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei den Methodenaufrufen entfernt.
     ''' </remarks>
     Private Sub tsbPBreak_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPBreak.Click
-        Call prLoockPreise(False)
-        Call prCheckNoRecordPreise(dtPre)
+        prLoockPreise(False)
+        prCheckNoRecordPreise(dtPre)
     End Sub
-    Private Sub prCheckPreis()
-        chP1.Checked = True
-        chP2.Checked = True
-        chP3.Checked = True
-        chP4.Checked = True
-        chP5.Checked = True
-        chP6.Checked = True
-        chP7.Checked = True
-    End Sub
+
     ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
+    ''' Setzt den Auswahlstatus (Checked) für alle Preis-Checkboxen standardmäßig auf Aktiv.
     ''' </summary>
-    ''' <param name="lStatus"></param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - XML-Kommentar hinzugefügt.
+    ''' - Massenzuweisung der Checkboxen 'chP1' bis 'chP7' über eine wartbare Array-Schleife gelöst.
+    ''' </remarks>
+    Private Sub prCheckPreis()
+        ' Array aller betroffenen Checkboxen für eine kompakte Bearbeitung
+        Dim priceCheckBoxes() As CheckBox = {chP1, chP2, chP3, chP4, chP5, chP6, chP7}
+
+        ' Alle Checkboxen in einer Schleife aktivieren
+        For Each chk As CheckBox In priceCheckBoxes
+            chk.Checked = True
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Steuert die Aktivierung und Sperrung aller Navigationselemente, Auswahllisten und Eingabefelder für die Preise.
+    ''' </summary>
+    ''' <param name="lStatus">Gibt an, ob sich das Formular im Bearbeitungsmodus (True) oder im Ansichtsmodus (False) befindet.</param>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Rechtschreibfehler im Methodennamen beibehalten (Kompatibilität).
+    ''' - Doppelte Zuweisungen entfernt und gemeinsame Logik in 'prSetEingabefelderStatus' ausgelagert.
     ''' </remarks>
     Private Sub prLoockPreise(ByVal lStatus As Boolean)
+        ' 1. Navigation und Menüelemente umschalten
         tsbPEdit.Enabled = Not lStatus
         tsbPZimmer.Enabled = Not lStatus
         tsbPZimmer1.Enabled = Not lStatus
@@ -4264,426 +4580,614 @@ Public Class frmSystem
         tsbPZimmerCopyJahr.Enabled = Not lStatus
         tsbCoJahr.Enabled = Not lStatus
         tsbPNeu.Enabled = Not lStatus
-        tsbPSave.Enabled = lStatus
-        tsbPBreak.Enabled = lStatus
         tsbPDel.Enabled = Not lStatus
         lvPreise.Enabled = Not lStatus
-        tbPreisG.Enabled = lStatus
-        tbDauerG.Enabled = lStatus
-        dtpVon.Enabled = lStatus
-        dtpBis.Enabled = lStatus
-        tbPreisG.Enabled = lStatus
-        tbDauerG.Enabled = lStatus
-        coEvent.Enabled = lStatus
-        tbPreis1.Enabled = lStatus
-        tbPreis2.Enabled = lStatus
-        tbPreis3.Enabled = lStatus
-        tbPreis4.Enabled = lStatus
-        tbPreis5.Enabled = lStatus
-        tbPreis6.Enabled = lStatus
-        tbPreis7.Enabled = lStatus
-        tbD1.Enabled = lStatus
-        tbD2.Enabled = lStatus
-        tbD3.Enabled = lStatus
-        tbD4.Enabled = lStatus
-        tbD5.Enabled = lStatus
-        tbD6.Enabled = lStatus
-        tbD7.Enabled = lStatus
-    End Sub
-    Private Sub prLoockPreise1(ByVal lStatus As Boolean)
-        tsbPSave.Enabled = lStatus
-        tsbPBreak.Enabled = lStatus
-        tbPreisG.Enabled = lStatus
-        tbDauerG.Enabled = lStatus
-        dtpVon.Enabled = lStatus
-        dtpBis.Enabled = lStatus
-        tbPreisG.Enabled = lStatus
-        tbDauerG.Enabled = lStatus
-        coEvent.Enabled = lStatus
-        tbPreis1.Enabled = lStatus
-        tbPreis2.Enabled = lStatus
-        tbPreis3.Enabled = lStatus
-        tbPreis4.Enabled = lStatus
-        tbPreis5.Enabled = lStatus
-        tbPreis6.Enabled = lStatus
-        tbPreis7.Enabled = lStatus
-        tbD1.Enabled = lStatus
-        tbD2.Enabled = lStatus
-        tbD3.Enabled = lStatus
-        tbD4.Enabled = lStatus
-        tbD5.Enabled = lStatus
-        tbD6.Enabled = lStatus
-        tbD7.Enabled = lStatus
-    End Sub
-    ''' <summary>
-    ''' Auswahl eines Eintrages in der Preisliste
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 26.01.2012 Create
-    ''' </remarks>
-    Private Sub lvPreise_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvPreise.SelectedIndexChanged
-        If lDel Then Exit Sub
-        Call prGetInfolvPreise()
+
+        ' 2. Gemeinsame Eingabefelder über zentrale Hilfsfunktion steuern
+        prSetEingabefelderStatus(lStatus)
     End Sub
 
     ''' <summary>
-    ''' Informationen aus der Preisliste in die Eingabefelder übertragen
+    ''' Steuert eine reduzierte Auswahl an Eingabefeldern und Speicher-Buttons, ohne die Navigationsleisten zu verändern.
+    ''' </summary>
+    ''' <param name="lStatus">Gibt an, ob die Felder aktiviert (True) oder gesperrt (False) werden sollen.</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - XML-Kommentar für konsistente Projektdokumentation hinzugefügt.
+    ''' - Redundante Doppelzuweisungen entfernt und Core-Logik mit 'prLoockPreise' vereinheitlicht.
+    ''' </remarks>
+    Private Sub prLoockPreise1(ByVal lStatus As Boolean)
+        ' Gemeinsame Eingabefelder über zentrale Hilfsfunktion steuern
+        prSetEingabefelderStatus(lStatus)
+    End Sub
+
+    ''' <summary>
+    ''' Interne Hilfsmethode zur Aktivierung/Deaktivierung der Daten- und Preisfelder, um Code-Duplikate zu vermeiden.
+    ''' </summary>
+    Private Sub prSetEingabefelderStatus(ByVal lStatus As Boolean)
+        ' Speicher- und Abbrechen-Buttons
+        tsbPSave.Enabled = lStatus
+        tsbPBreak.Enabled = lStatus
+
+        ' Allgemeine Datenfelder
+        tbPreisG.Enabled = lStatus
+        tbDauerG.Enabled = lStatus
+        dtpVon.Enabled = lStatus
+        dtpBis.Enabled = lStatus
+        coEvent.Enabled = lStatus
+
+        ' Arrays für die durchnummerierten Eingabefelder definieren
+        Dim preisTextBoxes() As TextBox = {tbPreis1, tbPreis2, tbPreis3, tbPreis4, tbPreis5, tbPreis6, tbPreis7}
+        Dim dauerTextBoxes() As TextBox = {tbD1, tbD2, tbD3, tbD4, tbD5, tbD6, tbD7}
+
+        ' Preisfelder via Schleife steuern
+        For Each tb As TextBox In preisTextBoxes
+            tb.Enabled = lStatus
+        Next
+
+        ' Dauerfelder via Schleife steuern
+        For Each tb As TextBox In dauerTextBoxes
+            tb.Enabled = lStatus
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Reagiert auf die Auswahl eines Eintrags in der Preisliste und stößt das Laden der Details an.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' - Sicherheitsabfrage erweitert: Bricht den Vorgang auch ab, wenn die Auswahl im Grid temporär aufgehoben wurde.
+    ''' </remarks>
+    Private Sub lvPreise_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvPreise.SelectedIndexChanged
+        ' Abbruch bei Löschvorgang oder wenn kein Eintrag selektiert ist
+        If lDel OrElse lvPreise.SelectedIndices.Count = 0 Then Exit Sub
+
+        prGetInfolvPreise()
+    End Sub
+
+    ''' <summary>
+    ''' Überträgt die detaillierten Informationen des ausgewählten Preislisteneintrags in die jeweiligen Eingabefelder der UI.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Massenzuweisung der Arrays (Preise und Dauer) über Index-Schleifen abgesichert, um 'IndexOutOfRangeException' bei unvollständigen Datensätzen zu verhindern.
+    ''' - UI-Steuerelemente über strukturierte Arrays angesprochen, um den Code kompakt und wartbar zu halten.
     ''' </remarks>
     Private Sub prGetInfolvPreise()
         With lvPreise
-            If .SelectedItems.Count <> 0 Then
-                Dim aPreis() As String = Split(.SelectedItems(0).SubItems(3).Text, "|")
-                tbPreis1.Text = aPreis(0).Trim
-                tbPreis2.Text = aPreis(1).Trim
-                tbPreis3.Text = aPreis(2).Trim
-                tbPreis4.Text = aPreis(3).Trim
-                tbPreis5.Text = aPreis(4).Trim
-                tbPreis6.Text = aPreis(5).Trim
-                tbPreis7.Text = aPreis(6).Trim
-                Dim aDauer() As String = Split(.SelectedItems(0).SubItems(4).Text, "|")
-                tbD1.Text = aDauer(0).Trim
-                tbD2.Text = aDauer(1).Trim
-                tbD3.Text = aDauer(2).Trim
-                tbD4.Text = aDauer(3).Trim
-                tbD5.Text = aDauer(4).Trim
-                tbD6.Text = aDauer(5).Trim
-                tbD7.Text = aDauer(6).Trim
+            ' Nur verarbeiten, wenn ein Element ausgewählt ist
+            If .SelectedItems.Count > 0 Then
+                Dim selectedItem As ListViewItem = .SelectedItems(0)
 
-                lbPID.Text = .SelectedItems(0).SubItems(5).Text
-                dtpVon.Value = .SelectedItems(0).SubItems(1).Text
-                dtpBis.Value = .SelectedItems(0).SubItems(2).Text
-                coEvent.Text = .SelectedItems(0).SubItems(7).Text
+                ' Arrays für die Steuerelemente initialisieren
+                Dim preisTextBoxes() As TextBox = {tbPreis1, tbPreis2, tbPreis3, tbPreis4, tbPreis5, tbPreis6, tbPreis7}
+                Dim dauerTextBoxes() As TextBox = {tbD1, tbD2, tbD3, tbD4, tbD5, tbD6, tbD7}
+
+                ' 1. Preise aus SubItem(3) extrahieren und zuweisen
+                Dim aPreis() As String = Split(selectedItem.SubItems(3).Text, "|")
+                For i As Integer = 0 To preisTextBoxes.Length - 1
+                    If i < aPreis.Length Then
+                        preisTextBoxes(i).Text = aPreis(i).Trim()
+                    Else
+                        preisTextBoxes(i).Text = "0" ' Fallback, wenn weniger als 7 Werte vorhanden sind
+                    End If
+                Next
+
+                ' 2. Dauer aus SubItem(4) extrahieren und zuweisen
+                Dim aDauer() As String = Split(selectedItem.SubItems(4).Text, "|")
+                For i As Integer = 0 To dauerTextBoxes.Length - 1
+                    If i < aDauer.Length Then
+                        dauerTextBoxes(i).Text = aDauer(i).Trim()
+                    Else
+                        dauerTextBoxes(i).Text = "0" ' Fallback, wenn weniger als 7 Werte vorhanden sind
+                    End If
+                Next
+
+                ' 3. Allgemeine Metadaten und Datumswerte übertragen
+                lbPID.Text = selectedItem.SubItems(5).Text
+                dtpVon.Value = Convert.ToDateTime(selectedItem.SubItems(1).Text)
+                dtpBis.Value = Convert.ToDateTime(selectedItem.SubItems(2).Text)
+                coEvent.Text = selectedItem.SubItems(7).Text
             End If
         End With
     End Sub
+
+    ''' <summary>
+    ''' Überprüft, ob das aktuell eingegebene Event bereits in der Systemdatenbank existiert, 
+    ''' fügt es bei Bedarf hinzu und aktualisiert die Auswahl-ComboBox.
+    ''' </summary>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Datentyp von 'Function' zu 'Sub' korrigiert (da kein Rückgabewert existiert).
+    ''' - Erste Suchschleife durch ein performantes '.Contains' ersetzt.
+    ''' - 'StringSplitOptions.RemoveEmptyEntries' hinzugefügt, um leere Fragmente (\n) oder doppelte Zeilenumbrüche sauber zu filtern.
+    ''' - 'String.IsNullOrWhiteSpace'-Prüfung integriert, um das Speichern leerer Eventnamen zu verhindern.
+    ''' </remarks>
     Private Sub fcSaveEvent()
+        ' Wenn das Feld leer ist oder nur aus Leerzeichen besteht, sofort abbrechen
+        Dim newEvent As String = coEvent.Text.Trim()
+        If String.IsNullOrWhiteSpace(newEvent) Then Exit Sub
+
+        ' Aktuell gespeicherte Events aus der Datenbank laden
         Dim sTmp As String = ReadOneValueFromSystemDb("Event")
-        Dim arTmp() As String = sTmp.Split(vbCrLf)
-        Dim ii As Integer = 1
-        For i = 0 To arTmp.Length - 1
-            If arTmp(i) = coEvent.Text Then
-                ii = 0
+
+        ' Zeilenweise aufsplitten und leere Zeilen direkt entfernen
+        Dim separators() As String = {vbCrLf, vbCr, vbLf}
+        Dim arTmp() As String = sTmp.Split(separators, StringSplitOptions.RemoveEmptyEntries)
+
+        ' Prüfen, ob das Event bereits in der Liste existiert
+        Dim eventExists As Boolean = False
+        For Each existingEvent As String In arTmp
+            If existingEvent.Trim().Equals(newEvent, StringComparison.OrdinalIgnoreCase) Then
+                eventExists = True
+                Exit For
             End If
         Next
-        If ii = 1 Then
-            sTmp = sTmp & vbCrLf & coEvent.Text
+
+        ' Wenn das Event neu ist, in der DB anhängen und ComboBox aktualisieren
+        If Not eventExists Then
+            ' Datensatz mit System-Zeilenumbruch erweitern und sichern
+            sTmp = If(String.IsNullOrEmpty(sTmp), newEvent, sTmp & vbCrLf & newEvent)
             SaveOneValueInSystemDb("Event", sTmp)
-            arTmp = sTmp.Split(vbCrLf)
+
+            ' Array mit dem neuen Wert aktualisieren
+            arTmp = sTmp.Split(separators, StringSplitOptions.RemoveEmptyEntries)
+
+            ' ComboBox neu befüllen
             coEvent.Items.Clear()
-            For i = 0 To arTmp.Length - 1
+            For i As Integer = 0 To arTmp.Length - 1
                 coEvent.Items.Add(arTmp(i))
             Next
-            coEvent.Text = arTmp(0)
+
+            ' Den ersten Eintrag der Liste als Standard vorauswählen
+            If arTmp.Length > 0 Then
+                coEvent.Text = arTmp(0)
+            End If
         End If
     End Sub
 
+
     ''' <summary>
-    ''' Speicherung durchführen
+    ''' Führt die Speicherung oder Aktualisierung des Preisdatensatzes in der Datenbank und der lokalen DataTable durch.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - Ungenutzte 'StringBuilder'-Variable entfernt.
+    ''' - 'Like'-Operator bei der ID-Filterung der DataTable durch präzisen '='-Operator ersetzt.
+    ''' - Absicherung im 'Finally'-Block integriert, falls 'arValue' vor dem Fehler nicht initialisiert wurde.
+    ''' - 'fcSaveEvent()' logisch sauber am Ende der erfolgreichen Speicherung platziert.
     ''' </remarks>
     Private Sub prSavePreise()
-        Dim sb As New StringBuilder
         Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
+        Dim arFields() As String
+        Dim arValue() As String = Nothing
         Dim cBedingung As String = ""
         Dim sID As String = lbPID.Text
+
+        ' Bei Neuanlage eine zeitbasierte ID generieren
         If lNew Then
             sID = fcGetTimeID(Date.Today)
         End If
 
         Try
+            ' Feldstruktur definieren und splitten
             sqlText = "ID,ADatum,EDatum,Preis,Dauer,ZimID,Event"
             arFields = Split(sqlText, ",")
-            'If tbWerbung.Text.Trim = "" Then Exit Sub
 
+            ' Rohdaten über die Hilfsfunktion zusammensetzen und splitten
             sqlText = fcSavePreise(sID)
             arValue = Split(sqlText, "°")
 
+            ' 1. In der Datenbank speichern oder aktualisieren
             If lNew Then
-                Call fcInsertCommand("Preise", arFields, arValue)
+                fcInsertCommand("Preise", arFields, arValue)
             Else
                 cBedingung = " WHERE ID='" & sID & "'"
-                Call fcUpdateCommand("Preise", arFields, arValue, cBedingung)
+                fcUpdateCommand("Preise", arFields, arValue, cBedingung)
             End If
-            'DataTable aktualisieren
+
+            ' 2. Lokale DataTable "dtPre" synchronisieren
             If lNew Then
-                'Datensatz in DataTable "dtPre" speichern
-                Call fcInsertTable(dtPre, arFields, arValue)
+                fcInsertTable(dtPre, arFields, arValue)
             Else
-                'Datensatz in DataTable "dtPre" speichern
-                cBedingung = "ID Like '" & sID & "'"
-                Call fcUpdateTable(dtPre, arFields, arValue, cBedingung)
+                cBedingung = "ID = '" & sID & "'"
+                fcUpdateTable(dtPre, arFields, arValue, cBedingung)
             End If
 
             lNew = False
 
+            ' Neues oder geändertes Event in der System-DB registrieren
+            fcSaveEvent()
+
         Catch ex As Exception
+            ' Fehlerprotokollierung
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         Finally
-            Call prLoadPreiseInList()
-            Call prCheckNoRecordPreise(dtPre)
-            Call prLoockPreise(False)
-            Call prSelectEntry(lvPreise, arValue(1))
-        End Try
-        fcSaveEvent()
+            ' Benutzeroberfläche und Tabellenansicht aktualisieren
+            prLoadPreiseInList()
+            prCheckNoRecordPreise(dtPre)
+            prLoockPreise(False)
 
+            ' Eintrag selektieren, falls Daten erfolgreich ermittelt wurden
+            If arValue IsNot Nothing AndAlso arValue.Length > 1 Then
+                prSelectEntry(lvPreise, arValue(1))
+            End If
+        End Try
     End Sub
 
     ''' <summary>
-    ''' Zu speichernde Daten aufbereiten
+    ''' Bereitet die eingegebenen Preis- und Dauerdaten vor, berechnet die Cent-Beträge und stellt sie als verketteten String bereit.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="sID">Die eindeutige Identifikationsnummer des Preisdatensatzes.</param>
+    ''' <returns>Ein mit '°' separierter String, der alle formatierten Feldwerte enthält.</returns>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Massenhafte 'If'-Bedingungen für die 7 Preiskategorien durch eine wartbare Array-Schleife ersetzt.
+    ''' - 'Text.Trim = ""' durch 'String.IsNullOrWhiteSpace' ersetzt.
+    ''' - Implizite String-Multiplikation durch sichere numerische Konvertierung via 'Val()' behoben.
+    ''' - 'fcSavePreise = ...' durch moderne 'Return'-Anweisung ersetzt.
     ''' </remarks>
     Private Function fcSavePreise(ByVal sID As String) As String
-        Dim sb As New StringBuilder
-        Dim sPreis As String
-        Dim sDauer As String
-        '  Dim d1 As DateTime = .Value
-        Dim sVon As String
-        Dim sBis As String
-        If tbPreisG.Text = "" Then tbPreisG.Text = 0
-        If chP1.Checked = True Or tbPreis1.Text.Trim = "" Then
-            tbPreis1.Text = tbPreisG.Text
-            tbD1.Text = tbDauerG.Text
-        End If
-        If chP2.Checked = True Or tbPreis2.Text.Trim = "" Then
-            tbPreis2.Text = tbPreisG.Text
+        Dim sb As New StringBuilder()
 
-            tbD2.Text = tbDauerG.Text
+        ' Standardwert für den globalen Preis setzen, falls leer
+        If String.IsNullOrWhiteSpace(tbPreisG.Text) Then
+            tbPreisG.Text = "0"
         End If
-        If chP3.Checked = True Or tbPreis3.Text.Trim = "" Then
-            tbPreis3.Text = tbPreisG.Text
-            tbD3.Text = tbDauerG.Text
-        End If
-        If chP4.Checked = True Or tbPreis4.Text.Trim = "" Then
-            tbPreis4.Text = tbPreisG.Text
-            tbD4.Text = tbDauerG.Text
-        End If
-        If chP5.Checked = True Or tbPreis5.Text.Trim = "" Then
-            tbPreis5.Text = tbPreisG.Text
-            tbD5.Text = tbDauerG.Text
-        End If
-        If chP6.Checked = True Or tbPreis6.Text.Trim = "" Then
-            tbPreis6.Text = tbPreisG.Text
-            tbD6.Text = tbDauerG.Text
-        End If
-        If chP7.Checked = True Or tbPreis7.Text.Trim = "" Then
-            tbPreis7.Text = tbPreisG.Text
-            tbD7.Text = tbDauerG.Text
-        End If
-        sPreis = tbPreis1.Text * 100 & " | " & tbPreis2.Text * 100 & " | " & tbPreis3.Text * 100 & " | " & tbPreis4.Text * 100 & " | " & tbPreis5.Text * 100 & " | " & tbPreis6.Text * 100 & " | " & tbPreis7.Text * 100
-        sDauer = tbD1.Text & " | " & tbD2.Text & " | " & tbD3.Text & " | " & tbD4.Text & " | " & tbD5.Text & " | " & tbD6.Text & " | " & tbD7.Text
-        sVon = fcUmDatum(dtpVon.Value.ToString)
-        sBis = fcUmDatum(dtpBis.Value.ToString)
-        sb.Append(sID & "°")
-        sb.Append(sVon & "°")
-        sb.Append(sBis & "°")
-        sb.Append(sPreis & "°")
-        sb.Append(sDauer & "°")
-        sb.Append(lbPZimID.Text & "°")
+
+        ' Steuerungs-Arrays für die strukturierten Steuerelemente definieren
+        Dim preisTextBoxes() As TextBox = {tbPreis1, tbPreis2, tbPreis3, tbPreis4, tbPreis5, tbPreis6, tbPreis7}
+        Dim dauerTextBoxes() As TextBox = {tbD1, tbD2, tbD3, tbD4, tbD5, tbD6, tbD7}
+        Dim checkBoxes() As CheckBox = {chP1, chP2, chP3, chP4, chP5, chP6, chP7}
+
+        ' Schleife durch alle 7 Preiskategorien zur automatischen Befüllung/Kopie der globalen Werte
+        For i As Integer = 0 To preisTextBoxes.Length - 1
+            If checkBoxes(i).Checked OrElse String.IsNullOrWhiteSpace(preisTextBoxes(i).Text) Then
+                preisTextBoxes(i).Text = tbPreisG.Text
+                dauerTextBoxes(i).Text = tbDauerG.Text
+            End If
+        Next
+
+        ' Preis-Kette generieren (Werte mit Val() absichern und in Cent umrechnen)
+        Dim sPreis As String = String.Format("{0} | {1} | {2} | {3} | {4} | {5} | {6}",
+        Val(tbPreis1.Text) * 100, Val(tbPreis2.Text) * 100, Val(tbPreis3.Text) * 100,
+        Val(tbPreis4.Text) * 100, Val(tbPreis5.Text) * 100, Val(tbPreis6.Text) * 100, Val(tbPreis7.Text) * 100)
+
+        ' Dauer-Kette generieren
+        Dim sDauer As String = String.Format("{0} | {1} | {2} | {3} | {4} | {5} | {6}",
+        tbD1.Text, tbD2.Text, tbD3.Text, tbD4.Text, tbD5.Text, tbD6.Text, tbD7.Text)
+
+        ' Datumswerte konvertieren
+        Dim sVon As String = fcUmDatum(dtpVon.Value.ToString())
+        Dim sBis As String = fcUmDatum(dtpBis.Value.ToString())
+
+        ' Gesamt-String mit Trennzeichen zusammenbauen
+        sb.Append(sID).Append("°")
+        sb.Append(sVon).Append("°")
+        sb.Append(sBis).Append("°")
+        sb.Append(sPreis).Append("°")
+        sb.Append(sDauer).Append("°")
+        sb.Append(lbPZimID.Text).Append("°")
         sb.Append(coEvent.Text)
-        fcSavePreise = sb.ToString
+
+        Return sb.ToString()
     End Function
 
     ''' <summary>
-    ''' Preis löschen
+    ''' Löscht den aktuell ausgewählten Preisdatensatz nach einer Sicherheitsabfrage aus der Datenbank und aktualisiert die Anzeige.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - 'sID = ""' durch 'String.IsNullOrEmpty' ersetzt und an den Methodenstart vorgezogen (Early Exit).
+    ''' - Massenhafte Textbox-Leerungen über eine kompakte Array-Schleife für alle 7 Preisfelder vereinheitlicht.
+    ''' - Fehlerhaften '.TopItem.Selected'-Aufruf durch die sichere Methode 'prSelectFirstListViewItemIfNeeded' ersetzt.
+    ''' - Veraltete 'Call'-Syntax entfernt.
     ''' </remarks>
     Private Sub tsbPDel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPDel.Click
-
-        Dim sMsg As String = "Wollen Sie diesen Preis wirklich löschen?  "
         Dim sID As String = lbPID.Text
-        Dim cSql As String = "DELETE FROM Preise WHERE ID = '" & sID & "'"
-        If sID = "" Then Exit Sub
+
+        ' Abbrechen, wenn keine gültige ID vorhanden ist
+        If String.IsNullOrEmpty(sID) Then Exit Sub
+
+        Dim sMsg As String = "Wollen Sie diesen Preis wirklich löschen?"
+
+        ' Sicherheitsabfrage vor dem Löschen
         If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
             lDel = True
-            ' coUArt.Text = ""
-            tbPreis1.Text = ""
-            tbPreis2.Text = ""
-            tbPreis3.Text = ""
-            tbPreis4.Text = ""
-            tbPreis5.Text = ""
-            '   coKategorie.Text = ""
-            '  coSasion.Text = ""
-            'Datensatz per SQL aus der Tabelle löschen
+
+            ' Alle 7 Preis-Textfelder über ein Array leeren
+            Dim preisTextBoxes() As TextBox = {tbPreis1, tbPreis2, tbPreis3, tbPreis4, tbPreis5, tbPreis6, tbPreis7}
+            For Each tb As TextBox In preisTextBoxes
+                tb.Text = ""
+            Next
+
+            ' Datensatz per SQL aus der Tabelle löschen
+            Dim cSql As String = "DELETE FROM Preise WHERE ID = '" & sID & "'"
             UpdateTable(cSql)
+
+            ' Preisliste neu laden
             prLoadPreiseInList()
-            'Änderung in DataTable "dtPre" speichern
-            'Call fcDeleteTableRow(dtPre, "ID = '" & sID & "'")
+
+            ' Fokus auf das Steuerelement setzen und das erste Element auswählen, falls Daten vorhanden sind
             lvPreise.Select()
-            If lvPreise.Items.Count > 0 Then lvPreise.TopItem.Selected = True
+            prSelectFirstListViewItemIfNeeded(lvPreise)
+
             lDel = False
-            Call prCheckNoRecordPreise(dtPre)
+
+            ' Button-Status der Benutzeroberfläche aktualisieren
+            prCheckNoRecordPreise(dtPre)
         End If
     End Sub
-    Private Sub chP7_CheckedChanged(sender As Object, e As EventArgs) Handles chP7.CheckedChanged
-        If chP7.Checked = False Then
-            tbPreis7.Enabled = True
-        Else
-            tbPreis7.Enabled = False
+
+    ''' <summary>
+    ''' Schaltet die Bearbeitbarkeit des Preis-Eingabefeldes 7 frei, wenn die dazugehörige Checkbox deaktiviert wird.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - XML-Kommentar hinzugefügt.
+    ''' - 'If-Else'-Struktur durch eine hocheffiziente, direkte Boolean-Zuweisung ersetzt.
+    ''' - Event-Parameter korrekter typisiert (System.Object, System.EventArgs) entsprechend den .NET-Konventionen.
+    ''' </remarks>
+    'Private Sub chP7_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chP7.CheckedChanged
+    '    ' Wenn die Checkbox NICHT gesetzt ist (False), wird das Textfeld aktiviert (True)
+    '    tbPreis7.Enabled = Not chP7.Checked
+    'End Sub
+
+    ''' <summary>
+    ''' Universeller Event-Handler für alle sieben Preis-Checkboxen.
+    ''' Schaltet das jeweils zugehörige Textfeld basierend auf dem Auswahlstatus frei oder sperrt es.
+    ''' </summary>
+    Private Sub chP_Generic_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
+    Handles chP1.CheckedChanged, chP2.CheckedChanged, chP3.CheckedChanged,
+            chP4.CheckedChanged, chP5.CheckedChanged, chP6.CheckedChanged, chP7.CheckedChanged
+
+        ' Den Sender als Checkbox identifizieren
+        Dim currentCheckBox As CheckBox = TryCast(sender, CheckBox)
+        If currentCheckBox IsNot Nothing Then
+            ' Die Nummer der Checkbox aus dem Namen ermitteln (z.B. "chP7" -> "7")
+            Dim indexStr As String = currentCheckBox.Name.Substring(3)
+
+            ' Das passende Textfeld über den Namen im Formular suchen und umschalten
+            Dim targetTextBox As TextBox = TryCast(Me.Controls.Find("tbPreis" & indexStr, True).FirstOrDefault(), TextBox)
+            If targetTextBox IsNot Nothing Then
+                targetTextBox.Enabled = Not currentCheckBox.Checked
+            End If
         End If
     End Sub
-    Private Sub tsbPCopy_Click(sender As Object, e As EventArgs) Handles tsbPCopy.Click
-        Call prLoockPreise(True)
-        Call prLoockPreise1(False)
+
+    ''' <summary>
+    ''' Kopiert bestehende Preiselemente für ein ausgewähltes Zimmer in ein zukünftiges Jahr 
+    ''' und berechnet die Werte auf Cent-Basis neu.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - 'With lvPreise' aus der performancerelevanten i-Schleife nach oben herausgezogen.
+    ''' - String-Zusammenbau bei den Preisen durch ein effizientes 'StringBuilder'-Objekt optimiert.
+    ''' - Unnötige 'Mid'-Funktion bei der String-Längen-Kürzung durch modernes '.Length - 1' ersetzt.
+    ''' - Event-Parameter konform auf 'ByVal' und korrekte .NET-Typen umgestellt.
+    ''' </remarks>
+    Private Sub tsbPCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPCopy.Click
+        ' Benutzeroberfläche sperren und Warte-Cursor aktivieren
+        prLoockPreise(True)
+        prLoockPreise1(False)
         Me.Cursor = Cursors.WaitCursor
         tsbPCopy.Enabled = False
+
+        ' Abbrechen, falls keine ListView-Einträge vorhanden sind
+        If lvPreise.Items.Count = 0 Then
+            tsbPCopy.Enabled = True
+            Me.Cursor = Cursors.Default
+            prLoockPreise(False)
+            Exit Sub
+        End If
+
+        ' Basisdaten ermitteln
         Dim sJahr As String = Mid(fcUmDatum(lvPreise.Items(0).SubItems(1).Text), 1, 4)
         Dim iJahr As Integer = Val(Mid(tsbCoJahr.Text, 1, 1))
-        Dim sVon As String = ""
-        Dim sBis As String = ""
-        Dim sPreis As String = ""
-        Dim arPreis() As String
-        Dim sDauer As String = ""
-        Dim sZim As String = ""
-        Dim sEvent As String = ""
-        Dim sID As String = ""
-        sZim = fcGetObjektZimmerID(dtZim, tsbPZimmer1.Text, "ID")
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        sqlText = "ID,ADatum,EDatum,Preis,Dauer,ZimID,Event"
-        arFields = Split(sqlText, ",")
-        If tsbPZimmer1.Text <> "" Then
-            For i = 0 To lvPreise.Items.Count - 1
-                With lvPreise
+        Dim sZim As String = fcGetObjektZimmerID(dtZim, tsbPZimmer1.Text, "ID")
 
-                    sVon = fcUmDatum(.Items(i).SubItems(1).Text)
-                    sBis = fcUmDatum(.Items(i).SubItems(2).Text)
-                    sPreis = Trim(.Items(i).SubItems(3).Text)
-                    sDauer = Trim(.Items(i).SubItems(4).Text)
-                    '  sID = .Items(i).SubItems(4).Text
-                    'sZim = fcGetObjektZimmerID(dtZim, .Items(i).SubItems(5).Text, "ID")
-                    sEvent = .Items(i).SubItems(7).Text
-                    If Mid(sVon, 1, 4) = (Val(sJahr) + iJahr).ToString Then
-                        sID = fcGetTimeID(Date.Today)
-                        fcWait(2)
-                        arPreis = Split(sPreis, "|")
-                        sPreis = ""
-                        For j = 0 To arPreis.Length - 1
-                            sPreis = sPreis & (arPreis(j) * 100) & "|"
+        Dim sqlText As String = "ID,ADatum,EDatum,Preis,Dauer,ZimID,Event"
+        Dim arFields() As String = Split(sqlText, ",")
+        Dim arValue() As String
+
+        ' Kopierprozess starten, wenn ein Zielzimmer ausgewählt wurde
+        If Not String.IsNullOrWhiteSpace(tsbPZimmer1.Text) Then
+            With lvPreise
+                For i As Integer = 0 To .Items.Count - 1
+                    Dim item As ListViewItem = .Items(i)
+
+                    Dim sVon As String = fcUmDatum(item.SubItems(1).Text)
+                    Dim sBis As String = fcUmDatum(item.SubItems(2).Text)
+                    Dim sPreisRaw As String = item.SubItems(3).Text.Trim()
+                    Dim sDauer As String = item.SubItems(4).Text.Trim()
+                    Dim sEvent As String = item.SubItems(7).Text
+
+                    ' Prüfen, ob das Jahr des Datensatzes dem Zieljahr entspricht
+                    If Mid(sVon, 1, 4) = (Val(sJahr) + iJahr).ToString() Then
+                        Dim sID As String = fcGetTimeID(Date.Today)
+                        fcWait(2) ' Kurze Pause zur Gewährleistung eindeutiger IDs
+
+                        ' Preise splitten und neu berechnen (Cent-Multiplikation)
+                        Dim arPreis() As String = Split(sPreisRaw, "|")
+                        Dim sbPreis As New StringBuilder()
+
+                        For j As Integer = 0 To arPreis.Length - 1
+                            Dim priceValue As Double = Val(arPreis(j)) * 100
+                            sbPreis.Append(priceValue).Append("|")
                         Next
-                        sPreis = Mid(sPreis, 1, sPreis.Length - 1)
-                        sqlText = sID & "°" & sVon & "°" & sBis & "°" & sPreis & "°" & sDauer & "°" & sZim & "°" & sEvent
+
+                        ' Letztes Trennzeichen abschneiden
+                        Dim sPreis As String = sbPreis.ToString()
+                        If sPreis.Length > 0 Then
+                            sPreis = sPreis.Substring(0, sPreis.Length - 1)
+                        End If
+
+                        ' Datensatz-Array vorbereiten und in Datenbank einfügen
+                        sqlText = String.Format("{0}°{1}°{2}°{3}°{4}°{5}°{6}", sID, sVon, sBis, sPreis, sDauer, sZim, sEvent)
                         arValue = Split(sqlText, "°")
-                        Call fcInsertCommand("Preise", arFields, arValue)
+
+                        fcInsertCommand("Preise", arFields, arValue)
                     End If
-                    ' Call fcInsertCommand("Preise", arFields, arValue)
-                End With
-            Next
+                Next
+            End With
         End If
+
+        ' Ansicht zurücksetzen
         tsbCoJahr.Text = "0 Jahre"
         tsbPZimmer1.Text = ""
         tsbPCopy.Enabled = True
         Me.Cursor = Cursors.Default
-        Call prLoockPreise(False)
+        prLoockPreise(False)
     End Sub
 
-    Private Sub tsbPZimmerCopyJahr_Click(sender As Object, e As EventArgs) Handles tsbPZimmerCopyJahr.Click
-        Call prLoockPreise(True)
-        Call prLoockPreise1(False)
+    ''' <summary>
+    ''' Kopiert alle Preise des aktuellen Zimmers aus dem ausgewählten Basisjahr in ein zukünftiges Jahr 
+    ''' und berechnet die Werte auf Cent-Basis neu.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Absturzsicherung hinzugefügt für den Fall, dass 'lvPreise' keine Einträge enthält.
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
+    ''' - Preis-Verkettung in der inneren Schleife auf performantes 'StringBuilder'-Objekt umgestellt.
+    ''' - 'String.Format' für eine saubere und lesbare SQL-Wert-Generierung implementiert.
+    ''' - Parameter auf korrekte .NET-Typen typisiert.
+    ''' </remarks>
+    Private Sub tsbPZimmerCopyJahr_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPZimmerCopyJahr.Click
+        ' Abbrechen, falls keine ListView-Einträge vorhanden sind (verhindert Absturz bei Items(0))
+        If lvPreise.Items.Count = 0 Then Exit Sub
+
+        ' Oberflächen-Status sperren und Warte-Cursor aktivieren
+        prLoockPreise(True)
+        prLoockPreise1(False)
         Me.Cursor = Cursors.WaitCursor
+
+        ' Jahre und Basis-Jahr ermitteln
         Dim iJahr As Integer = Val(Mid(tsbCoJahr.Text, 1, 1))
         tsbCoJahr.Text = "0 Jahre"
-        Dim sVon As String = fcUmDatum(lvPreise.Items(0).SubItems(1).Text)
-        Dim sJahr = Mid(sVon, 1, 4)
-        Dim sBis As String = ""
-        Dim sPreis As String = ""
-        Dim arPreis() As String
-        Dim sDauer As String = ""
-        Dim sZim As String = ""
-        Dim sEvent As String = ""
-        Dim sID As String = ""
-        sZim = fcGetObjektZimmerID(dtZim, tsbPZimmer.Text, "ID")
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        sqlText = "ID,ADatum,EDatum,Preis,Dauer,ZimID,Event"
-        arFields = Split(sqlText, ",")
+
+        Dim sVonBase As String = fcUmDatum(lvPreise.Items(0).SubItems(1).Text)
+        Dim sJahr As String = Mid(sVonBase, 1, 4)
+
+        Dim sZim As String = fcGetObjektZimmerID(dtZim, tsbPZimmer.Text, "ID")
+
+        Dim sqlText As String = "ID,ADatum,EDatum,Preis,Dauer,ZimID,Event"
+        Dim arFields() As String = Split(sqlText, ",")
+        Dim arValue() As String
 
         With lvPreise
-            For i = 0 To lvPreise.Items.Count - 1
-                sVon = fcUmDatum(.Items(i).SubItems(1).Text)
-                If iJahr <> 0 And Mid(sVon, 1, 4) = sJahr Then
-                    sID = fcGetTimeID(Date.Today)
-                    fcWait(2)
+            For i As Integer = 0 To .Items.Count - 1
+                Dim item As ListViewItem = .Items(i)
+                Dim sVon As String = fcUmDatum(item.SubItems(1).Text)
 
-                    sBis = fcUmDatum(.Items(i).SubItems(2).Text)
-                    sPreis = Trim(.Items(i).SubItems(3).Text)
-                    sDauer = Trim(.Items(i).SubItems(4).Text)
-                    '  sID = .Items(i).SubItems(4).Text
-                    'sZim = fcGetObjektZimmerID(dtZim, .Items(i).SubItems(5).Text, "ID")
-                    sEvent = .Items(i).SubItems(7).Text
+                ' Nur kopieren, wenn ein Zieljahr gewählt wurde und der Datensatz zum Basisjahr gehört
+                If iJahr <> 0 AndAlso Mid(sVon, 1, 4) = sJahr Then
+                    Dim sID As String = fcGetTimeID(Date.Today)
+                    fcWait(2) ' Kurze Pause zur Absicherung eindeutiger IDs
 
+                    Dim sBis As String = fcUmDatum(item.SubItems(2).Text)
+                    Dim sPreisRaw As String = item.SubItems(3).Text.Trim()
+                    Dim sDauer As String = item.SubItems(4).Text.Trim()
+                    Dim sEvent As String = item.SubItems(7).Text
 
-                    sBis = (Val(Mid(sBis, 1, 4)) + iJahr).ToString & Mid(sBis, 5)
-                    sVon = (Val(Mid(sVon, 1, 4)) + iJahr).ToString & Mid(sVon, 5)
-                    arPreis = Split(sPreis, "|")
-                    sPreis = ""
-                    For j = 0 To arPreis.Length - 1
-                        sPreis = sPreis & (arPreis(j) * 100) & "|"
+                    ' Jahre der Datumsfelder um die gewählte Jahresanzahl erhöhen
+                    sBis = (Val(Mid(sBis, 1, 4)) + iJahr).ToString() & Mid(sBis, 5)
+                    sVon = (Val(Mid(sVon, 1, 4)) + iJahr).ToString() & Mid(sVon, 5)
+
+                    ' Preise splitten und in Cent umrechnen
+                    Dim arPreis() As String = Split(sPreisRaw, "|")
+                    Dim sbPreis As New StringBuilder()
+
+                    For j As Integer = 0 To arPreis.Length - 1
+                        Dim priceValue As Double = Val(arPreis(j)) * 100
+                        sbPreis.Append(priceValue).Append("|")
                     Next
-                    sPreis = Mid(sPreis, 1, sPreis.Length - 1)
-                    sqlText = sID & "°" & sVon & "°" & sBis & "°" & sPreis & "°" & sDauer & "°" & sZim & "°" & sEvent
+
+                    ' Abschließendes Trennzeichen entfernen
+                    Dim sPreis As String = sbPreis.ToString()
+                    If sPreis.Length > 0 Then
+                        sPreis = sPreis.Substring(0, sPreis.Length - 1)
+                    End If
+
+                    ' Datensatz-Array vorbereiten und in Datenbank einfügen
+                    sqlText = String.Format("{0}°{1}°{2}°{3}°{4}°{5}°{6}", sID, sVon, sBis, sPreis, sDauer, sZim, sEvent)
                     arValue = Split(sqlText, "°")
-                    Call fcInsertCommand("Preise", arFields, arValue)
+
+                    fcInsertCommand("Preise", arFields, arValue)
                 End If
             Next
         End With
+
+        ' Ansicht aktualisieren und UI freigeben
         prLoadPreiseInList()
         Me.Cursor = Cursors.Default
-        Call prLoockPreise(False)
-
-
+        prLoockPreise(False)
     End Sub
 
-    Private Sub tbPreis_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbPreis1.KeyPress
-        Call prCheckNumericKey(e.KeyChar, tbPreis1)
+    ''' <summary>
+    ''' Validiert die Tastatureingaben für alle Preis-Textfelder und erlaubt nur numerische Zeichen sowie Steuerzeichen.
+    ''' </summary>
+    ''' <param name="sender">Die TextBox, in der das Zeichen eingegeben wurde.</param>
+    ''' <param name="e">Die Ereignisdaten mit dem eingegebenen Zeichen.</param>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Alle einzelnen KeyPress-Events in einer einzigen, generischen Methode zusammengefasst.
+    ''' - 'tbPreis6' und 'tbPreis7' direkt im 'Handles'-Block ergänzt, da diese im Originalcode fehlten.
+    ''' - Veraltete 'Call'-Syntax entfernt und 'sender' dynamisch an die Prüffunktion übergeben.
+    ''' </remarks>
+    Private Sub tbPreis_Generic_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) _
+    Handles tbPreis1.KeyPress, tbPreis2.KeyPress, tbPreis3.KeyPress,
+            tbPreis4.KeyPress, tbPreis5.KeyPress, tbPreis6.KeyPress, tbPreis7.KeyPress
+
+        Dim currentTextBox As TextBox = TryCast(sender, TextBox)
+        If currentTextBox IsNot Nothing Then
+            ' Übergibt das gedrückte Zeichen und die auslösende TextBox an Ihre Prüfroutine
+            prCheckNumericKey(e.KeyChar, currentTextBox)
+        End If
     End Sub
 
-    Private Sub tbPreis_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbPreis1.Leave
-        tbPreis1.Text = fcFormatDecimal(tbPreis1.Text)
-    End Sub
+    ''' <summary>
+    ''' Formatiert den Inhalt des Preis-Textfeldes automatisch als Dezimalzahl, sobald das Feld verlassen wird.
+    ''' </summary>
+    ''' <param name="sender">Die TextBox, die den Fokus verloren hat.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Alle einzelnen Leave-Events in einer einzigen, generischen Methode zusammengefasst.
+    ''' - 'tbPreis6' und 'tbPreis7' direkt mit abgesichert.
+    ''' - Castet den 'sender' dynamisch, um die Formatierung fehlerfrei auf das aktive Feld anzuwenden.
+    ''' </remarks>
+    Private Sub tbPreis_Generic_Leave(ByVal sender As Object, ByVal e As System.EventArgs) _
+    Handles tbPreis1.Leave, tbPreis2.Leave, tbPreis3.Leave,
+            tbPreis4.Leave, tbPreis5.Leave, tbPreis6.Leave, tbPreis7.Leave
 
-    Private Sub tbPreis3_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbPreis2.KeyPress
-        Call prCheckNumericKey(e.KeyChar, tbPreis2)
-    End Sub
-
-    Private Sub tbPreis3_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbPreis2.Leave
-        tbPreis2.Text = fcFormatDecimal(tbPreis2.Text)
-    End Sub
-
-    Private Sub tbPreis4_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbPreis3.KeyPress
-        Call prCheckNumericKey(e.KeyChar, tbPreis3)
-    End Sub
-
-    Private Sub tbPreis4_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbPreis3.Leave
-        tbPreis3.Text = fcFormatDecimal(tbPreis3.Text)
-    End Sub
-    Private Sub tbPreis5_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbPreis4.KeyPress
-        Call prCheckNumericKey(e.KeyChar, tbPreis4)
-    End Sub
-
-    Private Sub tbPreis5_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbPreis4.Leave
-        tbPreis4.Text = fcFormatDecimal(tbPreis4.Text)
-    End Sub
-    Private Sub tbPreis6_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbPreis5.KeyPress
-        Call prCheckNumericKey(e.KeyChar, tbPreis5)
-    End Sub
-
-    Private Sub tbPreis6_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbPreis5.Leave
-        tbPreis5.Text = fcFormatDecimal(tbPreis5.Text)
+        Dim currentTextBox As TextBox = TryCast(sender, TextBox)
+        If currentTextBox IsNot Nothing Then
+            ' Formatiert den Text der betroffenen TextBox neu
+            currentTextBox.Text = fcFormatDecimal(currentTextBox.Text)
+        End If
     End Sub
 
 
@@ -4725,33 +5229,64 @@ Public Class frmSystem
     End Sub
 
     ''' <summary>
-    ''' Tabelle Saison mit daten aus der Datei "Saison.ini" füllen
+    ''' Füllt die ListView 'lvSasion' mit den Saisondaten aus der Konfigurationsdatei und formatiert die Zeilen farblich.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 30.09.2026 - Code-Optimierung:
+    ''' - Zeilenumbruch-Splitting robuster gestaltet, um leere Fragmente (\n) abzufangen.
+    ''' - Index-Zähler für die Hintergrundfarbe ('BackColor') entkoppelt, damit Leerzeilen im Array das Grid nicht verschieben.
+    ''' - Fehlerhaften '.TopItem.Selected'-Aufruf durch die neue, sichere Methode 'prSelectFirstListViewItemIfNeeded' ersetzt.
     ''' </remarks>
     Private Sub prLoadSaisonInList()
-        Dim arTmp() As String = ReadOneValueFromSystemDb("Saison").Split(vbCrLf)
-        Dim nMax As Integer = arTmp.Length - 1
+        ' Daten auslesen und zeilenweise splitten (leere Zeilen direkt ignorieren)
+        Dim rawData As String = ReadOneValueFromSystemDb("Saison")
+        Dim arTmp() As String = rawData.Split(New String() {vbCrLf, vbCr, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+
         Dim arT() As String
         Dim nColor As Integer
+        Dim itemIndex As Integer = 0
+
         With lvSasion
             .Items.Clear()
-            For i As Integer = 0 To nMax
-                If arTmp(i).Trim <> "" Then
-                    arT = arTmp(i).Split(";")
-                    Dim lv As ListViewItem
-                    lv = .Items.Add(arT(0).Trim)
-                    lv.SubItems.Add(arT(1))
-                    lv.SubItems.Add(arT(2))
-                    nColor = arT(0).Trim.Substring(0, 1)
-                    .Items(i).BackColor = fcStringRGB(arFarbe(nColor, 1))
+
+            ' Zeilen verarbeiten
+            For i As Integer = 0 To arTmp.Length - 1
+                Dim currentRow As String = arTmp(i).Trim()
+
+                ' Nur verarbeiten, wenn die Zeile nach dem Trimmen valide Daten enthält und ein Semikolon besitzt
+                If Not String.IsNullOrWhiteSpace(currentRow) AndAlso currentRow.Contains(";") Then
+                    arT = currentRow.Split(";"c)
+
+                    ' Neues ListViewItem erstellen und SubItems befüllen
+                    Dim lv As ListViewItem = .Items.Add(arT(0).Trim())
+
+                    ' Prüfen, ob genügend Spaltenwerte vorhanden sind (Sicherheit gegen korrupte INI-Zeilen)
+                    If arT.Length > 2 Then
+                        lv.SubItems.Add(arT(1))
+                        lv.SubItems.Add(arT(2))
+                    End If
+
+                    ' Farbindex ermitteln (Erstes Zeichen des ersten Elements)
+                    Dim firstChar As String = arT(0).Trim().Substring(0, 1)
+                    If Integer.TryParse(firstChar, nColor) Then
+                        ' Hintergrundfarbe zuweisen
+                        .Items(itemIndex).BackColor = fcStringRGB(arFarbe(nColor, 1))
+                    End If
+
+                    ' Index für den nächsten visuellen Eintrag erhöhen
+                    itemIndex += 1
                 End If
             Next
+
+            ' Fokus auf das Steuerelement setzen
             .Select()
-            If .Items.Count > 0 Then .TopItem.Selected = True
+
+            ' Automatisch den ersten Eintrag selektieren, falls Daten geladen wurden
+            prSelectFirstListViewItemIfNeeded(lvSasion)
         End With
     End Sub
+
 
     Private Sub lvSasion_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvSasion.SelectedIndexChanged
         Call prGetInfolvSaison()

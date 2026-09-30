@@ -98,7 +98,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>CdkLaX4T1ZwXnb2s+T8iVFuU4GYhvy9lj4l07/0SOrk=</dsig:DigestValue>
+        <dsig:DigestValue>XKOhGjuanajx13MSvgHvafa/tC8rXoj8v+W5h0X9nh4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -110,7 +110,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>+j54Pm8WsrMV/txtgAupqvC9PLWzK/K1cmDpAgIjk/Q=</dsig:DigestValue>
+        <dsig:DigestValue>xdy7q1LM7yEEMV1mUGSFCI1FdnQdr3O6C5uXs31LM40=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -122,7 +122,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Z0hXNCOndeenQ8h1x1w7O1NwsiCfbj3VWvgURpuEgxs=</dsig:DigestValue>
+        <dsig:DigestValue>z7JMqK4lyTlrW32ljcVS9xMNGFyDQeP3CqW0iH45fxs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -175,14 +175,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Pension.exe" size="1437184">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Pension.exe" size="1437696">
       <assemblyIdentity name="Pension" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>eeDPjBbsbO0Nhfdt69t1KCRe3AOK9y5Bau0B/vr5oIM=</dsig:DigestValue>
+        <dsig:DigestValue>afRs9uEIvbK1qh6EIQ+1LNczXIuh/p/Onm09pr7smPE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

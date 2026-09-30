@@ -805,19 +805,19 @@ Partial Class frmMain
         'tsmSystem
         '
         Me.tsmSystem.Name = "tsmSystem"
-        Me.tsmSystem.Size = New System.Drawing.Size(125, 22)
+        Me.tsmSystem.Size = New System.Drawing.Size(180, 22)
         Me.tsmSystem.Text = "Anpassen"
         '
         'ToolStripSeparator12
         '
         Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
-        Me.ToolStripSeparator12.Size = New System.Drawing.Size(122, 6)
+        Me.ToolStripSeparator12.Size = New System.Drawing.Size(177, 6)
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmSave, Me.tsmRestore, Me.DatenKorekturToolStripMenuItem, Me.DatenKontrolleToolStripMenuItem, Me.CodeToolStripMenuItem, Me.IDKundeToolStripMenuItem, Me.ServerFehlerToolStripMenuItem, Me.IniToolStripMenuItem})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(125, 22)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem1.Text = "Database"
         '
         'tsmSave

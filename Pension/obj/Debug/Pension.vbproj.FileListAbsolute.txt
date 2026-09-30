@@ -20,7 +20,6 @@ C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\K4os.Hash.xxHash.dll
 C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
 C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\BouncyCastle.Cryptography.xml
 C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\itextsharp.xml
-C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\MySql.Data.xml
 C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\Interop.ADODB.dll
 C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\Interop.ADOX.dll
 C:\Users\Uwe\Desktop\Pension_Mobil\Pension\bin\Debug\Interop.JRO.dll
