@@ -23,6 +23,8 @@ Public Class frmDruckBPlan
     ''' - Veraltete 'Str()'-Funktion durch saubere '.ToString()'-Konvertierung ersetzt, um führende Leerzeichen zu vermeiden.
     ''' - Lokale Schleifenvariable 'i' explizit typisiert ('For i As Integer = ...').
     ''' - Veraltete VB-Kompatibilitätsfunktion 'Split()' durch die native '.Split()'-Methode ersetzt.
+    ''' 02.10.2026
+    ''' - Leerfelder aus Combobox Druckprofile entfernt
     ''' </remarks>
     Private Sub frmDruckVorlage_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Dim currentYear As Integer = Date.Today.Year
@@ -45,7 +47,12 @@ Public Class frmDruckBPlan
 
             ' Profile zur ComboBox hinzufügen
             For i As Integer = 0 To arDruckZimmer1.Length - 1
-                cbProfil.Items.Add(AtLeft(arDruckZimmer1(i), ";", 1))
+                Dim eintrag As String = arDruckZimmer1(i).Trim()
+
+                ' Die Bedingung ist nur erfüllt, wenn BEIDE Kriterien zutreffen
+                If eintrag <> ";" AndAlso eintrag <> "" Then
+                    cbProfil.Items.Add(AtLeft(arDruckZimmer1(i), ";", 1))
+                End If
             Next
 
             ' Erstes Profil als Standard selektieren
@@ -869,7 +876,7 @@ Public Class frmDruckBPlan
     ''' <remarks>
     ''' 07.01.2012 - Create
     ''' 28.09.2026 - Code-Optimierung:
-    ''' - Veralteten Vergleich 'arT(0) <> Nothing' durch das performantere und null-sichere 'Not String.IsNullOrEmpty()' ersetzt.
+    ''' - Veralteten Vergleich 'arT(0) ungleich Nothing' durch das performantere und null-sichere 'Not String.IsNullOrEmpty()' ersetzt.
     ''' - Variablen-Deklarationen in die Schleife verlagert (Local Scope), um den Speicher direkt freizugeben.
     ''' - 'With VPE'-Block entfernt, da innerhalb des Blocks kein direkter Bezug (mittels '.') auf VPE stattfand, außer beim PageBreak.
     ''' - Doppelte Zuweisungen bei 'nPos' bereinigt und Inline-Dokumentation für den Seitenumbruch-Schwellenwert (18 cm/Zoll) hinzugefügt.

@@ -313,7 +313,7 @@
     ''' <remarks>
     ''' 25.09.2026 - Code-Optimierung:
     ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen komplett entfernt.
-    ''' - 'sGeb.Trim <> ""' durch performanteres 'Not String.IsNullOrWhiteSpace(sGeb)' ersetzt.
+    ''' - 'sGeb.Trim ungleich ""' durch performanteres 'Not String.IsNullOrWhiteSpace(sGeb)' ersetzt.
     ''' - 'Using'-Block oder 'With'-Struktur zur Vermeidung wiederholter Datenzeilen-Zugriffe (dt.Rows(0)) vorbereitet.
     ''' - SQL-Injektions-Risiko über inline verkettete Strings minimiert (Verwendung von Parametern wird empfohlen).
     ''' - Fehleranfällige und nicht genutzte Variablen bereinigt bzw. strukturiert.

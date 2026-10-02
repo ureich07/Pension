@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cec="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>
+  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
+  <cbc:ID>?BT-001</cbc:ID>
+  <cbc:IssueDate>?BT-002</cbc:IssueDate>
+  <cbc:DueDate>?BT-009</cbc:DueDate>
+  <cbc:InvoiceTypeCode>?BT-003</cbc:InvoiceTypeCode>
+  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+  <cbc:BuyerReference>?BT-010</cbc:BuyerReference>
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cbc:EndpointID schemeID="EM">?BT-034</cbc:EndpointID>
+      <cac:PartyName>
+        <cbc:Name>?BT-027</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:StreetName>?BT-035</cbc:StreetName>
+        <cbc:CityName>?BT-037</cbc:CityName>
+        <cbc:PostalZone>?BT-038</cbc:PostalZone>
+        <cac:Country>
+          <cbc:IdentificationCode>?BT-040</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>?BT-031</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>?BT-032</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>FC</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>?BT-027</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+      <cac:Contact>
+        <cbc:Name>?BT-041</cbc:Name>
+        <cbc:Telephone>?BT-043</cbc:Telephone>
+        <cbc:ElectronicMail>?BT-042</cbc:ElectronicMail>
+      </cac:Contact>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cbc:EndpointID schemeID="EM">?BT-049</cbc:EndpointID>
+      <cac:PartyName>
+        <cbc:Name>?BT-044</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:StreetName>?BT-050</cbc:StreetName>
+        <cbc:CityName>?BT-052</cbc:CityName>
+        <cbc:PostalZone>?BT-053</cbc:PostalZone>
+        <cac:Country>
+          <cbc:IdentificationCode>?BT-055</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>?BT-044</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:Delivery>
+    <cbc:ActualDeliveryDate>?BT-072</cbc:ActualDeliveryDate>
+  </cac:Delivery>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>?BT-081</cbc:PaymentMeansCode>
+	  <cbc:PaymentID>?BT-083</cbc:PaymentID>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>?BT-084</cbc:ID>
+      <cbc:Name>?BT-085</cbc:Name>
+      <cac:FinancialInstitutionBranch>
+        <cbc:ID>?BT-086</cbc:ID>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="EUR">?BT-110</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="EUR">?BT-106</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="EUR">?BT-110</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>?BT-152</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="EUR">?BT-106</cbc:LineExtensionAmount>
+    <cbc:TaxExclusiveAmount currencyID="EUR">?BT-106</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="EUR">?BT-112</cbc:TaxInclusiveAmount>
+    <cbc:AllowanceTotalAmount currencyID="EUR">?BT-113</cbc:AllowanceTotalAmount>
+    <cbc:PrepaidAmount currencyID="EUR">0</cbc:PrepaidAmount>
+    <cbc:PayableAmount currencyID="EUR">?BT-115</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  ?Position
+</Invoice>

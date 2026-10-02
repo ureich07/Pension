@@ -1,0 +1,484 @@
+Adelshofen;82276;Landkreis Fürstenfeldbruck;Bayern
+Aichtal;72631;Landkreis Esslingen;Baden-Württemberg
+Aichwald;73773;Landkreis Esslingen;Baden-Württemberg
+Alling;82239;Landkreis Fürstenfeldbruck;Bayern
+Altbach;73776;Landkreis Esslingen;Baden-Württemberg
+Altdorf;72655;Landkreis Esslingen;Baden-Württemberg
+Altenriet;72657;Landkreis Esslingen;Baden-Württemberg
+Althegnenberg;82278;Landkreis Fürstenfeldbruck;Bayern
+Baltmannsweiler;73666;Landkreis Esslingen;Baden-Württemberg
+Barßel;26676;Landkreis Cloppenburg;Niedersachsen
+Bempflingen;72658;Landkreis Esslingen;Baden-Württemberg
+Berlin Mitte;10115;;Berlin
+Berlin Mitte;10117;;Berlin
+Berlin Mitte;10178;;Berlin
+Berlin Friedrichshain-Kreuzberg;10179;;Berlin
+Berlin Friedrichshain-Kreuzberg;10243;;Berlin
+Berlin Friedrichshain-Kreuzberg;10245;;Berlin
+Berlin Mitte;10551;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10553;;Berlin
+Berlin Mitte;10555;;Berlin
+Berlin Mitte;10557;;Berlin
+Berlin Mitte;10559;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10585;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10587;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10589;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10623;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10625;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10627;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10629;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10707;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10709;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10711;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10713;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10715;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10717;;Berlin
+Berlin Charlottenburg-Wilmersdorf;10719;;Berlin
+Berlin Tempelhof-Schöneberg;10777;;Berlin
+Berlin Tempelhof-Schöneberg;10779;;Berlin
+Berlin Tempelhof-Schöneberg;10781;;Berlin
+Berlin Tempelhof-Schöneberg;10783;;Berlin
+Berlin Tempelhof-Schöneberg;10785;;Berlin
+Berlin Tempelhof-Schöneberg;10787;;Berlin
+Berlin Tempelhof-Schöneberg;10789;;Berlin
+Berlin Tempelhof-Schöneberg;10823;;Berlin
+Berlin Tempelhof-Schöneberg;10825;;Berlin
+Berlin Tempelhof-Schöneberg;10827;;Berlin
+Berlin Tempelhof-Schöneberg;10829;;Berlin
+Berlin Friedrichshain-Kreuzberg;10961;;Berlin
+Berlin Friedrichshain-Kreuzberg;10963;;Berlin
+Berlin Neukölln;10965;;Berlin
+Berlin Neukölln;10967;;Berlin
+Berlin Friedrichshain-Kreuzberg;10969;;Berlin
+Berlin Friedrichshain-Kreuzberg;10997;;Berlin
+Berlin Friedrichshain-Kreuzberg;10999;;Berlin
+Berlin Neukölln;12043;;Berlin
+Berlin Neukölln;12045;;Berlin
+Berlin Neukölln;12047;;Berlin
+Berlin Neukölln;12049;;Berlin
+Berlin Neukölln;12051;;Berlin
+Berlin Neukölln;12053;;Berlin
+Berlin Neukölln;12055;;Berlin
+Berlin Neukölln;12057;;Berlin
+Berlin Neukölln;12059;;Berlin
+Berlin Neukölln;12099;;Berlin
+Berlin Tempelhof-Schöneberg;12101;;Berlin
+Berlin Tempelhof-Schöneberg;12103;;Berlin
+Berlin Tempelhof-Schöneberg;12105;;Berlin
+Berlin Neukölln;12107;;Berlin
+Berlin Tempelhof-Schöneberg;12109;;Berlin
+Berlin Tempelhof-Schöneberg;12157;;Berlin
+Berlin Tempelhof-Schöneberg;12159;;Berlin
+Berlin Tempelhof-Schöneberg;12161;;Berlin
+Berlin Tempelhof-Schöneberg;12163;;Berlin
+Berlin Tempelhof-Schöneberg;12169;;Berlin
+Berlin Tempelhof-Schöneberg;12249;;Berlin
+Berlin Tempelhof-Schöneberg;12277;;Berlin
+Berlin Tempelhof-Schöneberg;12279;;Berlin
+Berlin Neukölln;12305;;Berlin
+Berlin Tempelhof-Schöneberg;12307;;Berlin
+Berlin Tempelhof-Schöneberg;12309;;Berlin
+Berlin Neukölln;12347;;Berlin
+Berlin Neukölln;12349;;Berlin
+Berlin Neukölln;12351;;Berlin
+Berlin Neukölln;12353;;Berlin
+Berlin Neukölln;12355;;Berlin
+Berlin Neukölln;12357;;Berlin
+Berlin Neukölln;12359;;Berlin
+Berlin Mitte;13347;;Berlin
+Berlin Mitte;13349;;Berlin
+Berlin Mitte;13351;;Berlin
+Berlin Charlottenburg-Wilmersdorf;13353;;Berlin
+Berlin Mitte;13355;;Berlin
+Berlin Mitte;13357;;Berlin
+Berlin Mitte;13359;;Berlin
+Berlin Reinickendorf;13403;;Berlin
+Berlin Reinickendorf;13405;;Berlin
+Berlin Reinickendorf;13407;;Berlin
+Berlin Reinickendorf;13409;;Berlin
+Berlin Reinickendorf;13435;;Berlin
+Berlin Reinickendorf;13437;;Berlin
+Berlin Reinickendorf;13439;;Berlin
+Berlin Reinickendorf;13465;;Berlin
+Berlin Reinickendorf;13467;;Berlin
+Berlin Reinickendorf;13469;;Berlin
+Berlin Reinickendorf;13503;;Berlin
+Berlin Reinickendorf;13505;;Berlin
+Berlin Reinickendorf;13507;;Berlin
+Berlin Reinickendorf;13509;;Berlin
+Berlin Reinickendorf;13599;;Berlin
+Berlin Reinickendorf;13629;;Berlin
+Berlin Charlottenburg-Wilmersdorf;14050;;Berlin
+Berlin Charlottenburg-Wilmersdorf;14053;;Berlin
+Berlin Charlottenburg-Wilmersdorf;14055;;Berlin
+Berlin Charlottenburg-Wilmersdorf;14057;;Berlin
+Berlin Charlottenburg-Wilmersdorf;14059;;Berlin
+Berlin Tempelhof-Schöneberg;14197;;Berlin
+Berne;27804;Landkreis Wesermarsch;Niedersachsen
+Beuren;72660;Landkreis Esslingen;Baden-Württemberg
+Bissingen an der Teck;73266;Landkreis Esslingen;Baden-Württemberg
+Bösel;26219;Landkreis Cloppenburg;Niedersachsen
+Brake;26919;Landkreis Wesermarsch;Niedersachsen
+Bremen;27568;;Bremen
+Bremen;28195;;Bremen
+Bremen;28197;;Bremen
+Bremen;28199;;Bremen
+Bremen;28201;;Bremen
+Bremen;28203;;Bremen
+Bremen;28205;;Bremen
+Bremen;28207;;Bremen
+Bremen;28209;;Bremen
+Bremen;28211;;Bremen
+Bremen;28213;;Bremen
+Bremen;28215;;Bremen
+Bremen;28217;;Bremen
+Bremen;28219;;Bremen
+Bremen;28237;;Bremen
+Bremen;28239;;Bremen
+Bremen;28259;;Bremen
+Bremen;28277;;Bremen
+Bremen;28279;;Bremen
+Bremen;28307;;Bremen
+Bremen;28309;;Bremen
+Bremen;28325;;Bremen
+Bremen;28327;;Bremen
+Bremen;28329;;Bremen
+Bremen;28355;;Bremen
+Bremen;28357;;Bremen
+Bremen;28359;;Bremen
+Bremen;28717;;Bremen
+Bremen;28719;;Bremen
+Bremen;28755;;Bremen
+Bremen;28757;;Bremen
+Bremen;28759;;Bremen
+Bremen;28777;;Bremen
+Bremen;28779;;Bremen
+Butjadingen;26969;Landkreis Wesermarsch;Niedersachsen
+Cappeln (Oldenburg);49692;Landkreis Cloppenburg;Niedersachsen
+Castrop-Rauxel;44575;Kreis Recklinghausen;Nordrhein-Westfalen
+Castrop-Rauxel;44577;Kreis Recklinghausen;Nordrhein-Westfalen
+Castrop-Rauxel;44579;Kreis Recklinghausen;Nordrhein-Westfalen
+Castrop-Rauxel;44581;Kreis Recklinghausen;Nordrhein-Westfalen
+Cloppenburg;49661;Landkreis Cloppenburg;Niedersachsen
+Datteln;45711;Kreis Recklinghausen;Nordrhein-Westfalen
+Deizisau;73779;Landkreis Esslingen;Baden-Württemberg
+Delmenhorst;27749;;Niedersachsen
+Delmenhorst;27751;;Niedersachsen
+Delmenhorst;27753;;Niedersachsen
+Delmenhorst;27755;;Niedersachsen
+Denkendorf;73770;Landkreis Esslingen;Baden-Württemberg
+Dettingen unter Teck;73265;Landkreis Esslingen;Baden-Württemberg
+Dorsten;46282;Kreis Recklinghausen;Nordrhein-Westfalen
+Dorsten;46284;Kreis Recklinghausen;Nordrhein-Westfalen
+Dorsten;46286;Kreis Recklinghausen;Nordrhein-Westfalen
+Egenhofen;82281;Landkreis Fürstenfeldbruck;Bayern
+Eichenau;82223;Landkreis Fürstenfeldbruck;Bayern
+Elsfleth;26931;Landkreis Wesermarsch;Niedersachsen
+Emmering;82275;Landkreis Fürstenfeldbruck;Bayern
+Emstek;49685;Landkreis Cloppenburg;Niedersachsen
+Erkenbrechtsweiler;73268;Landkreis Esslingen;Baden-Württemberg
+Essen (Oldenburg);49632;Landkreis Cloppenburg;Niedersachsen
+Esslingen am Neckar;73728;Landkreis Esslingen;Baden-Württemberg
+Esslingen am Neckar;73730;Landkreis Esslingen;Baden-Württemberg
+Esslingen am Neckar;73732;Landkreis Esslingen;Baden-Württemberg
+Esslingen am Neckar;73733;Landkreis Esslingen;Baden-Württemberg
+Esslingen am Neckar;73734;Landkreis Esslingen;Baden-Württemberg
+Filderstadt;70794;Landkreis Esslingen;Baden-Württemberg
+Filderstadt;71111;Landkreis Esslingen;Baden-Württemberg
+Frankfurt am Main;60306;;Hessen
+Frankfurt am Main;60308;;Hessen
+Frankfurt am Main;60310;;Hessen
+Frankfurt am Main;60311;;Hessen
+Frankfurt am Main;60313;;Hessen
+Frankfurt am Main;60314;;Hessen
+Frankfurt am Main;60316;;Hessen
+Frankfurt am Main;60318;;Hessen
+Frankfurt am Main;60320;;Hessen
+Frankfurt am Main;60322;;Hessen
+Frankfurt am Main;60323;;Hessen
+Frankfurt am Main;60325;;Hessen
+Frankfurt am Main;60326;;Hessen
+Frankfurt am Main;60327;;Hessen
+Frankfurt am Main;60329;;Hessen
+Frankfurt am Main;60385;;Hessen
+Frankfurt am Main;60386;;Hessen
+Frankfurt am Main;60388;;Hessen
+Frankfurt am Main;60389;;Hessen
+Frankfurt am Main;60431;;Hessen
+Frankfurt am Main;60433;;Hessen
+Frankfurt am Main;60435;;Hessen
+Frankfurt am Main;60437;;Hessen
+Frankfurt am Main;60438;;Hessen
+Frankfurt am Main;60439;;Hessen
+Frankfurt am Main;60486;;Hessen
+Frankfurt am Main;60487;;Hessen
+Frankfurt am Main;60488;;Hessen
+Frankfurt am Main;60489;;Hessen
+Frankfurt am Main;60528;;Hessen
+Frankfurt am Main;60529;;Hessen
+Frankfurt am Main;60549;;Hessen
+Frankfurt am Main;60594;;Hessen
+Frankfurt am Main;60596;;Hessen
+Frankfurt am Main;60598;;Hessen
+Frankfurt am Main;60599;;Hessen
+Frankfurt am Main;65929;;Hessen
+Frankfurt am Main;65931;;Hessen
+Frankfurt am Main;65933;;Hessen
+Frankfurt am Main;65934;;Hessen
+Frankfurt am Main;65936;;Hessen
+Frickenhausen;72636;Landkreis Esslingen;Baden-Württemberg
+Friesoythe;26169;Landkreis Cloppenburg;Niedersachsen
+Fürstenfeldbruck;82256;Landkreis Fürstenfeldbruck;Bayern
+Garrel;49681;Landkreis Cloppenburg;Niedersachsen
+Germering;82110;Landkreis Fürstenfeldbruck;Bayern
+Gladbeck;45964;Kreis Recklinghausen;Nordrhein-Westfalen
+Gladbeck;45966;Kreis Recklinghausen;Nordrhein-Westfalen
+Gladbeck;45968;Kreis Recklinghausen;Nordrhein-Westfalen
+Grafrath;82284;Landkreis Fürstenfeldbruck;Bayern
+Gröbenzell;82194;Landkreis Fürstenfeldbruck;Bayern
+Großbettlingen;72663;Landkreis Esslingen;Baden-Württemberg
+Hagen;58089;;Nordrhein-Westfalen
+Hagen;58091;;Nordrhein-Westfalen
+Hagen;58093;;Nordrhein-Westfalen
+Hagen;58095;;Nordrhein-Westfalen
+Hagen;58097;;Nordrhein-Westfalen
+Hagen;58099;;Nordrhein-Westfalen
+Hagen;58119;;Nordrhein-Westfalen
+Hagen;58135;;Nordrhein-Westfalen
+Haltern am See;45721;Kreis Recklinghausen;Nordrhein-Westfalen
+Hamm;59063;;Nordrhein-Westfalen
+Hamm;59065;;Nordrhein-Westfalen
+Hamm;59067;;Nordrhein-Westfalen
+Hamm;59069;;Nordrhein-Westfalen
+Hamm;59071;;Nordrhein-Westfalen
+Hamm;59073;;Nordrhein-Westfalen
+Hamm;59075;;Nordrhein-Westfalen
+Hamm;59077;;Nordrhein-Westfalen
+Hattenhofen;82285;Landkreis Fürstenfeldbruck;Bayern
+Herne;44623;;Nordrhein-Westfalen
+Herne;44625;;Nordrhein-Westfalen
+Herne;44627;;Nordrhein-Westfalen
+Herne;44628;;Nordrhein-Westfalen
+Herne;44629;;Nordrhein-Westfalen
+Herne;44649;;Nordrhein-Westfalen
+Herne;44651;;Nordrhein-Westfalen
+Herne;44652;;Nordrhein-Westfalen
+Herne;44653;;Nordrhein-Westfalen
+Herten;45699;Kreis Recklinghausen;Nordrhein-Westfalen
+Herten;45701;Kreis Recklinghausen;Nordrhein-Westfalen
+Hochdorf;73269;Landkreis Esslingen;Baden-Württemberg
+Holzmaden;73271;Landkreis Esslingen;Baden-Württemberg
+Jade;26349;Landkreis Wesermarsch;Niedersachsen
+Jesenwang;82287;Landkreis Fürstenfeldbruck;Bayern
+Kirchheim unter Teck;73230;Landkreis Esslingen;Baden-Württemberg
+Kohlberg;72664;Landkreis Esslingen;Baden-Württemberg
+Köln;50667;;Nordrhein-Westfalen
+Köln;50668;;Nordrhein-Westfalen
+Köln;50670;;Nordrhein-Westfalen
+Köln;50672;;Nordrhein-Westfalen
+Köln;50674;;Nordrhein-Westfalen
+Köln;50676;;Nordrhein-Westfalen
+Köln;50677;;Nordrhein-Westfalen
+Köln;50678;;Nordrhein-Westfalen
+Köln;50679;;Nordrhein-Westfalen
+Köln;50733;;Nordrhein-Westfalen
+Köln;50735;;Nordrhein-Westfalen
+Köln;50737;;Nordrhein-Westfalen
+Köln;50739;;Nordrhein-Westfalen
+Köln;50765;;Nordrhein-Westfalen
+Köln;50767;;Nordrhein-Westfalen
+Köln;50769;;Nordrhein-Westfalen
+Köln;50823;;Nordrhein-Westfalen
+Köln;50825;;Nordrhein-Westfalen
+Köln;50827;;Nordrhein-Westfalen
+Köln;50829;;Nordrhein-Westfalen
+Köln;50858;;Nordrhein-Westfalen
+Köln;50859;;Nordrhein-Westfalen
+Köln;50931;;Nordrhein-Westfalen
+Köln;50933;;Nordrhein-Westfalen
+Köln;50935;;Nordrhein-Westfalen
+Köln;50937;;Nordrhein-Westfalen
+Köln;50939;;Nordrhein-Westfalen
+Köln;50968;;Nordrhein-Westfalen
+Köln;50969;;Nordrhein-Westfalen
+Köln;50996;;Nordrhein-Westfalen
+Köln;50997;;Nordrhein-Westfalen
+Köln;50999;;Nordrhein-Westfalen
+Köln;51061;;Nordrhein-Westfalen
+Köln;51063;;Nordrhein-Westfalen
+Köln;51065;;Nordrhein-Westfalen
+Köln;51067;;Nordrhein-Westfalen
+Köln;51069;;Nordrhein-Westfalen
+Köln;51103;;Nordrhein-Westfalen
+Köln;51105;;Nordrhein-Westfalen
+Köln;51107;;Nordrhein-Westfalen
+Köln;51109;;Nordrhein-Westfalen
+Köln;51143;;Nordrhein-Westfalen
+Köln;51145;;Nordrhein-Westfalen
+Köln;51147;;Nordrhein-Westfalen
+Köln;51149;;Nordrhein-Westfalen
+Köln;51467;;Nordrhein-Westfalen
+Köngen;73257;Landkreis Esslingen;Baden-Württemberg
+Kottgeisering;82288;Landkreis Fürstenfeldbruck;Bayern
+Landsberied;82290;Landkreis Fürstenfeldbruck;Bayern
+Lastrup;49688;Landkreis Cloppenburg;Niedersachsen
+Leinfelden-Echterdingen;70771;Landkreis Esslingen;Baden-Württemberg
+Lemwerder;27809;Landkreis Wesermarsch;Niedersachsen
+Lenningen;73252;Landkreis Esslingen;Baden-Württemberg
+Lenningen;73266;Landkreis Esslingen;Baden-Württemberg
+Lichtenwald;73669;Landkreis Esslingen;Baden-Württemberg
+Lindern (Oldenburg);49699;Landkreis Cloppenburg;Niedersachsen
+Löningen;49624;Landkreis Cloppenburg;Niedersachsen
+Maisach;82216;Landkreis Fürstenfeldbruck;Bayern
+Mammendorf;82291;Landkreis Fürstenfeldbruck;Bayern
+Marl;45768;Kreis Recklinghausen;Nordrhein-Westfalen
+Marl;45770;Kreis Recklinghausen;Nordrhein-Westfalen
+Marl;45772;Kreis Recklinghausen;Nordrhein-Westfalen
+Memmingen;87700;;Bayern
+Mittelstetten;82293;Landkreis Fürstenfeldbruck;Bayern
+Molbergen;49696;Landkreis Cloppenburg;Niedersachsen
+Moorenweis;82272;Landkreis Fürstenfeldbruck;Bayern
+München;80331;;Bayern
+München;80333;;Bayern
+München;80335;;Bayern
+München;80336;;Bayern
+München;80337;;Bayern
+München;80339;;Bayern
+München;80469;;Bayern
+München;80538;;Bayern
+München;80539;;Bayern
+München;80634;;Bayern
+München;80636;;Bayern
+München;80637;;Bayern
+München;80638;;Bayern
+München;80639;;Bayern
+München;80686;;Bayern
+München;80687;;Bayern
+München;80689;;Bayern
+München;80796;;Bayern
+München;80797;;Bayern
+München;80798;;Bayern
+München;80799;;Bayern
+München;80801;;Bayern
+München;80802;;Bayern
+München;80803;;Bayern
+München;80804;;Bayern
+München;80805;;Bayern
+München;80807;;Bayern
+München;80809;;Bayern
+München;80933;;Bayern
+München;80935;;Bayern
+München;80937;;Bayern
+München;80939;;Bayern
+München;80992;;Bayern
+München;80993;;Bayern
+München;80995;;Bayern
+München;80997;;Bayern
+München;80999;;Bayern
+München;81241;;Bayern
+München;81243;;Bayern
+München;81245;;Bayern
+München;81247;;Bayern
+München;81249;;Bayern
+München;81369;;Bayern
+München;81371;;Bayern
+München;81373;;Bayern
+München;81375;;Bayern
+München;81377;;Bayern
+München;81379;;Bayern
+München;81475;;Bayern
+München;81476;;Bayern
+München;81477;;Bayern
+München;81479;;Bayern
+München;81539;;Bayern
+München;81541;;Bayern
+München;81543;;Bayern
+München;81545;;Bayern
+München;81547;;Bayern
+München;81549;;Bayern
+München;81667;;Bayern
+München;81669;;Bayern
+München;81671;;Bayern
+München;81673;;Bayern
+München;81675;;Bayern
+München;81677;;Bayern
+München;81679;;Bayern
+München;81735;;Bayern
+München;81737;;Bayern
+München;81739;;Bayern
+München;81825;;Bayern
+München;81827;;Bayern
+München;81829;;Bayern
+München;81925;;Bayern
+München;81927;;Bayern
+München;81929;;Bayern
+München;85540;;Bayern
+Neckartailfingen;72666;Landkreis Esslingen;Baden-Württemberg
+Neckartenzlingen;72654;Landkreis Esslingen;Baden-Württemberg
+Neidlingen;73272;Landkreis Esslingen;Baden-Württemberg
+Neuffen;72639;Landkreis Esslingen;Baden-Württemberg
+Neuhausen auf den Fildern;73765;Landkreis Esslingen;Baden-Württemberg
+Nordenham;26954;Landkreis Wesermarsch;Niedersachsen
+Notzingen;73274;Landkreis Esslingen;Baden-Württemberg
+Nürtingen;72622;Landkreis Esslingen;Baden-Württemberg
+Oberboihingen;72644;Landkreis Esslingen;Baden-Württemberg
+Oberschweinbach;82294;Landkreis Fürstenfeldbruck;Bayern
+Oer-Erkenschwick;45739;Kreis Recklinghausen;Nordrhein-Westfalen
+Ohmden;73275;Landkreis Esslingen;Baden-Württemberg
+Olching;82140;Landkreis Fürstenfeldbruck;Bayern
+Ostfildern;73760;Landkreis Esslingen;Baden-Württemberg
+Ovelgönne;26939;Landkreis Wesermarsch;Niedersachsen
+Owen;73277;Landkreis Esslingen;Baden-Württemberg
+Plochingen;73207;Landkreis Esslingen;Baden-Württemberg
+Puchheim;82178;Landkreis Fürstenfeldbruck;Bayern
+Recklinghausen;45657;Kreis Recklinghausen;Nordrhein-Westfalen
+Recklinghausen;45659;Kreis Recklinghausen;Nordrhein-Westfalen
+Recklinghausen;45661;Kreis Recklinghausen;Nordrhein-Westfalen
+Recklinghausen;45663;Kreis Recklinghausen;Nordrhein-Westfalen
+Recklinghausen;45665;Kreis Recklinghausen;Nordrhein-Westfalen
+Reichenbach an der Fils;73262;Landkreis Esslingen;Baden-Württemberg
+Remscheid;42853;;Nordrhein-Westfalen
+Remscheid;42855;;Nordrhein-Westfalen
+Remscheid;42857;;Nordrhein-Westfalen
+Remscheid;42859;;Nordrhein-Westfalen
+Remscheid;42897;;Nordrhein-Westfalen
+Remscheid;42899;;Nordrhein-Westfalen
+Rosenheim;83022;;Bayern
+Rosenheim;83024;;Bayern
+Rosenheim;83026;;Bayern
+Saterland;26683;Landkreis Cloppenburg;Niedersachsen
+Schlaitdorf;72667;Landkreis Esslingen;Baden-Württemberg
+Schöngeising;82296;Landkreis Fürstenfeldbruck;Bayern
+Stadland;26935;Landkreis Wesermarsch;Niedersachsen
+Stadland;26936;Landkreis Wesermarsch;Niedersachsen
+Stadland;26937;Landkreis Wesermarsch;Niedersachsen
+Türkenfeld;82299;Landkreis Fürstenfeldbruck;Bayern
+Unterensingen;72669;Landkreis Esslingen;Baden-Württemberg
+Waltrop;45731;Kreis Recklinghausen;Nordrhein-Westfalen
+Weilheim an der Teck;73235;Landkreis Esslingen;Baden-Württemberg
+Wendlingen am Neckar;73240;Landkreis Esslingen;Baden-Württemberg
+Wernau (Neckar);73249;Landkreis Esslingen;Baden-Württemberg
+Wolfschlugen;72649;Landkreis Esslingen;Baden-Württemberg
+Wuppertal;42103;;Nordrhein-Westfalen
+Wuppertal;42105;;Nordrhein-Westfalen
+Wuppertal;42107;;Nordrhein-Westfalen
+Wuppertal;42109;;Nordrhein-Westfalen
+Wuppertal;42111;;Nordrhein-Westfalen
+Wuppertal;42113;;Nordrhein-Westfalen
+Wuppertal;42115;;Nordrhein-Westfalen
+Wuppertal;42117;;Nordrhein-Westfalen
+Wuppertal;42119;;Nordrhein-Westfalen
+Wuppertal;42275;;Nordrhein-Westfalen
+Wuppertal;42277;;Nordrhein-Westfalen
+Wuppertal;42279;;Nordrhein-Westfalen
+Wuppertal;42281;;Nordrhein-Westfalen
+Wuppertal;42283;;Nordrhein-Westfalen
+Wuppertal;42285;;Nordrhein-Westfalen
+Wuppertal;42287;;Nordrhein-Westfalen
+Wuppertal;42289;;Nordrhein-Westfalen
+Wuppertal;42327;;Nordrhein-Westfalen
+Wuppertal;42329;;Nordrhein-Westfalen
+Wuppertal;42349;;Nordrhein-Westfalen
+Wuppertal;42369;;Nordrhein-Westfalen
+Wuppertal;42389;;Nordrhein-Westfalen
+Wuppertal;42399;;Nordrhein-Westfalen

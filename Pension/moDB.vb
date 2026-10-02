@@ -576,7 +576,6 @@ Module moDB
         sb.Append(SEC_BASIC & "," & KEY_TE3 & "," & " " & vbCrLf)
         sb.Append(SEC_BASIC & "," & KEY_TE4 & "," & " " & vbCrLf)
         sb.Append(SEC_BASIC & "," & KEY_Web & "," & "http://www.feworeich.de/" & vbCrLf)
-        sb.Append(SEC_BASIC & "," & KEY_MWST1 & "," & " " & vbCrLf)
         sb.Append(SEC_BASIC & "," & KEY_MWST2 & "," & " " & vbCrLf)
         sb.Append(SEC_BASIC & "," & KEY_KNr & "," & "0" & vbCrLf)
         sb.Append(SEC_BASIC & "," & KEY_BNr & "," & "0" & vbCrLf)
@@ -587,8 +586,6 @@ Module moDB
 
         sb.Append(SEC_BASIC & "," & KEY_KKonto & "," & "1600" & vbCrLf)
         sb.Append(SEC_BASIC & "," & KEY_BKonto & "," & "1800" & vbCrLf)
-        sb.Append(SEC_BASIC & "," & KEY_GKonto7 & "," & "4300" & vbCrLf)
-        sb.Append(SEC_BASIC & "," & KEY_GKonto19 & "," & "4400" & vbCrLf)
 
         sb.Append(SEC_EMAIL & "," & KEY_SMTP & "," & " " & vbCrLf)
         sb.Append(SEC_EMAIL & "," & KEY_EMAIL & "," & " " & vbCrLf)

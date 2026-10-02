@@ -43,12 +43,12 @@ Public Module Globals
     Public Const KEY_AUTOR As String = "Autor"
     Public Const KEY_BETREFF As String = "Betreff"
 
-    Public Const KEY_MWST1 As String = "Mwst voll"       ' Getränke
+    'Public Const KEY_MWST1 As String = "Mwst voll"       ' Getränke
     Public Const KEY_MWST2 As String = "Mwst reduziert"  ' Übernachtung
-    Public Const KEY_MWST3 As String = "Mwst Sonder"     ' Speisen
-    Public Const KEY_MWSTAlt As String = "Mwst Alt"      ' Alter Steuersatz
-    Public Const KEY_MWSTNEW1 As String = "Mwst Neu1"    ' Neuer Steuersatz 1
-    Public Const KEY_MWSTNEW2 As String = "Mwst Neu2"    ' Neuer Steuersatz 2
+    'Public Const KEY_MWST3 As String = "Mwst Sonder"     ' Speisen
+    'Public Const KEY_MWSTAlt As String = "Mwst Alt"      ' Alter Steuersatz
+    'Public Const KEY_MWSTNEW1 As String = "Mwst Neu1"    ' Neuer Steuersatz 1
+    'Public Const KEY_MWSTNEW2 As String = "Mwst Neu2"    ' Neuer Steuersatz 2
 
     Public Const KEY_KNr As String = "Kunden-Nummer"
     Public Const KEY_BNr As String = "Buchungs-Nummer"
@@ -58,12 +58,12 @@ Public Module Globals
 
     Public Const KEY_KKonto As String = "Kasse-Konto"
     Public Const KEY_BKonto As String = "Bank-Konto"
-    Public Const KEY_GKonto7 As String = "G-Konto7"
-    Public Const KEY_GKonto19 As String = "G-Konto19"
-    Public Const KEY_GKontoS As String = "G-KontoS"
-    Public Const KEY_GKontoAlt As String = "G-KontoAlt"
-    Public Const KEY_GKontoNeu1 As String = "G-KontoNeu1"
-    Public Const KEY_GKontoNeu2 As String = "G-KontoNeu2"
+    'Public Const KEY_GKonto7 As String = "G-Konto7"
+    'Public Const KEY_GKonto19 As String = "G-Konto19"
+    'Public Const KEY_GKontoS As String = "G-KontoS"
+    'Public Const KEY_GKontoAlt As String = "G-KontoAlt"
+    'Public Const KEY_GKontoNeu1 As String = "G-KontoNeu1"
+    'Public Const KEY_GKontoNeu2 As String = "G-KontoNeu2"
 
     Public Const SEC_PREIS As String = "Preise"
     Public Const KEY_UArt As String = "U-Art"

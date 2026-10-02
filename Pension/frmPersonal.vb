@@ -224,7 +224,7 @@ Public Class frmPersonal
     ''' - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prGetAnschrift' entfernt.
     ''' - Performance-Optimierung: Mehrfache, redundante Zugriffe auf das 'SelectedItems(0)'-Objekt durch Deklaration einer lokalen Zwischenvariable ersetzt.
     ''' - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor IndexOutOfBound-Ausnahmen bei den SubItems ergänzt.
-    ''' - Logische Prüfung verfeinert ('If .Count > 0' statt '<> 0') für saubereren Programmfluss.
+    ''' - Logische Prüfung verfeinert ('If .Count > 0' statt 'undgleich 0') für saubereren Programmfluss.
     ''' </remarks>
     Private Sub prGetInfolvPersonal()
         Try
@@ -881,9 +881,6 @@ Public Class frmPersonal
         ' Chip-Text auslesen, Leerzeichen entfernen und mit Template verketten
         Dim chipText As String = If(lbChip.Text IsNot Nothing, lbChip.Text.Trim(), "")
         sgCodeNew = chipText & "#" & deleteTemplate
-
-        ' Status- oder Übertragungsfenster anzeigen
-        frmTSend.Show()
 
         ' Transponder-Anzeige in der UI leeren
         lbChip.Text = ""

@@ -87,6 +87,8 @@ Module moStart
     ''' <remarks>
     ''' 17.12.2011 Create <br/>
     ''' 20.09.2026 Code-Optimierung: Zusammenfassung sequentieller Array-Indizes in Schleifenstrukturen zur Reduzierung von Redundanz und Erhöhung der Lesbarkeit.
+    ''' 02.10.2026
+    ''' - Mwst für Speise und Getränke und Gegenkonten entfernt
     ''' </remarks>
     Public Sub prLoadArINI()
         Dim IniFile As String = myInit.ReadIni()
@@ -108,20 +110,10 @@ Module moStart
         arIni(22) = myInit.ReadEntry(IniFile, KEY_Web)
         arIni(24) = myInit.ReadEntry(IniFile, KEY_Ge)
         ' 2. Nicht-sequentielle Steuern und Konten 
-        arIni(10) = myInit.ReadEntry(IniFile, KEY_MWST1)
+
         arIni(11) = myInit.ReadEntry(IniFile, KEY_MWST2)
-        arIni(23) = myInit.ReadEntry(IniFile, KEY_MWST3)
-        arIni(27) = myInit.ReadEntry(IniFile, KEY_MWSTAlt)
-        arIni(28) = myInit.ReadEntry(IniFile, KEY_MWSTNEW1)
-        arIni(29) = myInit.ReadEntry(IniFile, KEY_MWSTNEW2)
         arIni(18) = myInit.ReadEntry(IniFile, KEY_KKonto)
         arIni(19) = myInit.ReadEntry(IniFile, KEY_BKonto)
-        arIni(20) = myInit.ReadEntry(IniFile, KEY_GKonto7)
-        arIni(21) = myInit.ReadEntry(IniFile, KEY_GKonto19)
-        arIni(25) = myInit.ReadEntry(IniFile, KEY_GKontoS)
-        arIni(26) = myInit.ReadEntry(IniFile, KEY_GKontoAlt)
-        arIni(36) = myInit.ReadEntry(IniFile, KEY_GKontoNeu1)
-        arIni(37) = myInit.ReadEntry(IniFile, KEY_GKontoNeu2)
         ' 3. Verzeichnisse 
         arIni(30) = myInit.ReadEntry(IniFile, KEY_SDIR)
         arIni(31) = myInit.ReadEntry(IniFile, KEY_DDIR)

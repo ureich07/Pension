@@ -31,6 +31,8 @@ Public Class frmMain
     ''' 22.09.2026 Code-Optimierung: Umstellung der Instanz-Prüfung auf LINQ, 
     ''' Ersetzen des 'End'-Befehls durch ein sauberes 'Application.Exit()' und 
     ''' Optimierung der Benutzeroberflächen-Initialisierung.
+    ''' 02.10.2026
+    ''' - "Anstehende Termine prüfen und anzeigen" entfernt
     ''' </remarks>
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ' 1. Prüfung auf Mehrfachinstanzen (Single Instance Check via LINQ)
@@ -67,22 +69,10 @@ Public Class frmMain
         tsbSystem.Enabled = False
         tsbStatistik.Enabled = False
         tsbPersonen.Enabled = False
-        tsbDatev.Enabled = False
         tsbDruck.Enabled = False
         tsbKunde.Enabled = False
 
-        ' 6. Anstehende Termine prüfen und anzeigen
-        Dim sDatum As String = fcUmDatum(Date.Today)
-        ' Hinweis: Für SQL-Abfragen empfiehlt sich langfristig der Einsatz von Parametern, 
-        ' um SQL-Injection und Formatfehler (z.B. bei Datumsangaben) zu verhindern.
-        Dim query As String = $"Select * from Termine Where Termin >= '{sDatum}' Order by Termin asc"
-        Dim dtTermin As DataTable = fcReadDataTable(query)
-
-        If dtTermin IsNot Nothing AndAlso dtTermin.Rows.Count > 0 Then
-            frmTermine.Show()
-        End If
-
-        ' 7. agefangene / fehlerhafte Buchungen laden & Login aufrufen
+        ' 6. agefangene / fehlerhafte Buchungen laden & Login aufrufen
         prReadCopy()
         prCreateTabellelvBuchError()
 
@@ -858,11 +848,18 @@ Public Class frmMain
     ''' <para>Setzt den globalen Statuscode zurück, führt bei gesetztem Flag eine FTP-Sicherung durch und schließt das aktuelle Formular bzw. die Anwendung ordnungsgemäß.</para>
     ''' <para>
     ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – Optimiert: Das kritische <c>End</c>-Schlüsselwort wurde durch den sauberen .NET-Befehl <c>Me.Close()</c> ersetzt.<br/>
+    ''' 22.09.2026 Optimiert: 
+    ''' - Das kritische <c>End</c>-Schlüsselwort wurde durch den sauberen .NET-Befehl <c>Me.Close()</c> ersetzt.<br/>
+    ''' 02.10.2026 
+    ''' - Menüpunkt " Buchung ohne Gast" aus Database nach tbsClose verschoben
     ''' </para>
     ''' </remarks>
     Private Sub tsbClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbClose.Click
         Try
+
+            ' Alle Buchungssätze ohne zugewiesenen Kunden (KunID = '0') aus der Datenbank löschen
+            UpdateTable("DELETE FROM Buchung WHERE KunID ='0'")
+
             ' Globalen Statuscode zurücksetzen
             sgCodeNew = ""
 
@@ -911,7 +908,6 @@ Public Class frmMain
             tsbSystem.Enabled = False
             tsbStatistik.Enabled = False
             tsbPersonen.Enabled = False
-            tsbDatev.Enabled = False
             tsbDruck.Enabled = False
             tsbKunde.Enabled = False
 
@@ -919,80 +915,6 @@ Public Class frmMain
             Me.Text = "Pension am Radweg"
         End If
 
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis der Datev-Schaltfläche (<c>tsbDatev</c>) und öffnet die Datev-Exportmaske.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Datev-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet das Formular für den Datev-Export. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub tsbDatev_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDatev.Click
-        frmDatev.Show()
-        frmDatev.BringToFront()
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis des Wiederherstellungs-Menüeintrags (<c>tsmRestore</c>).
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (der Menüeintrag).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet die Maske zur Datenwiederherstellung (<see cref="frmRestore"/>). Auskommentierte Web- und Direkt-Restore-Methoden wurden als Altlasten dokumentiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Cursor-Handling strukturell bereinigt.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub tsmRestore_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmRestore.Click
-        Try
-            ' Warte-Cursor setzen, falls das Laden des Formulars einen Moment dauert
-            Me.Cursor = Cursors.WaitCursor
-
-            ' Hinweis: PHP.SaveRestore(sIP) und prRestoreData() sind historisch deaktiviert.
-            ' Öffnet das Wiederherstellungs-Formular
-            frmRestore.Show()
-
-            ' Bringt das Fenster in den Vordergrund, falls es bereits offen war
-            frmRestore.BringToFront()
-
-        Catch ex As Exception
-            ' Fehlerbehandlung für den Fall, dass das Formular nicht geladen werden kann
-            ErrReport(ex.Message, ex.Source, ex.StackTrace)
-        Finally
-            ' Mauszeiger in jedem Fall wieder auf Standard zurücksetzen
-            Me.Cursor = Cursors.Default
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis des Menüeintrags zur Datensicherung (<c>tsmSave</c>).
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (der Menüeintrag).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Ruft die zentrale Routine <see cref="prSaveData"/> auf, um die Anwendungsdaten zu sichern. Während des Vorgangs wird der Mauszeiger als Warte-Cursor dargestellt.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – Optimiert: Das veraltete <c>Call</c>-Schlüsselwort entfernt und ein visuelles Cursor-Feedback für den Benutzer integriert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub tsmSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmSave.Click
-        Try
-
-            ' Führt die eigentliche Datensicherung aus (Modern ohne das alte 'Call')
-            prSaveData()
-
-        Catch ex As Exception
-            ' Fehlerbehandlung, falls beim Sichern etwas schiefgeht
-            ErrReport(ex.Message, ex.Source, ex.StackTrace)
-        End Try
     End Sub
 
     ''' <summary>
@@ -1024,26 +946,9 @@ Public Class frmMain
     ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
     ''' </para>
     ''' </remarks>
-    Private Sub tsbPersonal_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPersonal.Click
+    Private Sub tsbPersonal_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbPersonen.Click
         frmPersonal.Show()
         frmPersonal.BringToFront()
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis der Einteilung-Schaltfläche (<c>tsbEinteilung</c>) und öffnet den Belegungs-/Einteilungsplan.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub tsbEinteilung_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEinteilung.Click
-        frmEinteilung.Show()
-        frmEinteilung.BringToFront()
     End Sub
 
     ''' <summary>
@@ -1198,23 +1103,23 @@ Public Class frmMain
         PHP.KunTOBuc(sIP)
     End Sub
 
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis der RFID leser.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub CodeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CodeToolStripMenuItem.Click
+    '''' <summary>
+    '''' Verarbeitet das Klick-Ereignis der RFID leser.
+    '''' </summary>
+    '''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
+    '''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
+    '''' <remarks>
+    '''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
+    '''' <para>
+    '''' <b>Historie:</b><br/>
+    '''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
+    '''' </para>
+    '''' </remarks>
+    'Private Sub CodeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CodeToolStripMenuItem.Click
 
-        frmReadRFID.Show()
-        frmReadRFID.BringToFront()
-    End Sub
+    '    frmReadRFID.Show()
+    '    frmReadRFID.BringToFront()
+    'End Sub
 
     ''' <summary>
     ''' Verarbeitet das Klick-Ereignis der Datenkontrolle.
@@ -1231,49 +1136,6 @@ Public Class frmMain
     Private Sub DatenKontrolleToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DatenKontrolleToolStripMenuItem.Click
         frmDatenControl.Show()
         frmDatenControl.BringToFront()
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis der Datenkorrektur.
-    ''' Bereinigt verwaiste Buchungssätze in der Datenbank und bietet einen Programmneustart an.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <b>Historie:</b><br/>
-    ''' 24.09.2026 – Uwe: 'End'-Befehl durch 'Application.Restart()' ersetzt und MsgBox modernisiert.<br/>
-    ''' </remarks>
-    Private Sub DatenKorekturToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DatenKorekturToolStripMenuItem.Click
-        ' Alle Buchungssätze ohne zugewiesenen Kunden (KunID = '0') aus der Datenbank löschen
-        UpdateTable("DELETE FROM Buchung WHERE KunID ='0'")
-
-        ' Den Benutzer fragen, ob die Anwendung neu gestartet werden soll
-        Dim result As DialogResult = MessageBox.Show("Die Datenkorrektur wurde durchgeführt. Möchten Sie das Programm jetzt neu starten?",
-                                                 "Programm neu starten",
-                                                 MessageBoxButtons.YesNo,
-                                                 MessageBoxIcon.Question)
-
-        ' Wenn der Benutzer mit 'Ja' antwortet, wird die Anwendung sauber neu gestartet
-        If result = DialogResult.Yes Then Application.Restart()
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis des Corona Formulares.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub tsbCorona_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbCorona.Click
-        Form1.Show()
-        Form1.BringToFront()
-        '  frmDruckAnAb.Show()
-
     End Sub
 
     ''' <summary>
@@ -1325,63 +1187,6 @@ Public Class frmMain
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         frmWasser.Show()
         frmWasser.BringToFront()
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis zum TS Send.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub ToolStripButton2_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
-        frmTSend.Show()
-        frmTSend.BringToFront()
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis zur Schlossverwaltung.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub tsbSchloss_Click(sender As Object, e As EventArgs) Handles tsbSchloss.Click
-        frmSchloss.Show()
-        frmSchloss.BringToFront()
-    End Sub
-
-    ''' <summary>
-    ''' Verarbeitet das Klick-Ereignis zur Terminverwaltung.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    ''' <remarks>
-    ''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub tsbTermine_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbTermine.Click
-        frmTermine.Show()
-        frmTermine.BringToFront()
-    End Sub
-
-    ' Alte Funktion, die noch überarbeitet werden müssen
-    Private Sub tsbUpgrade_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Dim sQuellFile As String = fcOpenFileDialog("", "")
-        '  Call prStartUpgrade(sQuellFile)
     End Sub
 
 #End Region
@@ -1602,7 +1407,7 @@ Public Class frmMain
     ''' <param name="c2">Index der End-Spalte (Letztes Zimmer)</param>
     ''' <remarks>
     ''' 19.01.2012 Create <br/>
-    ''' 23.09.2026 Refactored (Typsicherheit & Validierung hinzugefügt)
+    ''' 23.09.2026 Refactored (Typsicherheit und Validierung hinzugefügt)
     ''' </remarks>
     Private Sub prReservierung(ByVal r1 As Integer, ByVal c1 As Integer,
                             ByVal r2 As Integer, ByVal c2 As Integer)
@@ -1643,7 +1448,7 @@ Public Class frmMain
     ''' <param name="sBnr">Buchungsnummer</param>
     ''' <remarks>
     ''' 19.01.2012 Create <br/>
-    ''' 23.09.2026 Refactored (Bugfix bei Variablen-Verschiebung & Typsicherheit)
+    ''' 23.09.2026 Refactored (Bugfix bei Variablen-Verschiebung und Typsicherheit)
     ''' </remarks>
     Private Sub prCreateReservierung(ByVal sBDate As String, ByVal sEDate As String,
                                   ByVal sZim As String, ByVal sBnr As String)
@@ -1718,7 +1523,7 @@ Public Class frmMain
     ''' <returns>Die zugehörige Objekt-ID als String, oder ein Leerzeichen, falls nicht gefunden.</returns>
     ''' <remarks>
     ''' 19.01.2012 Create <br/>
-    ''' 23.09.2026 Refactored (DataTable-Suche optimiert & Typsicherheit erhöht)
+    ''' 23.09.2026 Refactored (DataTable-Suche optimiert und Typsicherheit erhöht)
     ''' </remarks>
     Private Function fcGetObjID(ByVal sZim As String) As String
         ' Standard-Rückgabewert definieren (analog zum Original)
@@ -2307,89 +2112,6 @@ Public Class frmMain
 
 #End Region
 
-#Region "Daten sichern............................................................................."
-
-    ''' <summary>
-    ''' Frägt den Benutzer, ob eine manuelle Datensicherung durchgeführt werden soll, 
-    ''' führt diese aus und protokolliert den Erfolg im Logbuch.
-    ''' </summary>
-    ''' <remarks>
-    ''' <para>Zeigt einen Bestätigungsdialog. Bei 'Ja' wird die Routine <see cref="prSaveDaten"/> aufgerufen und ein Eintrag in <c>cgLogFile</c> erzeugt.</para>
-    ''' <para>
-    ''' <b>Historie:</b><br/>
-    ''' 22.09.2026 – Optimiert: Umstellung auf das moderne <c>MessageBox.Show</c>, Entfernung von <c>Call</c> und Absicherung des Log-Eintrags per Try-Catch.<br/>
-    ''' </para>
-    ''' </remarks>
-    Private Sub prSaveData()
-        ' Modernes .NET-Äquivalent für die Sicherheitsabfrage (Standardbutton ist 'Nein')
-        Dim meldungText As String = "Die aktuelle Konfiguration wird gesichert. Die Sicherungsdatei " & Environment.NewLine &
-                                "liegt in dem Verzeichnis ""...\SaveDB\Montag - Sonntag""." & Environment.NewLine &
-                                "Sicherung durchführen?"
-
-        Dim result As DialogResult = MessageBox.Show(meldungText, "Datensicherung", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
-
-        If result = DialogResult.Yes Then
-            Try
-                ' Mauszeiger auf Sanduhr/Warten stellen, da das Sichern von Daten Zeit benötigt
-                Me.Cursor = Cursors.WaitCursor
-                ' Führt die eigentliche Sicherung aus 
-                prSaveDaten()
-
-                ' Nur wenn die Sicherung fehlerfrei durchgelaufen ist, wird das Protokoll geschrieben
-                fcWriteLog(cgLogFile, String.Format("{0} Datenbank manuell gesichert.", DateTime.Now.ToString()))
-
-                ' Erfolgsmeldung an den Benutzer ausgeben
-                MessageBox.Show("Sicherung durchgeführt.", "Datensicherung", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-            Catch ex As Exception
-                ' Fehlerbehandlung, falls prSaveDaten oder das Schreiben des Logs fehlschlägt
-                ErrReport(ex.Message, ex.Source, ex.StackTrace)
-                MessageBox.Show("Die Datensicherung ist fehlgeschlagen!", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Finally
-                ' Mauszeiger nach Abschluss der Sicherung garantiert wieder zurücksetzen
-                Me.Cursor = Cursors.Default
-            End Try
-        End If
-    End Sub
-
-#End Region
-
-#Region "Daten wiederherstellen...................................................................."
-
-    'Private Sub prRestoreData()
-    '    Dim sFile As String = arIni(30) & "\RestoreDB.dat"
-    '    Dim cDaten As String 'Variable zur Aufnahme der Sicherungsdaten aus der Datei
-    '    Try
-    '        Call prRestore(sFile)
-
-    '        'Select Case MsgBox("Mit dieser Funktion wird eine Sicherungsdatei geladen." & vbCrLf & _
-    '        '            "Die aktuelle Konfiguration wird vorher gesichert. Mit der Funktion ""RollBack"" kann der" & _
-    '        '            "Ausgangszustand wiederhergestellt werden." & vbCrLf & "" & vbCrLf & "Wiederherstellung der Daten durchführen?", _
-    '        '            vbYesNo + vbQuestion + vbDefaultButton2, "Wiederherstellung der Daten")
-
-    '        '    Case vbYes
-    '        '        cDaten = fcOpenReadOneValueFromSystemDb(arIni(30), "Sicherungsdatei (SaveDB*.dat)|SaveDB*.dat")
-    '        '        If cDaten = "" Then Exit Sub
-    '        '        Me.Cursor = Cursors.WaitCursor
-    '        '        'Kopie der Sicherungsdaten zur weiteren Bearbeitung speichern.
-    '        '        Call SaveOneValueInSystemDb(sFile, cDaten)
-    '        '        'Rücksicherundsmodul aufrufen
-    '        '        Call prRestore(sFile)
-
-    '        '        Call fcWriteLog(cgLogFile, Date.Now & " Datenbank wiederhergestellt.")
-    '        '        Me.Cursor = Cursors.Default
-    '        '        MsgBox("Daten wiederhergestellt. Zur vollständigen Initialisierung ist ein Neustart der Application notwendig.", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Datensicherung")
-    '        'End Select
-
-    '    Catch ex As Exception
-    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
-    '    End Try
-    'End Sub
-
-
-
-#End Region
-
 #Region "Tagesstatistik bereitstellen.............................................................."
 
     ''' <summary>
@@ -2711,6 +2433,5 @@ Public Class frmMain
         ' Stoppt den Timer, um eine wiederholte Ausführung zu verhindern
         tiWait.Enabled = False
     End Sub
-
 
 End Class

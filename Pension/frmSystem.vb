@@ -1,5 +1,4 @@
 Imports System.Text
-Imports System.Net.Mail
 
 Public Class frmSystem
     Inherits System.Windows.Forms.Form
@@ -14,7 +13,7 @@ Public Class frmSystem
     Dim sDEnde As String
     Dim sDAK As String
     Dim lStart As Boolean = True
-    Dim arDruckZimmer As Array
+    Dim arDruckZimmer() As String
 
     ' HIER GEÄNDERT: Nur deklarieren, noch nicht befüllen!
     Dim sLanguage1() As String
@@ -34,6 +33,7 @@ Public Class frmSystem
         ' Dieser Aufruf ist für den Designer zwingend erforderlich.
         InitializeComponent()
     End Sub
+
 #Region "Form Load................................................................................."
 
     ''' <summary>
@@ -66,18 +66,14 @@ Public Class frmSystem
         prCreateTabelleObjekte()
         prCreateTabelleZimmer()
         prCreateTabelleUser()
-        prCreateTabelleSasion()
+        prCreateTabelleSaison()
         prCreateTabelleColor()
-        prCreateTabelleZusatz()
 
         ' Kombinationsfelder und  Datenaktualisierung / Zusatzfunktionen
         prLoadComboZimmer()
         prRefreshData()
-        prCreateWerbelink()
-        LoadDruck()
 
-        prLoadZusatzInList()
-        prLoockZusatz(False)
+        LoadDruck()
 
         ' Sprachunterstützung anwenden
         prSpracheIni()
@@ -99,6 +95,8 @@ Public Class frmSystem
     ''' - 'Dim arLa As Array' durch ein spezifisches String-Array ('String()') ersetzt, um die Typsicherheit zu garantieren.
     ''' - SQL-Strings direkt bei der Deklaration initialisiert.
     ''' - Sichtbarkeitssteuerung für E-Mail-Komponenten durch direkte Zuweisung des Boolean-Werts stark komprimiert.
+    ''' 02.10.2026
+    ''' - Mwst für Speise und Getränke und Gegenkonten entfernt
     ''' </remarks>
     Private Sub prRefreshData()
         Try
@@ -116,27 +114,14 @@ Public Class frmSystem
                 lbTel3.Text = arIni(8)
                 lbTel4.Text = arIni(9)
                 lbWeb.Text = arIni(22)
-                lbMwst1.Text = arIni(10)
-                lbMwst2.Text = arIni(11)
-                lbMwst3.Text = arIni(23)
-                tbMwstSatz2.Text = arIni(27)
-                tbMwstSatz3.Text = arIni(28)
-                tbMwstSatz4.Text = arIni(29)
                 lbKNr.Text = arIni(12)
                 lbBNr.Text = arIni(13)
                 lbRNr.Text = arIni(14)
                 lbUStNr.Text = arIni(15)
                 lbUStID.Text = arIni(16)
-                lbFrue.Text = arIni(17)
-                lbGetr.Text = arIni(24)
                 lbKK.Text = arIni(18)
                 lbBK.Text = arIni(19)
-                lbGK7.Text = arIni(20)
-                lbGK19.Text = arIni(21)
-                lbGKS.Text = arIni(25)
-                tbGKSatz2.Text = arIni(26)
-                tbGKSatz3.Text = arIni(36)
-                tbGKSatz4.Text = arIni(37)
+                lbMwst2.Text = arIni(11)
 
                 ' Verzeichnisse
                 lbSaveDir.Text = arIni(30)
@@ -227,11 +212,6 @@ Public Class frmSystem
                     tscSprache.Text = tscSprache.Items(0).ToString()
                 End If
             End If
-
-            ' 5. Werbung laden
-            dtWer = fcReadDataTable("SELECT * from Werbung order by Werbung asc")
-            liWerbung = fcLoadListe(liWerbung, dtWer, "Werbung")
-            prCheckNoRecordBuch(dtWer)
 
             ' 6. Saison und Farbprofile laden
             prLoadSaisonInList()
@@ -369,6 +349,8 @@ Public Class frmSystem
     ''' 28.09.2026 - Code-Optimierung:
     ''' - Null- und Indexprüfung für das Array 'arEMail' hinzugefügt, um Laufzeitfehler zu vermeiden.
     ''' - Inline-Kommentare zur visuellen Strukturierung der Steuerelemente eingefügt.
+    ''' 02.10.2026
+    ''' - Mwst für Speise und Getränke und Gegenkonten entfernt
     ''' </remarks>
     Private Sub prLock(ByVal lLook As Boolean)
         Dim isVisibleAsInput As Boolean = Not lLook
@@ -390,22 +372,12 @@ Public Class frmSystem
             tbTel3.Visible = isVisibleAsInput
             tbTel4.Visible = isVisibleAsInput
             tbWeb.Visible = isVisibleAsInput
-            tbMwst1.Visible = isVisibleAsInput
             tbRNr.Visible = isVisibleAsInput
             tbMwst2.Visible = isVisibleAsInput
-            tbMwst3.Visible = isVisibleAsInput
             tbUStNr.Visible = isVisibleAsInput
             tbUStID.Visible = isVisibleAsInput
-            tbFrue.Visible = isVisibleAsInput
-            tbGetr.Visible = isVisibleAsInput
             tbKK.Visible = isVisibleAsInput
             tbBK.Visible = isVisibleAsInput
-
-            tbGK7.Visible = isVisibleAsInput
-            lbGK7.Visible = lLook
-
-            tbGK19.Visible = isVisibleAsInput
-            tbGKS.Visible = isVisibleAsInput
 
             ' --- Verzeichnisse und Hardwareeinstellungen ---
             tbSaveDir.Visible = isVisibleAsInput
@@ -528,9 +500,6 @@ Public Class frmSystem
                 Case "tpPreise"
                     prCheckNoRecordPreise(dtPre)
 
-                Case "tbSonstiges"
-                    prCheckNoRecordWerbung(dtWer)
-
                 Case "tpZimmer"
                     prCheckNoRecordZimmer(dtZim)
 
@@ -538,7 +507,84 @@ Public Class frmSystem
         End If
     End Sub
 
+    ''' <summary>
+    ''' Selektiert den ersten Eintrag in der jeweiligen Liste, wenn eine Registerkarte ausgewählt wird.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten mit Informationen zur ausgewählten Registerkarte.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete '.Select()'-Aufrufe durch '.Focus()' ersetzt.
+    ''' - 'Case Is ='-Syntax vereinfacht und unnötiges '.ToString()' beim Namen entfernt.
+    ''' - Fokus- und Selektionslogik für das erste Element stabilisiert.
+    ''' </remarks>
+    Private Sub tcSystem_Selected(sender As Object, e As TabControlEventArgs) Handles tcSystem.Selected
+        prEnableMenu(True)
+        Select Case e.TabPage.Name
+            Case "tpObjekte"
+                lvObjekt.Focus()
+                If lvObjekt.Items.Count > 0 Then
+                    lvObjekt.Items(0).Selected = True
+                    lvObjekt.Items(0).Focused = True
+                End If
+                prEnableMenu(False)
+            Case "tpZimmer"
+                lvZimmer.Focus()
+                If lvZimmer.Items.Count > 0 Then
+                    lvZimmer.Items(0).Selected = True
+                    lvZimmer.Items(0).Focused = True
+                End If
+                prEnableMenu(False)
+            Case "tpKonto"
+                lvKonto.Focus()
+                If lvKonto.Items.Count > 0 Then
+                    lvKonto.Items(0).Selected = True
+                    lvKonto.Items(0).Focused = True
+                End If
+                prEnableMenu(False)
+            Case "tpUser"
+                lvUser.Focus()
+                If lvUser.Items.Count > 0 Then
+                    lvUser.Items(0).Selected = True
+                    lvUser.Items(0).Focused = True
+                End If
+                prEnableMenu(False)
+            Case "tpBText", "tpPreise", "tpSaison", "tpFarben", "tpDruck", "tpSprache"
+                prEnableMenu(False)
+        End Select
+    End Sub
 
+    Private Sub prEnableMenu(sStatus As Boolean)
+        tsbEdit.Enabled = sStatus
+        tsbSpeichern.Enabled = False
+        tsbESC.Enabled = False
+    End Sub
+
+    ''' <summary>
+    ''' Sucht nach einem bestimmten Eintrag in einer ListView anhand der ersten Spalte
+    ''' und selektiert diesen, falls er gefunden wird.
+    ''' </summary>
+    ''' <param name="lv">Die zu durchsuchende ListView.</param>
+    ''' <param name="sEntry">Der Text des gesuchten Eintrags.</param>
+    ''' <remarks>
+    ''' 20.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'ByVal'-Modifizierer entfernt.
+    ''' - Auskommentierten 'Totcode' innerhalb der Schleife gelöscht.
+    ''' - Umschaltung von '.Select()' auf '.Focus()' durchgeführt.
+    ''' </remarks>
+    Private Sub prSelectEntry(lv As ListView, sEntry As String)
+        For Each item As ListViewItem In lv.Items
+            If item.SubItems(0).Text = sEntry Then
+                lv.Focus()
+                item.Selected = True
+                item.Focused = True
+                item.EnsureVisible()
+                Exit For
+            End If
+        Next
+    End Sub
 #End Region
 
 #Region "Menü / Toolbar............................................................................"
@@ -624,6 +670,8 @@ Public Class frmSystem
     ''' - Veraltete 'Call'-Syntax beim Aufruf von 'prLock' entfernt.
     ''' - Null- und Indexprüfung für das Array 'arEMail' hinzugefügt, um Laufzeitfehler zu verhindern.
     ''' - Fokuszuweisung auf das erste Eingabefeld optimiert.
+    ''' 02.10.2026
+    ''' - Mwst für Speise und Getränke und Gegenkonten entfernt
     ''' </remarks>
     Private Sub prEdit()
         lEdit = True
@@ -640,18 +688,11 @@ Public Class frmSystem
         tbTel4.Text = lbTel4.Text
         tbWeb.Text = lbWeb.Text
         tbRNr.Text = lbRNr.Text
-        tbMwst1.Text = lbMwst1.Text
         tbMwst2.Text = lbMwst2.Text
-        tbMwst3.Text = lbMwst3.Text
         tbUStNr.Text = lbUStNr.Text
         tbUStID.Text = lbUStID.Text
-        tbFrue.Text = lbFrue.Text
-        tbGetr.Text = lbGetr.Text
         tbKK.Text = lbKK.Text
         tbBK.Text = lbBK.Text
-        tbGK7.Text = lbGK7.Text
-        tbGK19.Text = lbGK19.Text
-        tbGKS.Text = lbGKS.Text
 
         ' --- Verzeichnisse und Hardwareeinstellungen ---
         tbSaveDir.Text = lbSaveDir.Text
@@ -720,6 +761,8 @@ Public Class frmSystem
     ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
     ''' - Veraltete VB6 'Replace'-Funktion durch native .NET '.Replace()'-Methode der TextBoxen ersetzt.
     ''' - Strukturierung und Bereinigung auskommentierter Code-Fragmente.
+    ''' 02.10.2026
+    ''' - Mwst für Speise und Getränke und Gegenkonten entfernt
     ''' </remarks>
     Private Sub prSave()
         If lEdit Then
@@ -735,14 +778,11 @@ Public Class frmSystem
             iniFile = myInit.WriteEntry(iniFile, KEY_TE3, tbTel3.Text)
             iniFile = myInit.WriteEntry(iniFile, KEY_TE4, tbTel4.Text)
             iniFile = myInit.WriteEntry(iniFile, KEY_Web, tbWeb.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_MWST1, tbMwst1.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_MWST2, tbMwst2.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_MWST3, tbMwst3.Text)
             iniFile = myInit.WriteEntry(iniFile, KEY_RNr, tbRNr.Text)
             iniFile = myInit.WriteEntry(iniFile, KEY_UStNr, tbUStNr.Text)
             iniFile = myInit.WriteEntry(iniFile, KEY_UStID, tbUStID.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_Fr, tbFrue.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_Ge, tbGetr.Text)
+            iniFile = myInit.WriteEntry(iniFile, KEY_MWST2, tbMwst2.Text)
+
 
             ' --- Verzeichnisse (Backslash zu Slash konvertieren) und Hardware speichern ---
             tbDatevDir.Text = tbDatevDir.Text.Replace("\", "/")
@@ -769,17 +809,6 @@ Public Class frmSystem
             ' --- Kontoeinstellungen speichern ---
             iniFile = myInit.WriteEntry(iniFile, KEY_KKonto, tbKK.Text)
             iniFile = myInit.WriteEntry(iniFile, KEY_BKonto, tbBK.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_GKonto7, tbGK7.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_GKonto19, tbGK19.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_GKontoS, tbGKS.Text)
-
-            ' --- Alternative Steuersätze und Konten speichern ---
-            iniFile = myInit.WriteEntry(iniFile, KEY_GKontoAlt, tbGKSatz2.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_MWSTAlt, tbMwstSatz2.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_GKontoNeu1, tbGKSatz3.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_MWSTNEW1, tbMwstSatz3.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_GKontoNeu2, tbGKSatz4.Text)
-            iniFile = myInit.WriteEntry(iniFile, KEY_MWSTNEW2, tbMwstSatz4.Text)
 
             ' INI-Datei schreiben und Array neu laden
             myInit.WriteIni(iniFile)
@@ -829,17 +858,14 @@ Public Class frmSystem
     ''' </remarks>
     Private Sub TextBox_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles _
     tbFirma.KeyPress, tbStrasse.KeyPress, tbPLZ.KeyPress, tbOrt.KeyPress,
-    tbWeb.KeyPress, tbTel1.KeyPress, tbTel2.KeyPress, tbTel3.KeyPress, tbTel4.KeyPress,
-    tbMwst3.KeyPress, tbMwst2.KeyPress, tbMwst1.KeyPress, tbFrue.KeyPress, tbGetr.KeyPress,
-    tbGKS.KeyPress, tbGK7.KeyPress, tbGK19.KeyPress,
+    tbWeb.KeyPress, tbTel1.KeyPress, tbTel2.KeyPress, tbTel3.KeyPress, tbTel4.KeyPress, tbMwst2.KeyPress,
     tbRNr.KeyPress, tbUStNr.KeyPress, tbUStID.KeyPress, tbKK.KeyPress, tbBK.KeyPress,
     tbDatevDir.KeyPress, tbAblageDir.KeyPress, tbSaveDir.KeyPress,
     tbNetUser.KeyPress, tbIPSchloss.KeyPress, tbRFIDPort.KeyPress,
-    tbMwstSatz2.KeyPress, tbGKSatz2.KeyPress, tbMwstSatz3.KeyPress, tbGKSatz3.KeyPress, tbMwstSatz4.KeyPress, tbGKSatz4.KeyPress,
     tbSMTP.KeyPress, tbEMail.KeyPress, tbName.KeyPress, tbUName.KeyPress, tbPWort.KeyPress, tbTage.KeyPress,
     tbOStr.KeyPress, tbOHNr.KeyPress, tbOPLZ.KeyPress, tbOOrt.KeyPress,
     tbOOrtsteil.KeyPress, tbOName.KeyPress, tbOTelefon.KeyPress,
-    tbKUser.KeyPress, tbUPassWD.KeyPress, tbURechte.KeyPress, tbUUser.KeyPress
+    tbKUser.KeyPress, tbUPassWD.KeyPress, tbUUser.KeyPress
 
 
         ' Prüfen, ob die Eingabetaste (Enter) gedrückt wurde
@@ -863,23 +889,15 @@ Public Class frmSystem
                     Case "tbTel1" : tbTel2.Select()
                     Case "tbTel2" : tbTel3.Select()
                     Case "tbTel3" : tbTel4.Select()
-                    Case "tbTel4" : tbMwst3.Select()
+                    Case "tbTel4" : tbDatevDir.Select()
+
+                    ' --- Verzeichnisse ---
+                    Case "tbDatevDir" : tbAblageDir.Select()
+                    Case "tbAblageDir" : tbSaveDir.Select()
+                    Case "tbSaveDir" : tbMwst2.Select()
 
                     ' --- Steuern / Bank---
-                    Case "tbMwst3" : tbMwst2.Select()
-                    Case "tbMwst2" : tbMwst1.Select()
-                    Case "tbMwst1" : tbFrue.Select()
-                    Case "tbFrue" : tbGetr.Select()
-                    Case "tbGetr" : tbGKS.Select()
-                    Case "tbGKS" : tbGK7.Select()
-                    Case "tbGK7" : tbGK19.Select()
-                    Case "tbGK19" : tbMwstSatz2.Select()
-                    Case "tbMwstSatz2" : tbMwstSatz3.Select()
-                    Case "tbMwstSatz3" : tbMwstSatz4.Select()
-                    Case "tbMwstSatz4" : tbGKSatz2.Select()
-                    Case "tbGKSatz2" : tbGKSatz3.Select()
-                    Case "tbGKSatz3" : tbGKSatz4.Select()
-                    Case "tbGKSatz4" : tbRNr.Select()
+                    Case "tbMwst2" : tbRNr.Select()
                     Case "tbRNr" : tbUStNr.Select()
                     Case "tbUStNr" : tbUStID.Select()
                     Case "tbUStID" : tbKK.Select()
@@ -889,11 +907,8 @@ Public Class frmSystem
                     ' --- Türschloss ---
                     Case "tbNetUser" : tbIPSchloss.Select()
                     Case "tbIPSchloss" : tbRFIDPort.Select()
-                    Case "tbRFIDPort" : tbDatevDir.Select()
-                    ' --- Verzeichnisse ---
-                    Case "tbDatevDir" : tbAblageDir.Select()
-                    Case "tbAblageDir" : tbSaveDir.Select()
-                    Case "tbSaveDir" : tbFirma.Select()
+                    Case "tbRFIDPort" : tbFirma.Select()
+
 
                     ' --- E-Mail & Server (Tab 2) ---
                     Case "tbSMTP" : tbEMail.Select()
@@ -913,8 +928,7 @@ Public Class frmSystem
                     Case "tbOTelefon" : tbOName.Select()
 
                     Case "tbKUser" : tbUPassWD.Select()
-                    Case "tbUPassWD" : tbURechte.Select()
-                    Case "tbURechte" : tbUUser.Select()
+                    Case "tbUPassWD" : tbUUser.Select()
                     Case "tbUUser" : tbKUser.Select()
 
 
@@ -944,13 +958,6 @@ Public Class frmSystem
             e.Handled = True
             tcSystem.SelectTab(1)
             tbSMTP.Select()
-        End If
-    End Sub
-
-    Private Sub tbBetreff_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs)
-        If e.KeyChar = Convert.ToChar(Keys.Enter) Then
-            e.Handled = True
-            tbKopf.Select()
         End If
     End Sub
 
@@ -2920,6 +2927,8 @@ Public Class frmSystem
     ''' - Spalten-Generierung über ein strukturiertes Array und eine Schleife kompakt zusammengefasst (verbesserte Wartbarkeit).
     ''' - Konstante Spalteneinstellungen zur Reduzierung von redundantem Code ausgelagert.
     ''' - Einheitlicher Programmierstil analog zur Zimmer-Tabellenstruktur implementiert.
+    ''' 02.10.2026
+    ''' - Status entfernt
     ''' </remarks>
     Private Sub prCreateTabelleUser()
         With lvUser
@@ -2928,7 +2937,6 @@ Public Class frmSystem
             .Columns.Add("Name", 150, HorizontalAlignment.Left)
             .Columns.Add("Kurz-Name", 100, HorizontalAlignment.Left)
             .Columns.Add("Passwort", 0, HorizontalAlignment.Left)
-            .Columns.Add("Status", 150, HorizontalAlignment.Left)
             .Columns.Add("ID", 0, HorizontalAlignment.Left)
 
             ' Grid- und Anzeige-Eigenschaften konfigurieren
@@ -2955,6 +2963,8 @@ Public Class frmSystem
     ''' - 'For Each'-Schleife anstelle der indexbasierten Schleife für sauberere Lesbarkeit verwendet.
     ''' - 'ListViewItemCollection.AddRange' genutzt, um alle Zeilen performant in einem Rutsch dem Steuerelement zu übergeben.
     ''' - Null-Sicherheitsprüfung ('dtT Is Nothing') am Methodenstart integriert.
+    ''' 02.10.2026
+    ''' - Status entfernt
     ''' </remarks>
     Private Sub prLoadUserInList(ByVal dtT As DataTable)
         ' Validierung: Wenn die Tabelle leer oder ungültig ist, abbrechen
@@ -2982,7 +2992,6 @@ Public Class frmSystem
                 .Add(row("KName").ToString())
                 ' Passwort entschlüsseln
                 .Add(fDeCrypt(row("PassWD").ToString(), "UrSoft"))
-                .Add(row("Status").ToString())
                 .Add(row("ID").ToString())
             End With
 
@@ -3034,6 +3043,8 @@ Public Class frmSystem
     ''' 29.09.2026 - Code-Optimierung:
     ''' - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLoockUser' entfernt.
     ''' - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
+    ''' 02.10.2026
+    ''' - Status entfernt
     ''' </remarks>
     Private Sub tsbNewUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNewUser.Click
         ' Flag für neuen Datensatz setzen
@@ -3043,7 +3054,7 @@ Public Class frmSystem
         tbUUser.Text = String.Empty
         tbKUser.Text = String.Empty
         tbUPassWD.Text = String.Empty
-        tbURechte.Text = String.Empty
+        'tbURechte.Text = String.Empty
 
         ' Eingabemaske entsperren
         prLoockUser(True)
@@ -3112,12 +3123,14 @@ Public Class frmSystem
     ''' - 'ToolStripButton'-Typkonvertierungsfehler durch strikte Trennung von 'Control' und 'ToolStripItem' behoben.
     ''' - Zuweisung über kompakte Schleifen gelöst (bessere Übersicht und Wartbarkeit).
     ''' - Automatisches Zurücksetzen der Klartext-Anzeige integriert.
+    ''' 02.10.2026
+    ''' - tbURechte entfernt
     ''' </remarks>
     Private Sub prLoockUser(ByVal lStatus As Boolean)
         Dim lInvertedStatus As Boolean = Not lStatus
 
         ' --- 1. Steuerung der Standard-Formular-Steuerelemente (Control) ---
-        Dim editControls() As Control = {tbUUser, tbKUser, tbUPassWD, tbURechte, chKlar, lvUser}
+        Dim editControls() As Control = {tbUUser, tbKUser, tbUPassWD, chKlar, lvUser}
 
         For Each ctrl In editControls
             ' lvUser verhält sich umgekehrt zur Eingabemaske
@@ -3234,6 +3247,8 @@ Public Class frmSystem
     ''' 29.09.2026 - Code-Optimierung:
     ''' - Zugriff auf '.SelectedItems(0)' durch eine lokale Variable ('item') zentralisiert (bessere Performance und Lesbarkeit).
     ''' - Unnötige 'With'-Struktur aufgelöst, da die Variable den Kontext bereits sauber abbildet.
+    ''' 02.10.2026
+    ''' - tbURechte entfernt
     ''' </remarks>
     Private Sub prGetInfolvUser()
         ' Guard Clause: Wenn kein Element selektiert ist, sofort abbrechen
@@ -3246,8 +3261,7 @@ Public Class frmSystem
         tbUUser.Text = item.SubItems(0).Text
         tbKUser.Text = item.SubItems(1).Text
         tbUPassWD.Text = item.SubItems(2).Text
-        tbURechte.Text = item.SubItems(3).Text
-        lbUserID.Text = item.SubItems(4).Text
+        lbUserID.Text = item.SubItems(3).Text
     End Sub
 
     ''' <summary>
@@ -3262,6 +3276,8 @@ Public Class frmSystem
     ''' - Logikfehler behoben: Passwort wird nun beim Speichern sauber verschlüsselt ('fEnCrypt') statt entschlüsselt ('fDeCrypt').
     ''' - Veraltete String-Operationen und Funktionsnamen-Zuweisung durch moderne .NET-Standards ersetzt.
     ''' - 'String.IsNullOrWhiteSpace' für null-sichere und performantere Validierung eingesetzt.
+    ''' 02.10.2026
+    ''' - tbURechte entfernt
     ''' </remarks>
     Private Function fcSaveUser(ByVal sID As String) As String
         Dim sb As New StringBuilder()
@@ -3269,14 +3285,12 @@ Public Class frmSystem
         ' Standardwerte für leere Felder setzen
         If String.IsNullOrWhiteSpace(tbKUser.Text) Then tbKUser.Text = " "
         If String.IsNullOrWhiteSpace(tbUPassWD.Text) Then tbUPassWD.Text = " "
-        If String.IsNullOrWhiteSpace(tbURechte.Text) Then tbURechte.Text = "5"
 
         ' Daten strukturiert zusammenbauen (Passwort wird verschlüsselt in die DB geschrieben)
         sb.Append(sID).Append("°")
         sb.Append(tbUUser.Text).Append("°")
         sb.Append(tbKUser.Text).Append("°")
         sb.Append(fDeCrypt(tbUPassWD.Text, "UrSoft")).Append("°")
-        sb.Append(tbURechte.Text)
 
         Return sb.ToString()
     End Function
@@ -3333,6 +3347,8 @@ Public Class frmSystem
     ''' - Veraltete 'Call'-Syntax entfernt und leere Strings durch 'String.Empty' ersetzt.
     ''' - Grammatikfehler in der Hinweismeldung korrigiert ("diesen Nutzer" statt "dieses Nutzer").
     ''' - Selektions-Logik nach dem Löschen stabilisiert (wählt das erste verbleibende Element aus).
+    ''' 02.10.2026
+    ''' - tbURechte entfernt
     ''' </remarks>
     Private Sub tsbDelUser_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDelUser.Click
         Dim sUser As String = lbUserID.Text
@@ -3355,7 +3371,6 @@ Public Class frmSystem
             tbUUser.Text = String.Empty
             tbKUser.Text = String.Empty
             tbUPassWD.Text = String.Empty
-            tbURechte.Text = String.Empty
             lbUserID.Text = String.Empty
 
             ' UI-Liste frisch und korrekt mit den Benutzerdaten neu laden
@@ -3368,31 +3383,6 @@ Public Class frmSystem
             If lvUser.Items.Count > 0 Then
                 lvUser.Items(0).Selected = True
                 lvUser.Items(0).EnsureVisible()
-            End If
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Validiert die Eingabe im Rechte-Feld, um sicherzustellen, dass nur numerische Werte eingetragen werden.
-    ''' Schützt vor ungültigen Zeichen (z. B. Buchstaben).
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 20.12.2011 - Create
-    ''' 29.09.2026 - Code-Optimierung:
-    ''' - Fehlerhafte 'IsNumeric(e.ToString)'-Logik durch eine echte numerische Typprüfung ('Integer.TryParse') ersetzt.
-    ''' - Setzt das Feld bei Falscheingaben standardmäßig auf den Wert "5" zurück und hält die Cursor-Position am Ende des Textes.
-    ''' </remarks>
-    Private Sub tbURechte_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbURechte.TextChanged
-        ' Nur prüfen, wenn das Feld nicht leer ist
-        If tbURechte.Text.Length > 0 Then
-            Dim dummy As Integer
-            ' Falls die Eingabe keine gültige Zahl ist, auf Standardwert zurücksetzen
-            If Not Integer.TryParse(tbURechte.Text, dummy) Then
-                tbURechte.Text = "5"
-                ' Cursor ans Ende setzen, um ungestörtes Weitertippen zu ermöglichen
-                tbURechte.SelectionStart = tbURechte.Text.Length
             End If
         End If
     End Sub
@@ -3856,392 +3846,6 @@ Public Class frmSystem
     Private Sub rbMakro_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbMakro.CheckedChanged
         ' Das Ziel-Feld wird ausgeblendet, wenn der Makro-Modus aktiv ist
         tbZZiel.Visible = Not rbMakro.Checked
-    End Sub
-
-
-
-#End Region
-
-#Region "Werbung bearbeiten........................................................................"
-
-    ''' <summary>
-    ''' Prüft, ob Datensätze vorhanden sind, und steuert die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
-    ''' </summary>
-    ''' <param name="dt">Die zu prüfende DataTable mit den Werbedaten.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - Logik vereinfacht: Zuweisung des Boolean-Status direkt aus dem Vergleichsausdruck ohne temporäre Variable.
-    ''' </remarks>
-    Private Sub prCheckNoRecordWerbung(ByVal dt As DataTable)
-        ' Status direkt ermitteln: True, wenn Zeilen vorhanden sind
-        Dim hasRows As Boolean = (dt.Rows.Count > 0)
-
-        tsbWEdit.Enabled = hasRows
-        tsbWDel.Enabled = hasRows
-        ' Wenn Datensätze vorhanden sind, automatisch den ersten Eintrag auswählen
-        If hasRows Then
-            ' Nur selektieren, wenn aktuell noch nichts oder ein ungültiger Index ausgewählt ist
-            ' (verhindert das ungewollte Überschreiben einer bestehenden Benutzerauswahl)
-            If liWerbung.SelectedIndex = -1 AndAlso liWerbung.Items.Count > 0 Then
-                liWerbung.SelectedIndex = 0
-            End If
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Bereitet die Benutzeroberfläche für das Anlegen einer neuen Werbung vor.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
-    ''' </remarks>
-    Private Sub tsbWNeu_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWNeu.Click
-        lNew = True
-        tbWerbung.Text = ""
-
-        ' Felder für Eingabe freischalten und Fokus setzen
-        prLoockWerbung(True)
-        tbWerbung.Select()
-    End Sub
-
-    ''' <summary>
-    ''' Bereitet die Benutzeroberfläche für das Bearbeiten einer bestehenden Werbung vor und lädt die aktuellen Werte in die Textfelder.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
-    ''' </remarks>
-    Private Sub tsbWEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWEdit.Click
-        prLoockWerbung(True)
-
-        ' Werte aus den Labels in die Bearbeitungsfelder übertragen
-        tbBetreff.Text = lbBetreff.Text
-        tbKopf.Text = lbKopf.Text
-        tbFuss.Text = lbFuss.Text
-        tbProvision.Text = lbProvision.Text
-        tbWEMail.Text = lbWEMail.Text
-
-        tbWerbung.Select()
-    End Sub
-
-    ''' <summary>
-    ''' Löst das Speichern der vorgenommenen Änderungen an der Werbung aus.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
-    ''' </remarks>
-    Private Sub tsbWSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWSave.Click
-        prSaveWerbung()
-    End Sub
-
-    ''' <summary>
-    ''' Bricht die aktuelle Bearbeitung ab und setzt den Zustand der Benutzeroberfläche zurück.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
-    ''' </remarks>
-    Private Sub tsbWBreack_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWBreack.Click
-        ' Eingabemodus sperren und Button-Status anhand bestehender Daten neu evaluieren
-        prLoockWerbung(False)
-        prCheckNoRecordWerbung(dtWer)
-    End Sub
-
-    ''' <summary>
-    ''' Steuert die Aktivierung und Sichtbarkeit der Eingabefelder sowie der Funktionstasten basierend auf dem aktuellen Bearbeitungsstatus.
-    ''' </summary>
-    ''' <param name="lStatus">Gibt an, ob sich das Formular im Bearbeitungsmodus (True) oder im Ansichtsmodus (False) befindet.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - Rechtschreibfehler im Methodennamen beibehalten (Kompatibilität), interne Steuerung logisch strukturiert.
-    ''' </remarks>
-    Private Sub prLoockWerbung(ByVal lStatus As Boolean)
-        ' Steuerung der Button-Aktivierung
-        tsbWEdit.Enabled = Not lStatus
-        tsbWNeu.Enabled = Not lStatus
-        tsbWSave.Enabled = lStatus
-        tsbWBreack.Enabled = lStatus
-        tsbWDel.Enabled = Not lStatus
-
-        ' Steuerung der Listen- und Eingabeelemente
-        liWerbung.Enabled = Not lStatus
-        tbWerbung.Enabled = lStatus
-
-        ' Sichtbarkeiten der Detail-Eingabefelder umschalten
-        tbProvision.Visible = lStatus
-        tbBetreff.Visible = lStatus
-        tbKopf.Visible = lStatus
-        tbFuss.Visible = lStatus
-        tbWEMail.Visible = lStatus
-        tbNormal.Enabled = lStatus
-
-        ' Ansicht aktualisieren
-        liWerbung.Refresh()
-    End Sub
-
-    ''' <summary>
-    ''' Führt die Speicherung oder Aktualisierung des Werbedatensatzes in der Datenbank und der lokalen DataTable durch.
-    ''' </summary>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 01.04.2012 - Insert Format Provision
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
-    ''' - 'tbWerbung.Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
-    ''' - Nicht verwendete Variable 'sb' (StringBuilder) und 'sName' entfernt.
-    ''' - 'Like'-Operator bei der ID-Filterung der DataTable durch präzisen '='-Operator ersetzt.
-    ''' - Inline-Kommentare zur Dokumentation der Logikschritte hinzugefügt.
-    ''' </remarks>
-    Private Sub prSaveWerbung()
-        Dim sqlText As String = ""
-        Dim arFields() As String
-        Dim arValue() As String
-        Dim cBedingung As String = ""
-        Dim sID As String
-
-        ' Formatierung der Provision und ID-Ermittlung
-        tbProvision.Text = fcFormatDecimal(tbProvision.Text)
-
-        If lNew Then
-            sID = fcGetTimeID(Date.Today)
-        Else
-            sID = fcGetOneValue(dtWer, liWerbung.Text, "Werbung", "ID")
-        End If
-
-        Try
-            ' Felder definieren und Splitten
-            sqlText = "ID,Werbung,Betreff,KText,FText,Link,Provision,Color"
-            arFields = Split(sqlText, ",")
-
-            ' Validierung: Wenn Werbetext leer ist, Speichervorgang abbrechen
-            If String.IsNullOrWhiteSpace(tbWerbung.Text) Then Exit Sub
-
-            ' Werte für die Felder holen
-            sqlText = fcSaveWerbung(sID)
-            arValue = Split(sqlText, "°")
-
-            ' Bei Neuanlage leeren Datensatz in der Datenbank erzeugen
-            If lNew Then
-                sID = fcAppendBlank("Werbung")
-            End If
-
-            ' Daten in der Datenbank aktualisieren
-            cBedingung = " WHERE ID='" & sID & "'"
-            fcUpdateCommand("Werbung", arFields, arValue, cBedingung)
-
-            ' Lokale DataTable synchronisieren
-            If lNew Then
-                ' Neuen Datensatz in DataTable "dtWer" hinzufügen
-                fcInsertTable(dtWer, arFields, arValue)
-            Else
-                ' Bestehenden Datensatz in DataTable "dtWer" aktualisieren
-                cBedingung = "ID = '" & sID & "'"
-                fcUpdateTable(dtWer, arFields, arValue, cBedingung)
-            End If
-
-            lNew = False
-
-        Catch ex As Exception
-            ' Fehlerprotokollierung
-            ErrReport(ex.Message, ex.Source, ex.StackTrace)
-        Finally
-            ' Benutzeroberfläche zurücksetzen und Liste neu laden
-            prCheckNoRecordWerbung(dtWer)
-            prLoockWerbung(False)
-            liWerbung = fcLoadListe(liWerbung, dtWer, "Werbung")
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Stellt die Formulardaten zu einem mit Trennzeichen (°) separierten String für die Speicherung zusammen.
-    ''' </summary>
-    ''' <param name="sID">Die eindeutige Identifikationsnummer des Werbedatensatzes.</param>
-    ''' <returns>Ein mit '°' separierter String, der alle Feldwerte enthält.</returns>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 01.04.2012 - Insert Format Provision
-    ''' 24.09.2026 - Code-Optimierung:
-    ''' - 'Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
-    ''' - UI-Entkopplung: Standardwerte werden direkt im Speicher (StringBuilder) gesetzt, anstatt die Textbox-Inhalte der UI mit Leerzeichen zu überschreiben.
-    ''' - 'fcSaveWerbung = ...' durch die moderne 'Return'-Anweisung ersetzt.
-    ''' </remarks>
-    Private Function fcSaveWerbung(ByVal sID As String) As String
-        Dim sb As New StringBuilder
-
-        ' IDs und den Haupttext anfügen
-        sb.Append(sID).Append("°")
-        sb.Append(tbWerbung.Text).Append("°")
-
-        ' Optionale Textfelder prüfen und direkt im StringBuilder puffern (verhindert Leerzeichen in der UI)
-        If String.IsNullOrWhiteSpace(tbBetreff.Text) Then sb.Append(" 1°") Else sb.Append(tbBetreff.Text).Append("°")
-        If String.IsNullOrWhiteSpace(tbKopf.Text) Then sb.Append(" 1°") Else sb.Append(tbKopf.Text).Append("°")
-        If String.IsNullOrWhiteSpace(tbFuss.Text) Then sb.Append(" 1°") Else sb.Append(tbFuss.Text).Append("°")
-        If String.IsNullOrWhiteSpace(tbWEMail.Text) Then sb.Append(" 1°") Else sb.Append(tbWEMail.Text).Append("°")
-
-        ' Provision prüfen und standardisieren
-        If String.IsNullOrWhiteSpace(tbProvision.Text) Then
-            sb.Append("0.00°")
-        Else
-            sb.Append(tbProvision.Text).Append("°")
-        End If
-
-        ' Letzten Wert ohne abschließendes Trennzeichen anfügen
-        sb.Append(tbNormal.Text)
-
-        Return sb.ToString()
-    End Function
-
-    ''' <summary>
-    ''' Reagiert auf die Auswahl eines Eintrags in der Liste und lädt die dazugehörigen Detailinformationen.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 01.04.2012 - Insert Format Provision
-    ''' 30.09.2026 - Code-Optimierung:
-    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
-    ''' - Sicherheitsabfrage hinzugefügt: Verarbeitet die Auswahl nur, wenn der Index gültig ist (>-1).
-    ''' </remarks>
-    Private Sub liWerbung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles liWerbung.SelectedIndexChanged
-        ' Abbruch bei Löschvorgang, Systemstart oder wenn kein Eintrag selektiert ist
-        If lDel Or lStart OrElse liWerbung.SelectedIndex = -1 Then Exit Sub
-
-        Dim sID As String = fcGetOneValue(dtWer, liWerbung.Text, "Werbung", "ID")
-        prGetInfoWerbung(sID)
-    End Sub
-
-    ''' <summary>
-    ''' Lädt die detaillierten Daten der ausgewählten Werbung aus der Datenbank und stellt sie in der UI dar.
-    ''' </summary>
-    ''' <param name="sID">Die eindeutige Identifikationsnummer der anzuzeigenden Werbung.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 01.04.2012 - Insert Format Provision
-    ''' 30.09.2026 - Code-Optimierung:
-    ''' - Rechtschreibfehler im XML-Kommentar korrigiert.
-    ''' - Datenzugriff durch direkte Typkonvertierung (.ToString) optimiert.
-    ''' - Hintergrundfarbe wird nur zugewiesen, wenn Daten vorhanden sind.
-    ''' </remarks>
-    Private Sub prGetInfoWerbung(ByVal sID As String)
-        Dim dt As DataTable = fcReadDataTable("Select * from Werbung Where ID='" & sID & "'")
-
-        ' Wenn ein Datensatz gefunden wurde, die Steuerelemente befüllen
-        If dt.Rows.Count > 0 Then
-            Dim row As DataRow = dt.Rows(0)
-
-            lbWEMail.Text = row("Link").ToString()
-            lbBetreff.Text = row("Betreff").ToString()
-            lbKopf.Text = row("KText").ToString()
-            lbFuss.Text = row("FText").ToString()
-            tbWerbung.Text = row("Werbung").ToString()
-            lbProvision.Text = row("Provision").ToString()
-            tbNormal.Text = row("color").ToString()
-
-            ' Hintergrundfarbe basierend auf dem Farbwert setzen
-            tbNormal.BackColor = fcStringRGB(tbNormal.Text)
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Löscht den aktuell ausgewählten Werbedatensatz nach einer Sicherheitsabfrage aus der Datenbank und aktualisiert die Anzeige.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 26.01.2012 - Create
-    ''' 30.09.2026 - Code-Optimierung:
-    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
-    ''' - 'sID = ""' durch performanteres 'String.IsNullOrEmpty' ersetzt und an den Methodenstart verschoben (Early Exit).
-    ''' - Fehlerhaften Aufruf 'prCheckNoRecordBuch' auf die korrekte Methode 'prCheckNoRecordWerbung' umgestellt.
-    ''' - Ablauflogik zur Vermeidung von unnötigen String-Operationen strukturiert.
-    ''' </remarks>
-    Private Sub tsbWDel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbWDel.Click
-        Dim sID As String = fcGetOneValue(dtWer, liWerbung.Text, "Werbung", "ID")
-
-        ' Abbrechen, wenn keine gültige ID ermittelt werden konnte
-        If String.IsNullOrEmpty(sID) Then Exit Sub
-
-        Dim sMsg As String = "Wollen Sie diese Werbung wirklich löschen?"
-
-        ' Sicherheitsabfrage vor dem Löschen
-        If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
-            lDel = True
-            tbWerbung.Text = ""
-
-            ' Datensatz per SQL aus der Tabelle löschen
-            Dim cSql As String = "DELETE FROM Werbung WHERE ID = '" & sID & "'"
-            UpdateTable(cSql)
-
-            ' Änderung in lokaler DataTable "dtWer" nachvollziehen und neu laden
-            fcDeleteTableRow(dtWer, "ID = '" & sID & "'")
-            dtWer = fcReadDataTable("Select * from Werbung")
-
-            ' Liste aktualisieren
-            liWerbung = fcLoadListe(liWerbung, dtWer, "Werbung")
-
-            ' Selektion zurücksetzen auf das erste Element, falls noch Daten vorhanden sind
-            If dtWer.Rows.Count > 0 Then
-                liWerbung.SelectedIndex = 0
-            End If
-
-            lDel = False
-
-            ' Button-Status der Benutzeroberfläche aktualisieren
-            prCheckNoRecordWerbung(dtWer)
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Formatiert den eingegebenen Wert im Provisionsfeld automatisch als Dezimalzahl, sobald das Feld den Fokus verliert.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 30.09.2026 - Code-Dokumentation:
-    ''' - XML-Kommentar für konsistente Projektdokumentation hinzugefügt.
-    ''' </remarks>
-    Private Sub tbProvision_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbProvision.LostFocus
-        tbProvision.Text = fcFormatDecimal(tbProvision.Text)
-    End Sub
-
-    ''' <summary>
-    ''' Öffnet bei einem Klick auf das Farbfeld den Windows-Farbdialog und weist die gewählte Farbe als Hintergrund sowie als RGB-String zu.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 30.09.2026 - Code-Optimierung:
-    ''' - XML-Kommentar hinzugefügt.
-    ''' - 'ColorDialog' in einen 'Using'-Block eingebettet, um eine saubere Freigabe der Systemressourcen (Dispose) zu garantieren.
-    ''' </remarks>
-    Private Sub tbNormal_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNormal.Click
-        ' Ressourcenschonende Instanziierung des Farbdialogs
-        Using cd As New ColorDialog()
-            cd.Color = tbNormal.BackColor
-            cd.FullOpen = True
-
-            ' Wenn der Benutzer mit OK bestätigt, Farben anwenden
-            If cd.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                tbNormal.BackColor = cd.Color
-                tbNormal.Text = fcRGBString(cd.Color)
-            End If
-        End Using
     End Sub
 
 
@@ -4932,22 +4536,6 @@ Public Class frmSystem
     End Sub
 
     ''' <summary>
-    ''' Schaltet die Bearbeitbarkeit des Preis-Eingabefeldes 7 frei, wenn die dazugehörige Checkbox deaktiviert wird.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 30.09.2026 - Code-Optimierung:
-    ''' - XML-Kommentar hinzugefügt.
-    ''' - 'If-Else'-Struktur durch eine hocheffiziente, direkte Boolean-Zuweisung ersetzt.
-    ''' - Event-Parameter korrekter typisiert (System.Object, System.EventArgs) entsprechend den .NET-Konventionen.
-    ''' </remarks>
-    'Private Sub chP7_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chP7.CheckedChanged
-    '    ' Wenn die Checkbox NICHT gesetzt ist (False), wird das Textfeld aktiviert (True)
-    '    tbPreis7.Enabled = Not chP7.Checked
-    'End Sub
-
-    ''' <summary>
     ''' Universeller Event-Handler für alle sieben Preis-Checkboxen.
     ''' Schaltet das jeweils zugehörige Textfeld basierend auf dem Auswahlstatus frei oder sperrt es.
     ''' </summary>
@@ -5197,36 +4785,50 @@ Public Class frmSystem
 #Region "Sasion bearbeiten........................................................................."
 
     ''' <summary>
-    ''' Tabelle "Sasion" erstellen
+    ''' Erstellt die Spaltenstruktur für die Saison-Tabelle (ListView) und 
+    ''' lädt die verfügbaren Events aus der Systemdatenbank in die Combobox.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 26.01.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Rechtschreibfehler "Sasion" zu "Saison" korrigiert (Methodenname, Steuerelemente, Spalten).
+    ''' - Veraltete 'Call'-Syntax entfernt.
+    ''' - Robusten String-Split für Zeilenumbrüche implementiert, um unsichtbare Steuerzeichen zu verhindern.
+    ''' - Schleifenvariable explizit deklariert und doppelten Code (.Sorting) entfernt.
     ''' </remarks>
-    Private Sub prCreateTabelleSasion()
-        Dim nWidth As Integer
-        Call prColorRead()
-        With lvSasion
-            nWidth = .Width / 3
+    Private Sub prCreateTabelleSaison()
+        Dim nWidth As Integer = CInt(lvSaison.Width / 3)
+
+        prColorRead()
+
+        With lvSaison
             .Clear()
             .Columns.Add("Saison", nWidth, HorizontalAlignment.Left)
             .Columns.Add("Anfang", nWidth, HorizontalAlignment.Left)
             .Columns.Add("Ende", nWidth, HorizontalAlignment.Left)
             .FullRowSelect = True
             .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
+            .HeaderStyle = ColumnHeaderStyle.Nonclickable
             .HideSelection = False
             .MultiSelect = False
-            '.Sorting = SortOrder.Ascending
             .Sorting = SortOrder.Ascending
             .TabIndex = 0
             .View = View.Details
         End With
-        Dim arTmp() As String = ReadOneValueFromSystemDb("Event").Split(vbCrLf)
-        For i = 0 To arTmp.Length - 1
-            coEvent.Items.Add(arTmp(i))
-        Next
-        coEvent.Text = arTmp(0)
+
+        ' Split mit StringSplitOptions verhindert unsaubere Zeilenumbrüche und leere Einträge
+        Dim rawData As String = ReadOneValueFromSystemDb("Event")
+        Dim arTmp() As String = rawData.Split(New String() {vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+
+        If arTmp.Length > 0 Then
+            coEvent.Items.Clear() ' Empfohlen, um doppelte Einträge bei mehrfachem Aufruf zu vermeiden
+            For i As Integer = 0 To arTmp.Length - 1
+                coEvent.Items.Add(arTmp(i).Trim())
+            Next
+            coEvent.Text = arTmp(0).Trim()
+        End If
     End Sub
+
 
     ''' <summary>
     ''' Füllt die ListView 'lvSasion' mit den Saisondaten aus der Konfigurationsdatei und formatiert die Zeilen farblich.
@@ -5247,7 +4849,7 @@ Public Class frmSystem
         Dim nColor As Integer
         Dim itemIndex As Integer = 0
 
-        With lvSasion
+        With lvSaison
             .Items.Clear()
 
             ' Zeilen verarbeiten
@@ -5283,515 +4885,608 @@ Public Class frmSystem
             .Select()
 
             ' Automatisch den ersten Eintrag selektieren, falls Daten geladen wurden
-            prSelectFirstListViewItemIfNeeded(lvSasion)
+            prSelectFirstListViewItemIfNeeded(lvSaison)
         End With
     End Sub
 
-
-    Private Sub lvSasion_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvSasion.SelectedIndexChanged
-        Call prGetInfolvSaison()
+    ''' <summary>
+    ''' Reagiert auf die Änderung der Auswahl in der Saison-ListView und 
+    ''' aktualisiert die Detailanzeige in den Eingabefeldern.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Doppeltes 'Handles'-Ereignis in der Signatur entfernt.
+    ''' - Veraltete 'Call'-Syntax eliminiert.
+    ''' - Methodenname an korrekte Schreibweise (Saison) angepasst.
+    ''' </remarks>
+    Private Sub lvSaison_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lvSaison.SelectedIndexChanged
+        prGetInfolvSaison()
     End Sub
 
     ''' <summary>
-    ''' Informationen aus der Kontenliste in die Eingabefelder übertragen
+    ''' Überträgt die Informationen der ausgewählten Saison aus der ListView 
+    ''' in die entsprechenden Textfelder und Kalender-Steuerelemente.
     ''' </summary>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'ByVal'-Modifizierer entfernt.
+    ''' - Sicheres Konvertieren der Datumsstrings mittels 'Date.TryParse' integriert, 
+    '''   um Abstürze bei Fehlformaten im MonthCalendar zu verhindern.
     ''' </remarks>
     Private Sub prGetInfolvSaison()
+        With lvSaison
+            If .SelectedItems.Count > 0 Then
+                Dim selectedRow As ListViewItem = .SelectedItems(0)
 
-        With lvSasion
-            If .SelectedItems.Count <> 0 Then
-                coSaison.Text = .SelectedItems(0).SubItems(0).Text
-                sDAnfang = .SelectedItems(0).SubItems(1).Text
-                sDEnde = .SelectedItems(0).SubItems(2).Text
-                mcSaisonAnfang.SelectionStart = sDAnfang
-                mcSaisonEnde.SelectionStart = sDEnde
+                coSaison.Text = selectedRow.SubItems(0).Text
+                sDAnfang = selectedRow.SubItems(1).Text
+                sDEnde = selectedRow.SubItems(2).Text
+
+                ' Datumsübergabe an die Kalender sicherstellen
+                Dim dAnfang As Date
+                If Date.TryParse(sDAnfang, dAnfang) Then
+                    mcSaisonAnfang.SelectionStart = dAnfang
+                End If
+
+                Dim dEnde As Date
+                If Date.TryParse(sDEnde, dEnde) Then
+                    mcSaisonEnde.SelectionStart = dEnde
+                End If
             End If
         End With
     End Sub
 
-    Private Sub tsbNeuSasion_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNeuSasion.Click
+    ''' <summary>
+    ''' Bereitet die Benutzeroberfläche für die Erfassung einer neuen Saison vor.
+    ''' Setzt die Datumsfelder auf den Standardwert und aktiviert den Bearbeitungsmodus.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax entfernt.
+    ''' - Wechsel von '.Select()' auf das modernere '.Focus()' für das Steuerelement.
+    ''' - Fehlerbereinigung beim Methodennamen (prLoocksaison zu prLockSaison).
+    ''' - Typensichere Zuweisung des Startdatums an die Kalenderelemente integriert.
+    ''' </remarks>
+    Private Sub tsbNeuSaison_Click(sender As Object, e As EventArgs) Handles tsbNeuSaison.Click
         lNew = True
         sDAnfang = sDAK
         sDEnde = sDAK
-        mcSaisonAnfang.SelectionStart = sDAnfang
-        mcSaisonEnde.SelectionStart = sDEnde
-        Call prLoocksaison(True)
-        coSaison.Select()
+
+        Dim dInitial As Date
+        If Date.TryParse(sDAK, dInitial) Then
+            mcSaisonAnfang.SelectionStart = dInitial
+            mcSaisonEnde.SelectionStart = dInitial
+        End If
+
+        prLockSaison(True)
+        coSaison.Focus()
     End Sub
+
     ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
+    ''' Steuert die Aktivierung und Deaktivierung der Schaltflächen und Eingabefelder 
+    ''' in Abhängigkeit vom aktuellen Bearbeitungsstatus.
     ''' </summary>
-    ''' <param name="lStatus"></param>
+    ''' <param name="lStatus">True, wenn sich das Formular im Bearbeitungs-/Neumodus befindet; andernfalls False.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'ByVal'-Modifizierer entfernt.
+    ''' - Methodenname korrigiert (prLoocksaison zu prLockSaison).
+    ''' - XML-Dokumentation für den Parameter 'lStatus' präzisiert.
     ''' </remarks>
-    Private Sub prLoocksaison(ByVal lStatus As Boolean)
-        tsbEditSasion.Enabled = Not lStatus
-        tsbNeuSasion.Enabled = Not lStatus
-        tsbSaveSasion.Enabled = lStatus
-        tsbBreackSasion.Enabled = lStatus
-        tsbDelSasion.Enabled = Not lStatus
-        lvSasion.Enabled = Not lStatus
+    Private Sub prLockSaison(lStatus As Boolean)
+        tsbEditSaison.Enabled = Not lStatus
+        tsbNeuSaison.Enabled = Not lStatus
+        tsbSaveSaison.Enabled = lStatus
+        tsbBreackSaison.Enabled = lStatus
+        tsbDelSaison.Enabled = Not lStatus
+
+        lvSaison.Enabled = Not lStatus
         coSaison.Enabled = lStatus
         mcSaisonAnfang.Enabled = lStatus
         mcSaisonEnde.Enabled = lStatus
-
-
     End Sub
 
-    Private Sub tsbSaveSasion_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveSasion.Click
-        Dim sb As New StringBuilder
 
-        If lNew = True Then
-            Dim lv As ListViewItem
-            With lvSasion
-                lv = .Items.Add(Trim(coSaison.Text))
-                lv.SubItems.Add(Trim(sDAnfang))
-                lv.SubItems.Add(Trim(sDEnde))
-            End With
+    ''' <summary>
+    ''' Verarbeitet den Klick auf die Speichern-Schaltfläche. 
+    ''' Fügt eine neue Saison hinzu oder aktualisiert einen bestehenden Eintrag in der ListView,
+    ''' generiert die Datenstruktur und sichert diese dauerhaft in der Systemdatenbank.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen vollständig entfernt.
+    ''' - 'StringBuilder' durch Method-Chaining optimiert, um String-Verkettungen (&) zu vermeiden.
+    ''' - Veraltete VB-Funktion 'Trim()' durch die native .NET-Methode '.Trim()' ersetzt.
+    ''' - Validierung für leere Saisonnamen hinzugefügt.
+    ''' </remarks>
+    Private Sub tsbSaveSaison_Click(sender As Object, e As EventArgs) Handles tsbSaveSaison.Click
+        ' Validierung: Leere Einträge verhindern
+        Dim saisonName As String = coSaison.Text.Trim()
+        If String.IsNullOrEmpty(saisonName) Then
+            MessageBox.Show("Bitte geben Sie einen Namen für die Saison ein.", "Eingabe fehlt", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            coSaison.Focus()
+            Exit Sub
+        End If
+
+        If lNew Then
+            ' Neuen Eintrag zur ListView hinzufügen
+            Dim lv As ListViewItem = lvSaison.Items.Add(saisonName)
+            lv.SubItems.Add(sDAnfang.Trim())
+            lv.SubItems.Add(sDEnde.Trim())
         Else
-            With lvSasion
-                If .SelectedItems.Count <> 0 Then
-                    .SelectedItems(0).SubItems(0).Text = coSaison.Text
-                    .SelectedItems(0).SubItems(1).Text = sDAnfang
-                    .SelectedItems(0).SubItems(2).Text = sDEnde
+            ' Bestehenden Eintrag in der ListView aktualisieren
+            With lvSaison
+                If .SelectedItems.Count > 0 Then
+                    .SelectedItems(0).SubItems(0).Text = saisonName
+                    .SelectedItems(0).SubItems(1).Text = sDAnfang.Trim()
+                    .SelectedItems(0).SubItems(2).Text = sDEnde.Trim()
                 End If
             End With
         End If
-        Call prLoocksaison(False)
-        For i = 0 To lvSasion.Items.Count - 1
-            sb.Append(lvSasion.Items(i).SubItems(0).Text & ";")
-            sb.Append(lvSasion.Items(i).SubItems(1).Text & ";")
-            sb.Append(lvSasion.Items(i).SubItems(2).Text & vbCrLf)
+
+        ' Bearbeitungsmodus beenden
+        prLockSaison(False)
+
+        ' Daten für die Datenbank serialisieren
+        Dim sb As New StringBuilder()
+        For i As Integer = 0 To lvSaison.Items.Count - 1
+            Dim item As ListViewItem = lvSaison.Items(i)
+            sb.Append(item.SubItems(0).Text).Append(";") _
+          .Append(item.SubItems(1).Text).Append(";") _
+          .Append(item.SubItems(2).Text).Append(vbCrLf)
         Next
-        SaveOneValueInSystemDb("Saison", sb.ToString)
-        Call prSaisonColor()
 
-
+        ' In Datenbank sichern und Ansicht aktualisieren
+        SaveOneValueInSystemDb("Saison", sb.ToString())
+        prSaisonColor()
     End Sub
 
-    Private Sub tsbEditSasion_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbEditSasion.Click
+    ''' <summary>
+    ''' Schaltet die Benutzeroberfläche in den Bearbeitungsmodus für eine bestehende Saison um
+    ''' und setzt den Fokus auf das Namen-Auswahlfeld.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax entfernt.
+    ''' - 'coSaison.Select()' durch das modernere 'coSaison.Focus()' ersetzt.
+    ''' </remarks>
+    Private Sub tsbEditSaison_Click(sender As Object, e As EventArgs) Handles tsbEditSaison.Click
         lNew = False
-        Call prLoocksaison(True)
-        coSaison.Select()
-    End Sub
-    Private Sub mcSasion_Anfang_DateChanged(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DateRangeEventArgs) Handles mcSaisonAnfang.DateChanged
-        sDAnfang = mcSaisonAnfang.SelectionStart.ToShortDateString
+        prLockSaison(True)
+        coSaison.Focus()
     End Sub
 
-    Private Sub mcSaison_Ende_DateChanged(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DateRangeEventArgs) Handles mcSaisonEnde.DateChanged
-        sDEnde = mcSaisonEnde.SelectionStart.ToShortDateString
+    ''' <summary>
+    ''' Aktualisiert die String-Variable für das Startdatum, sobald sich die Auswahl im Start-Kalender ändert.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten des Datumsbereichs.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Datentypen verkürzt und Rechtschreibfehler im Methodennamen korrigiert (Sasion zu Saison).
+    ''' </remarks>
+    Private Sub mcSaison_Anfang_DateChanged(sender As Object, e As DateRangeEventArgs) Handles mcSaisonAnfang.DateChanged
+        sDAnfang = mcSaisonAnfang.SelectionStart.ToShortDateString()
     End Sub
 
-    Private Sub tsbBreackSasion_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBreackSasion.Click
+    ''' <summary>
+    ''' Aktualisiert die String-Variable für das Enddatum, sobald sich die Auswahl im End-Kalender ändert.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten des Datumsbereichs.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Datentypen verkürzt und ByVal-Modifizierer entfernt.
+    ''' </remarks>
+    Private Sub mcSaison_Ende_DateChanged(sender As Object, e As DateRangeEventArgs) Handles mcSaisonEnde.DateChanged
+        sDEnde = mcSaisonEnde.SelectionStart.ToShortDateString()
+    End Sub
+
+    ''' <summary>
+    ''' Bricht den aktuellen Erfassungs- oder Bearbeitungsmodus ab, 
+    ''' stellt den vorherigen Zustand des ausgewählten ListView-Eintrags wieder her und sperrt die Eingabefelder.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Bereinigung der Methodensignatur und Anpassung an den aktuellen XML-Standard.
+    ''' </remarks>
+    Private Sub tsbBreackSaison_Click(sender As Object, e As EventArgs) Handles tsbBreackSaison.Click
         prGetInfolvSaison()
-        prLoocksaison(False)
+        prLockSaison(False)
     End Sub
 
-    Private Sub tsbDelSasion_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDelSasion.Click
-        Dim sMsg As String = "Wollen Sie diese Datensatz wirklich löschen?"
-        Dim sb As New StringBuilder
-        Dim X As Integer
-        'Dim inhalt As String = ""
-        If X <> -1 Then
-            If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
-                X = lvSasion.SelectedIndices.Item(0)
-                lvSasion.Items.RemoveAt(X)
-                lvSasion.Select()
-                If lvSasion.Items.Count > 0 Then
-                    lvSasion.TopItem.Selected = True
-                    'inhalt = ""
-                    For i = 0 To lvSasion.Items.Count - 1
-                        'inhalt = inhalt + PadR(lvSasion.Items(i).SubItems(0).Text, 25)
-                        'inhalt = inhalt + PadR(lvSasion.Items(i).SubItems(1).Text, 11)
-                        'inhalt = inhalt + PadR(lvSasion.Items(i).SubItems(2).Text, 11) + Chr(13) + Chr(10)
-                        sb.Append(lvSasion.Items(i).SubItems(0).Text & ";")
-                        sb.Append(lvSasion.Items(i).SubItems(1).Text & ";")
-                        sb.Append(lvSasion.Items(i).SubItems(2).Text & vbCrLf)
-                    Next
-                    SaveOneValueInSystemDb("Saison", sb.ToString)
-                    Call prSaisonColor()
-                    'SaveOneValueInSystemDb(cgSystemPath & "\Saison.ini", inhalt)
-                End If
-            End If
+    ''' <summary>
+    ''' Verarbeitet den Klick auf die Löschen-Schaltfläche.
+    ''' Prüft, ob ein Eintrag ausgewählt ist, fordert eine Bestätigung an und entfernt 
+    ''' den Datensatz anschließend aus der ListView sowie dauerhaft aus der Systemdatenbank.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Kritischen Logikfehler bei der Indexprüfung (Variable X) behoben.
+    ''' - 'MsgBox' durch das moderne '.NET MessageBox.Show' ersetzt und Rechtschreibung korrigiert.
+    ''' - Kompletten Totcode (alte PadR- und Dateipfad-Logik) entfernt.
+    ''' - 'StringBuilder' durch performantes Method Chaining optimiert.
+    ''' - Veraltete 'Call'-Syntax eliminiert.
+    ''' </remarks>
+    Private Sub tsbDelSaison_Click(sender As Object, e As EventArgs) Handles tsbDelSaison.Click
+        ' Prüfen, ob überhaupt ein Eintrag in der ListView ausgewählt ist
+        If lvSaison.SelectedItems.Count = 0 Then
+            MessageBox.Show("Bitte wählen Sie zuerst einen Eintrag aus, den Sie löschen möchten.", "Keine Auswahl", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Exit Sub
         End If
 
-    End Sub
-#End Region
+        Dim sMsg As String = "Wollen Sie diesen Datensatz wirklich löschen?"
 
+        If MessageBox.Show(sMsg, "Löschen bestätigen", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) = DialogResult.OK Then
+            ' Index des ausgewählten Elements ermitteln und entfernen
+            Dim selectedIndex As Integer = lvSaison.SelectedIndices(0)
+            lvSaison.Items.RemoveAt(selectedIndex)
 
+            Dim sb As New StringBuilder()
 
-    ''' <summary>
-    ''' Ersten eintrag in der Liste selectieren, wenn die Seite ausgewählt wird
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub tcSystem_Selected(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles tcSystem.Selected
+            ' Wenn noch Elemente vorhanden sind, das erste Element auswählen und DB aktualisieren
+            If lvSaison.Items.Count > 0 Then
+                lvSaison.Items(0).Selected = True
+                lvSaison.Focus()
 
-        Select Case e.TabPage.Name.ToString
-            Case Is = "tpObjekte"
-                lvObjekt.Select()
-                If lvObjekt.Items.Count > 0 Then lvObjekt.TopItem.Selected = True
-            Case Is = "tpZimmer"
-                lvZimmer.Select()
-                If lvZimmer.Items.Count > 0 Then lvZimmer.TopItem.Selected = True
-            Case Is = "tpKonto"
-                lvKonto.Select()
-                If lvKonto.Items.Count > 0 Then lvKonto.TopItem.Selected = True
-            Case Is = "tpUser"
-                lvUser.Select()
-                If lvUser.Items.Count > 0 Then lvUser.TopItem.Selected = True
-        End Select
-    End Sub
-
-    ''' <summary>
-    ''' Bestimmten Eintrag in der Liste selektieren
-    ''' </summary>
-    ''' <param name="lv"></param>
-    ''' <param name="sEntry"></param>
-    ''' <remarks>
-    ''' 20.12.2011 Create
-    ''' </remarks>
-    Private Sub prSelectEntry(ByVal lv As ListView, ByVal sEntry As String)
-        For Each item As ListViewItem In lv.Items
-            If item.SubItems(0).Text = sEntry Then
-                lv.Select()
-                item.Selected = True
-                item.EnsureVisible()
-                '  .Items(i).Selected = True
-                '  .Items(i).EnsureVisible()
-                Exit For
+                ' Verbleibende Einträge für die Datenbank serialisieren
+                For i As Integer = 0 To lvSaison.Items.Count - 1
+                    Dim item As ListViewItem = lvSaison.Items(i)
+                    sb.Append(item.SubItems(0).Text).Append(";") _
+                  .Append(item.SubItems(1).Text).Append(";") _
+                  .Append(item.SubItems(2).Text).Append(vbCrLf)
+                Next
+            Else
+                ' Wenn die Liste leer ist, leeren String in die DB schreiben
+                sb.Append("")
             End If
-        Next
 
+            ' In Datenbank sichern und Ansicht aktualisieren
+            SaveOneValueInSystemDb("Saison", sb.ToString())
+
+            prSaisonColor()
+        End If
     End Sub
 
+#End Region
 
 #Region "Farben bearbeiten........................................................................."
 
     ''' <summary>
-    ''' Tabelle Farben erstellen
+    ''' Erstellt die Spaltenstruktur für die Objekt-Farbtabelle (ListView) 
+    ''' und liest die bestehenden Farbeinstellungen ein.
     ''' </summary>
     ''' <remarks>
-    ''' 12.02.2012 Create
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf vollständig entfernt.
+    ''' - Auskommentierten 'Totcode' bei der Breitenberechnung und Sortierung bereinigt.
+    ''' - Führende Leerzeichen im Spaltenheader "Objekt" entfernt.
     ''' </remarks>
     Private Sub prCreateTabelleColor()
-        Dim nWidth As Integer
-        Call prColorRead()
+        Dim nWidth As Integer = lvColor.Width
+
+        prColorRead()
 
         With lvColor
-            nWidth = .Width '/ 3
             .Clear()
-            .Columns.Add("        Objekt", nWidth, HorizontalAlignment.Left)
+            .Columns.Add("Objekt", nWidth, HorizontalAlignment.Left)
             .Columns.Add("BackColor", 0, HorizontalAlignment.Left)
             .Columns.Add("ForeColor", 0, HorizontalAlignment.Left)
             .FullRowSelect = True
             .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
+            .HeaderStyle = ColumnHeaderStyle.Nonclickable
             .HideSelection = False
             .MultiSelect = False
-            .Sorting = SortOrder.None 'SortOrder.Ascending
+            .Sorting = SortOrder.None
             .TabIndex = 0
             .View = View.Details
         End With
     End Sub
 
     ''' <summary>
-    ''' Farben aus der Datei "Color.ini" laden
+    ''' Lädt die Farbeinstellungen aus der Systemdatenbank, splittet die Datensätze
+    ''' und befüllt die ListView inklusive der visuellen Hintergrund- und Schriftfarben.
     ''' </summary>
     ''' <remarks>
-    ''' 12.02.2012 Create
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Logikfehler bei der Farbzuweisung (.Items(i)) behoben, der bei Leerzeilen zu Abstürzen führte.
+    ''' - Farbzuweisung direkt auf die erstellte 'ListViewItem'-Instanz umgestellt.
+    ''' - Robusten Zeilenumbruch-Split integriert, um Steuerzeichen sauber zu entfernen.
+    ''' - Veraltetes '.Select()' durch '.Focus()' ersetzt und XML-Beschreibung korrigiert.
     ''' </remarks>
     Private Sub prLoadColor()
-        Dim arTmp() As String = ReadOneValueFromSystemDb("Color").Split(vbCrLf)
-        Dim nMax As Integer = arTmp.Length - 1
-        Dim arT() As String
+        Dim rawData As String = ReadOneValueFromSystemDb("Color")
+        Dim arTmp() As String = rawData.Split(New String() {vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+
         With lvColor
             .Items.Clear()
-            For i As Integer = 0 To nMax
-                If arTmp(i).Trim <> "" Then
-                    arT = arTmp(i).Split(";")
-                    Dim lv As ListViewItem
-                    lv = .Items.Add(arT(0).Trim)
-                    lv.SubItems.Add(arT(1))
-                    lv.SubItems.Add(arT(2))
-                    .Items(i).BackColor = fcStringRGB(arT(1))
-                    .Items(i).ForeColor = fcStringRGB(arT(2))
+
+            For i As Integer = 0 To arTmp.Length - 1
+                Dim line As String = arTmp(i).Trim()
+
+                If line <> "" Then
+                    Dim arT() As String = line.Split(";"c)
+
+                    ' Sicherstellen, dass das Array genügend Elemente besitzt (Objekt name, BackColor, ForeColor)
+                    If arT.Length >= 3 Then
+                        Dim lv As ListViewItem = .Items.Add(arT(0).Trim())
+                        lv.SubItems.Add(arT(1).Trim())
+                        lv.SubItems.Add(arT(2).Trim())
+
+                        ' Farben direkt dem Item zuweisen (sicher vor Index-Verschiebungen)
+                        lv.BackColor = fcStringRGB(arT(1))
+                        lv.ForeColor = fcStringRGB(arT(2))
+                    End If
                 End If
             Next
-            .Select()
-            If .Items.Count > 0 Then .TopItem.Selected = True
+
+            .Focus()
+            If .Items.Count > 0 Then
+                .Items(0).Selected = True
+            End If
         End With
     End Sub
 
     ''' <summary>
-    ''' Farbe auswählen
+    ''' Reagiert auf die Auswahl eines Objekts in der Farbtabelle,
+    ''' lädt dessen Farbwerte und aktualisiert die Vorschau-Elemente sowie Buttons.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 12.02.2012 Create
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+    ''' - Lokale Variable für das ausgewählte ListViewItem eingeführt, um den Zugriff zu beschleunigen.
+    ''' - XML-Kommentare um Parameterbeschreibungen erweitert.
     ''' </remarks>
-    Private Sub lvColor_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvColor.SelectedIndexChanged
+    Private Sub lvColor_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lvColor.SelectedIndexChanged
         With lvColor
+            If .SelectedItems.Count > 0 Then
+                Dim selectedRow As ListViewItem = .SelectedItems(0)
 
-            If .SelectedItems.Count <> 0 Then
-                lbBackColor.Text = .SelectedItems(0).SubItems(0).Text
-                btBackColor.BackColor = fcStringRGB(.SelectedItems(0).SubItems(1).Text)
-                btForeColor.BackColor = fcStringRGB(.SelectedItems(0).SubItems(2).Text)
-                lbBackColor.BackColor = btBackColor.BackColor
+                ' Vorschau-Text und Farben auslesen
+                lbBackColor.Text = selectedRow.SubItems(0).Text
+
+                Dim backColorValue As Color = fcStringRGB(selectedRow.SubItems(1).Text)
+                Dim foreColorValue As Color = fcStringRGB(selectedRow.SubItems(2).Text)
+
+                ' Buttons und Vorschau-Label aktualisieren
+                btBackColor.BackColor = backColorValue
+                btForeColor.BackColor = foreColorValue
+
+                lbBackColor.BackColor = backColorValue
+                lbBackColor.ForeColor = foreColorValue
+            End If
+        End With
+
+        ' Nach dem Laden eines Eintrags den Speichern-Button standardmäßig sperren
+        btSaveColor.Enabled = False
+    End Sub
+
+    ''' <summary>
+    ''' Öffnet den Farbauswahldialog für die Hintergrundfarbe, aktualisiert bei Erfolg 
+    ''' die Vorschau-Elemente und aktiviert die Speichern-Schaltfläche.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (die Schaltfläche).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Ressourcen-Management durch Einführung eines 'Using'-Blocks für den ColorDialog optimiert.
+    ''' - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+    ''' - XML-Kommentare um präzise Parameterbeschreibungen ergänzt.
+    ''' </remarks>
+    Private Sub btBackColor_Click(sender As Object, e As EventArgs) Handles btBackColor.Click
+        Using cd As New ColorDialog()
+            cd.Color = btBackColor.BackColor
+            cd.FullOpen = True
+
+            If cd.ShowDialog() = DialogResult.OK Then
+                btBackColor.BackColor = cd.Color
+                lbRGBString.Text = fcRGBString(cd.Color)
+
+                ' Vorschau-Elemente anpassen
+                lbBackColor.BackColor = cd.Color
                 lbBackColor.ForeColor = btForeColor.BackColor
+
+                ' Änderungen erlauben das Speichern
+                btSaveColor.Enabled = True
             End If
-        End With
-        btSaveColor.Enabled = False
+        End Using
     End Sub
 
     ''' <summary>
-    ''' Hintergrundfarbe setzen
+    ''' Öffnet den Farbauswahldialog für die Schriftfarbe, aktualisiert bei Erfolg 
+    ''' die Vorschau-Elemente und aktiviert die Speichern-Schaltfläche.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (die Schaltfläche).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 12.02.2012 Create
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Ressourcen-Management durch Einführung eines 'Using'-Blocks für den ColorDialog optimiert.
+    ''' - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+    ''' - XML-Kommentare um präzise Parameterbeschreibungen ergänzt.
     ''' </remarks>
-    Private Sub btBackColor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btBackColor.Click
-        Dim cd As New ColorDialog
-        cd.Color = btBackColor.BackColor
-        cd.FullOpen = True
-        If cd.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            btBackColor.BackColor = cd.Color
-            lbRGBString.Text = fcRGBString(cd.Color)
-            lbBackColor.BackColor = btBackColor.BackColor
-            lbBackColor.ForeColor = btForeColor.BackColor
-            btSaveColor.Enabled = True
-        End If
+    Private Sub btForeColor_Click(sender As Object, e As EventArgs) Handles btForeColor.Click
+        Using cd As New ColorDialog()
+            cd.Color = btForeColor.BackColor
+            cd.FullOpen = True
+
+            If cd.ShowDialog() = DialogResult.OK Then
+                btForeColor.BackColor = cd.Color
+                lbRGBString.Text = fcRGBString(cd.Color)
+
+                ' Vorschau-Elemente anpassen
+                lbBackColor.BackColor = btBackColor.BackColor
+                lbBackColor.ForeColor = cd.Color
+
+                ' Änderungen erlauben das Speichern
+                btSaveColor.Enabled = True
+            End If
+        End Using
     End Sub
 
     ''' <summary>
-    ''' Schriftfarbe setzen
+    ''' Aktualisiert die Farbwerte des ausgewählten Objekts in der ListView, 
+    ''' serialisiert die gesamte Farbtabelle und sichert diese dauerhaft in der Systemdatenbank.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (die Schaltfläche).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 12.02.2012 Create
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Kritischen Selektions-Logikfehler in der Schleife (.SelectedItems(0)) korrigiert.
+    ''' - Datenzugriff direkt über den Schleifenindex ohne Manipulation der GUI-Auswahl umgestellt.
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen vollständig entfernt.
+    ''' - 'StringBuilder' durch Method-Chaining für maximale Performance optimiert.
     ''' </remarks>
-    Private Sub btForeColor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btForeColor.Click
-        Dim cd As New ColorDialog
-        cd.Color = btForeColor.BackColor
-        cd.FullOpen = True
-        If cd.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            btForeColor.BackColor = cd.Color
-            lbRGBString.Text = fcRGBString(cd.Color)
-            lbBackColor.BackColor = btBackColor.BackColor
-            lbBackColor.ForeColor = btForeColor.BackColor
-            btSaveColor.Enabled = True
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Farbe speichern in Datei und array
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 12.02.2012 Create
-    ''' </remarks>
-    Private Sub btSaveColor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSaveColor.Click
-        Dim i As Integer
-        Dim nMax As Integer = lvColor.Items.Count - 1
-        Dim sb As New StringBuilder
+    Private Sub btSaveColor_Click(sender As Object, e As EventArgs) Handles btSaveColor.Click
         With lvColor
-            If .SelectedItems.Count <> 0 Then
-                .SelectedItems(0).SubItems(1).Text = fcRGBString(btBackColor.BackColor)
-                .SelectedItems(0).SubItems(2).Text = fcRGBString(btForeColor.BackColor)
+            ' 1. Werte des aktuell ausgewählten Elements in der ListView aktualisieren
+            If .SelectedItems.Count > 0 Then
+                Dim selectedRow As ListViewItem = .SelectedItems(0)
+                selectedRow.SubItems(1).Text = fcRGBString(btBackColor.BackColor)
+                selectedRow.SubItems(2).Text = fcRGBString(btForeColor.BackColor)
             End If
-            For i = 0 To nMax
 
-                .Items.Item(i).Selected = True
-                sb.Append(.SelectedItems(0).SubItems(0).Text & ";")
-                sb.Append(.SelectedItems(0).SubItems(1).Text & ";")
-                sb.Append(.SelectedItems(0).SubItems(2).Text & vbCrLf)
+            ' 2. Gesamte Tabelle für die Datenbank serialisieren
+            Dim sb As New StringBuilder()
+            For i As Integer = 0 To .Items.Count - 1
+                Dim item As ListViewItem = .Items(i)
+                sb.Append(item.SubItems(0).Text).Append(";") _
+              .Append(item.SubItems(1).Text).Append(";") _
+              .Append(item.SubItems(2).Text).Append(vbCrLf)
             Next
+
+            ' 3. Daten dauerhaft sichern
+            SaveOneValueInSystemDb("Color", sb.ToString())
         End With
-        Call SaveOneValueInSystemDb("Color", sb.ToString)
-        Call prSaisonColor()
-        Call prLoadColor()
+
+        ' 4. Ansichten aktualisieren und Schaltfläche sperren
+        prSaisonColor()
+        prLoadColor()
         btSaveColor.Enabled = False
     End Sub
 
-#End Region
+    ''' <summary>
+    ''' Verknüpft die bestehenden Saisons mit den dazugehörigen Farbeinstellungen.
+    ''' Durchsucht die Datensätze, gleicht die Objektnamen ab und speichert die erweiterte 
+    ''' Saison-Struktur (inklusive Farb-RGB-Werten) wieder in der Systemdatenbank.
+    ''' </summary>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Generische 'Array'-Typen durch stark typisierte String-Arrays ersetzt.
+    ''' - String-Verkettungen in den verschachtelten Schleifen durch einen performanten 'StringBuilder' ersetzt.
+    ''' - Veraltete VB-Funktion 'Mid' durch die native '.Substring'-Methode ausgetauscht.
+    ''' - Fehlerschutz bei der Array-Länge der Farbzeilen integriert.
+    ''' </remarks>
     Private Sub prSaisonColor()
-        Dim arSaison As Array = Split(ReadOneValueFromSystemDb("Saison"), vbCrLf)
-        Dim arColor As Array = Split(ReadOneValueFromSystemDb("Color"), vbCrLf)
-        Dim arSaisonZeile As Array
-        Dim arColorZeile As Array
-        Dim sinhalt As String = ""
-        Dim test As String = ""
-        For ii = 0 To arSaison.Length - 1
-            If arSaison(ii).trim <> "" Then
-                arSaisonZeile = Split(arSaison(ii), ";")
-                For jj = 0 To arColor.Length - 1
-                    arColorZeile = Split(arColor(jj), ";")
-                    If arColorZeile(0).trim = Mid(arSaisonZeile(0).trim, 3).Trim Then
-                        sinhalt = sinhalt + arSaisonZeile(0) + ";" + arSaisonZeile(1) + ";" + arSaisonZeile(2) + ";" + arColorZeile(1) + ";" + arColorZeile(2) + vbCrLf
+        Dim rawSaison As String = ReadOneValueFromSystemDb("Saison")
+        Dim rawColor As String = ReadOneValueFromSystemDb("Color")
 
-                    End If
+        Dim arSaison() As String = rawSaison.Split(New String() {vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+        Dim arColor() As String = rawColor.Split(New String() {vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
 
-                Next
+        Dim sbInhalt As New StringBuilder()
+
+        For ii As Integer = 0 To arSaison.Length - 1
+            Dim saisonZeile As String = arSaison(ii).Trim()
+
+            If saisonZeile <> "" Then
+                Dim arSaisonZeile() As String = saisonZeile.Split(";"c)
+
+                If arSaisonZeile.Length > 0 Then
+                    Dim saisonName As String = arSaisonZeile(0).Trim()
+
+                    For jj As Integer = 0 To arColor.Length - 1
+                        Dim colorZeile As String = arColor(jj).Trim()
+
+                        If colorZeile <> "" Then
+                            Dim arColorZeile() As String = colorZeile.Split(";"c)
+
+                            ' Sicherstellen, dass der Farbdatensatz vollständig ist und der Name übereinstimmt
+                            ' .Substring(2) entspricht Mid(..., 3)
+                            If arColorZeile.Length >= 3 AndAlso saisonName.Length >= 3 Then
+                                If arColorZeile(0).Trim() = saisonName.Substring(2).Trim() Then
+
+                                    sbInhalt.Append(arSaisonZeile(0)).Append(";") _
+                                        .Append(arSaisonZeile(1)).Append(";") _
+                                        .Append(arSaisonZeile(2)).Append(";") _
+                                        .Append(arColorZeile(1)).Append(";") _
+                                        .Append(arColorZeile(2)).Append(vbCrLf)
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
             End If
         Next
-        SaveOneValueInSystemDb("Saison", sinhalt)
-    End Sub
-#Region "WerbungLink bearbeiten........................................................................"
-    Dim alink(1, 1) As String
-    Dim nRow As Integer
-    Dim nCol As Integer
-    Dim nRows As Integer
-    Dim nCols As Integer
-    Dim sText As String
-    ''' <summary>
-    ''' Tabelle Zimmer mit daten aus der DataTabel "Zimmer" füllen
-    ''' </summary>
-    ''' <param name="dtT"></param>
-    ''' <remarks>
-    ''' 19.12.2011 Create
-    ''' </remarks>
 
-    Private Sub prCreateWerbelink()
-        Call prLoadZimWerb()
-    End Sub
-    Private Sub prLoadZimWerb()
-
-        'Dim i As Integer                              'Zimmername in Array
-        'nRow = dtZim.Rows.Count - 1
-        'If nRow < 0 Then Exit Sub
-        'ReDim alink(nRow + 1, 1)
-        'For i = 0 To nRow
-        '    ' sFeWo = "Nein"
-        '    If dtZim.Rows(i).RowState <> DataRowState.Deleted Then
-        '        alink(i + 1, 0) = dtZim.Rows(i).Item("Name").ToString
-        '    End If
-        'Next
-        'nCol = dtWer.Rows.Count - 1                 'werbung in array
-        'If nCol < 0 Then Exit Sub
-        'ReDim Preserve alink(nRow + 1, nCol + 1)
-        'For i = 0 To nCol
-        '    ' If dtWer.Rows(i).RowState <> DataRowState.Deleted Then
-        '    alink(0, i + 1) = dtWer.Rows(i).Item("werbung").ToString
-        '    ' End If
-        'Next
-        'Dim aText() As String = ReadOneValueFromSystemDb("Link").Split(vbCrLf)
-        'Dim aZeile() As String
-        'Dim aCelle() As String
-        'Dim aCellLink() As String
-        'For ii = 0 To aText.Length - 1
-        '    aZeile = aText(ii).Split("|")
-        '    For i = 1 To nRow + 1
-        '        If alink(i, 0).Trim = aZeile(0).Trim Then
-        '            aCelle = aZeile(1).Split("*")
-        '            For jj = 0 To aCelle.Length - 1
-        '                aCellLink = aCelle(jj).Split("=")
-        '                For j = 1 To nCol + 1
-        '                    If aCellLink(0).Trim = alink(0, j).Trim Then
-        '                        alink(i, j) = aCellLink(1)
-        '                    End If
-        '                Next
-        '            Next
-        '        End If
-        '    Next
-        'Next
-
-        ''For i = 1 To nRow                      'array mit werten füllen normal aus datein 
-        '' For j = 1 To nCol
-        '' alink(i, j) = Str(i) + Str(j)
-
-        ''        Next
-        ''        Next
-        'With dgvLink
-        '    .Columns.Clear()
-        '    .ColumnHeadersHeight = 30
-        '    .Columns.Add("Zimmer", "Zimmer")
-        '    For i = 1 To nCol + 1
-        '        .Columns.Add(alink(0, i), alink(0, i))
-        '    Next
-        '    .RowHeadersVisible = False
-        '    .AllowUserToAddRows = False
-        '    .AllowUserToDeleteRows = False
-
-        '    .AutoResizeRows()
-        '    'Sortierung der Spalten verhindern
-        '    Dim DGVCol As DataGridViewColumn
-        '    For Each DGVCol In .Columns
-        '        DGVCol.SortMode = DataGridViewColumnSortMode.NotSortable
-        '    Next
-        '    .ReadOnly = True
-        '    'array in datagrid
-        '    For i = 1 To nRow + 1
-        '        .Rows.Add(" ")
-        '        For j = 0 To nCol
-        '            .Rows(i - 1).Cells(j).Value = alink(i, j)
-        '        Next
-        '    Next
-        'End With
-
-    End Sub
-    Private Sub dgvLink_CellEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgvLink.CellEnter
-        If e.RowIndex > -1 And e.ColumnIndex > 0 Then 'And 'e.ColumnIndex < 14 Then
-            nRows = e.RowIndex
-            nCols = e.ColumnIndex
-            tbLink.Text = dgvLink.Rows(nRows).Cells(nCols).Value
-            tbLink.Focus()
-        End If
-
-    End Sub
-
-    Private Sub tbLink_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbLink.TextChanged
-        dgvLink.Rows(nRows).Cells(nCols).Value = tbLink.Text
-        alink(nRows + 1, nCols) = tbLink.Text
-
-
-    End Sub
-
-
-    Private Sub tsbSaveLink_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbSaveLink.Click
-        Dim sZimmer As String
-        Dim sZeile As String
-        Dim slink As String
-        Dim a As String
-        sText = ""
-        For i = 1 To nRow + 1
-            sZimmer = alink(i, 0)
-            sZeile = alink(i, 0) & "|"
-            slink = ""
-            For j = 1 To nCol + 1
-                a = alink(i, j)
-                slink = slink & alink(0, j) & "=" & a & "*"
-            Next
-            sZeile = sZeile & slink & vbCrLf
-            sText = sText & sZeile
-        Next
-        '  Call SaveOneValueInSystemDb(cgSystemPath & "\Link.ini", stext)
-
-
-
+        SaveOneValueInSystemDb("Saison", sbInhalt.ToString())
     End Sub
 
 #End Region
-#Region "Druckprofil"
+
+#Region "Druckprofil..............................................................................."
+    ''' <summary>
+    ''' Lädt die verfügbaren Druckprofile aus der Systemdatenbank, splittet diese in das 
+    ''' globale Profil-Array und initialisiert die Anzeige sowie die verknüpfte Liste.
+    ''' </summary>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen vollständig entfernt.
+    ''' - Wechsel auf das performantere Char-Splitting ('#'c) durchgeführt.
+    ''' - Auskommentierten 'Totcode' am Anfang der Methode gelöscht.
+    ''' </remarks>
     Private Sub LoadDruck()
-        '  tsbcbDruck.Text = AtLeft(arDruckZimmer(0), ";", 1)
-        arDruckZimmer = Split(ReadOneValueFromSystemDb("Druckprofil"), "#")
-        Call prtsbcbDruckLoad()
-        Call LoadDruckList(tsbcbDruck.Text)
+        Dim rawDruckData As String = ReadOneValueFromSystemDb("Druckprofil")
+        arDruckZimmer = rawDruckData.Split("#"c)
+
+        prtsbcbDruckLoad()
+        LoadDruckList(tsbcbDruck.Text)
     End Sub
+
+    ''' <summary>
+    ''' Erstellt die Spaltenstruktur für die Zimmer-Drucktabelle (ListView)
+    ''' und definiert das visuelle Verhalten der Liste.
+    ''' </summary>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Namespaces gekürzt (ColumnHeaderStyle.Nonclickable).
+    ''' - Strukturierung und Formatierung des With-Blocks für bessere Lesbarkeit optimiert.
+    ''' </remarks>
     Private Sub prCreateTabelleZimmerDruck()
         With lvDruck
             .Clear()
+
+            ' Spaltenkonfiguration definieren
             .Columns.Add("Name", 150, HorizontalAlignment.Left)
             .Columns.Add("Art der Unterkunft", 150, HorizontalAlignment.Left)
             .Columns.Add("Ausstattung", 150, HorizontalAlignment.Left)
@@ -5800,9 +5495,11 @@ Public Class frmSystem
             .Columns.Add("ID", 0, HorizontalAlignment.Left)
             .Columns.Add("Objekt", 150, HorizontalAlignment.Left)
             .Columns.Add("FeWo", -2, HorizontalAlignment.Center)
+
+            ' Verhalten der ListView festlegen
             .FullRowSelect = True
             .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
+            .HeaderStyle = ColumnHeaderStyle.Nonclickable
             .HideSelection = False
             .MultiSelect = False
             .Sorting = SortOrder.Ascending
@@ -5810,316 +5507,279 @@ Public Class frmSystem
             .View = View.Details
         End With
     End Sub
+
     ''' <summary>
-    ''' Tabelle Zimmer mit daten aus der DataTabel "Zimmer" füllen
+    ''' Befüllt die Zimmer-Drucktabelle (ListView) mit den Datensätzen aus einer DataTable.
+    ''' Ignoriert dabei gelöschte Zeilen und löst IDs in lesbare Objektnamen auf.
     ''' </summary>
-    ''' <param name="dtT"></param>
+    ''' <param name="dtT">Die DataTable, die die Zimmerdaten enthält.</param>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Auf performantere 'For Each'-Schleife für DataRows umgestellt.
+    ''' - 'ByVal'-Modifizierer aus der Signatur entfernt.
+    ''' - Inline-Bedingung (If-Operator) für die FeWo-Kennzeichnung ("Ja"/"Nein") eingeführt.
+    ''' - Variablen-Gültigkeitsbereiche (Scope) optimiert und in die Schleife verlagert.
     ''' </remarks>
-    Private Sub prLoadZimInListDruck(ByVal dtT As DataTable)
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
-        If nMax < 0 Then Exit Sub
+    Private Sub prLoadZimInListDruck(dtT As DataTable)
+        If dtT Is Nothing OrElse dtT.Rows.Count = 0 Then Exit Sub
+
         lvDruck.Items.Clear()
-        Dim sObj As String
-        Dim sFeWo As String
-        For i = 0 To nMax
-            sFeWo = "Nein"
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                Dim lv As ListViewItem
-                With lvDruck
-                    lv = .Items.Add(dtT.Rows(i).Item("Name").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Art").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Ausstattung").ToString)
-                    lv.SubItems.Add(dtT.Rows(i).Item("Betten").ToString)
-                    sObj = dtT.Rows(i).Item("IDObjekte").ToString
-                    lv.SubItems.Add(sObj)
-                    lv.SubItems.Add(dtT.Rows(i).Item("ID").ToString)
-                    sObj = fcGetObjektName(dtObj, sObj)
-                    lv.SubItems.Add(sObj)
-                    If dtT.Rows(i).Item("FeWo").ToString = "1" Then sFeWo = "Ja"
-                    lv.SubItems.Add(sFeWo)
+
+        For Each row As DataRow In dtT.Rows
+            ' Gelöschte Zeilen in der DataTable überspringen
+            If row.RowState <> DataRowState.Deleted Then
+
+                Dim zimmerName As String = row("Name").ToString()
+                Dim unterkunftArt As String = row("Art").ToString()
+                Dim ausstattung As String = row("Ausstattung").ToString()
+                Dim bettenAnzahl As String = row("Betten").ToString()
+                Dim idObjekt As String = row("IDObjekte").ToString()
+                Dim zimmerId As String = row("ID").ToString()
+
+                ' Objektnamen über die ID ermitteln
+                Dim objektName As String = fcGetObjektName(dtObj, idObjekt)
+
+                ' FeWo-Status ermitteln (Wert "1" bedeutet "Ja", alles andere "Nein")
+                Dim sFeWo As String = If(row("FeWo").ToString() = "1", "Ja", "Nein")
+
+                ' ListViewItem erstellen und SubItems hinzufügen
+                Dim lv As ListViewItem = lvDruck.Items.Add(zimmerName)
+                With lv.SubItems
+                    .Add(unterkunftArt)
+                    .Add(ausstattung)
+                    .Add(bettenAnzahl)
+                    .Add(idObjekt)
+                    .Add(zimmerId)
+                    .Add(objektName)
+                    .Add(sFeWo)
                 End With
+
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Lädt die Zimmerstruktur für das ausgewählte Druckprofil, baut die Tabelle neu auf,
+    ''' befüllt sie und setzt die Auswahlhaken (Checked) bei den im Profil hinterlegten Zimmer-IDs.
+    ''' </summary>
+    ''' <param name="sProfil">Der Name des zu ladenden Druckprofils.</param>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Möglichen Absturz (NullReferenceException) abgefangen, falls das Profil nicht existiert.
+    ''' - Parameterübergabe von 'ByRef' auf den Standard (Wertübergabe) korrigiert.
+    ''' - Generischen Typ 'Array' durch ein stark typisiertes String-Array ersetzt.
+    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen vollständig entfernt.
+    ''' </remarks>
+    Private Sub LoadDruckList(sProfil As String)
+        prCreateTabelleZimmerDruck()
+        prLoadZimInListDruck(dtZim)
+
+        Dim arDruckZimmer1() As String = Nothing
+
+        ' 1. Das passende Profil im globalen Array suchen und splitten
+        For i As Integer = 0 To arDruckZimmer.Length - 1
+            If AtLeft(arDruckZimmer(i), ";", 1) = sProfil Then
+                arDruckZimmer1 = arDruckZimmer(i).Split(";"c)
+                Exit For ' Profil gefunden, Schleife kann vorzeitig verlassen werden
             End If
         Next
 
-    End Sub
-    Private Sub LoadDruckList(ByRef sProfil As String)
-        Call prCreateTabelleZimmerDruck()
-        Call prLoadZimInListDruck(dtZim)
-        Dim arDruckZimmer1 As Array
-        Dim IDZ As String = ""
-        For i = 0 To arDruckZimmer.Length - 1
-            If AtLeft(arDruckZimmer(i), ";", 1) = sProfil Then
-                arDruckZimmer1 = Split(arDruckZimmer(i), ";")
-            End If
-        Next
-        For i = 1 To arDruckZimmer1.Length - 1
-            IDZ = arDruckZimmer1(i)
-            For j = 0 To lvDruck.Items.Count - 1
-                If IDZ = lvDruck.Items(j).SubItems(5).Text Then
-                    lvDruck.Items(j).Checked = True
+        ' 2. Haken in der ListView setzen, sofern das Profil gefunden wurde
+        If arDruckZimmer1 IsNot Nothing Then
+            For i As Integer = 1 To arDruckZimmer1.Length - 1
+                Dim idZimmer As String = arDruckZimmer1(i).Trim()
+
+                ' Nur prüfen, wenn die ID nicht leer ist
+                If idZimmer <> "" Then
+                    For j As Integer = 0 To lvDruck.Items.Count - 1
+                        ' Index 5 entspricht der Spalte "ID"
+                        If idZimmer = lvDruck.Items(j).SubItems(5).Text Then
+                            lvDruck.Items(j).Checked = True
+                            Exit For ' Zimmer gefunden, innere Schleife abkürzen
+                        End If
+                    Next
                 End If
             Next
-        Next
+        End If
     End Sub
 
-    Private Sub tsbDruckSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDruckSave.Click
-        Call prDruckSave()
+    ''' <summary>
+    ''' Verarbeitet den Klick auf die Speichern-Schaltfläche der Drucksteuerung
+    ''' und stößt den eigentlichen Speichervorgang an.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax vollständig entfernt.
+    ''' </remarks>
+    Private Sub tsbDruckSave_Click(sender As Object, e As EventArgs) Handles tsbDruckSave.Click
+        prDruckSave()
     End Sub
-    Private Sub tsbcbDruck_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tsbcbDruck.TextChanged
-        For i = 0 To arDruckZimmer.Length - 1
-            If AtLeft(arDruckZimmer(i), ";", 1) = tsbcbDruck.Text Then
-                Call LoadDruckList(tsbcbDruck.Text)
-                Exit For
-            Else
-                For j = 0 To lvDruck.Items.Count - 1
-                    lvDruck.Items(j).Checked = False
+
+    ''' <summary>
+    ''' Reagiert auf die Textänderung der Druckprofil-Combobox. 
+    ''' Lädt das ausgewählte Profil, sofern es existiert; andernfalls werden alle Auswahlhaken zurückgesetzt.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Kritischen Logikfehler im Else-Zweig behoben, der bei jedem Schleifendurchlauf fälschlicherweise Haken entfernte.
+    ''' - Logik gestrafft: Setzt Haken nur zurück, wenn das Profil im gesamten Array nicht existiert.
+    ''' - Schleifenvariablen lokal typisiert und veraltete 'Call'-Syntax entfernt.
+    ''' </remarks>
+    Private Sub tsbcbDruck_TextChanged(sender As Object, e As EventArgs) Handles tsbcbDruck.TextChanged
+        Dim profilGefunden As Boolean = False
+        Dim gesuchtesProfil As String = tsbcbDruck.Text.Trim()
+
+        ' 1. Prüfen, ob das eingegebene Profil im Array existiert
+        If arDruckZimmer IsNot Nothing Then
+            For i As Integer = 0 To arDruckZimmer.Length - 1
+                If AtLeft(arDruckZimmer(i), ";", 1) = gesuchtesProfil Then
+                    LoadDruckList(gesuchtesProfil)
+                    profilGefunden = True
+                    Exit For
+                End If
+            Next
+        End If
+
+        ' 2. Wenn das Profil nicht existiert (z. B. bei einer Neueingabe), alle Haken entfernen
+        If Not profilGefunden Then
+            For j As Integer = 0 To lvDruck.Items.Count - 1
+                lvDruck.Items(j).Checked = False
+            Next
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Löscht das aktuell ausgewählte Druckprofil nach einer Bestätigungsabfrage
+    ''' aus dem Array und stößt die Aktualisierung der Systemdatenbank an.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - 'MsgBox' durch modernes 'MessageBox.Show' ersetzt.
+    ''' - Veraltete 'Call'-Syntax entfernt und Schleifenvariable lokal typisiert.
+    ''' </remarks>
+    Private Sub tsbDruckDel_Click(sender As Object, e As EventArgs) Handles tsbDruckDel.Click
+        Dim sMsg As String = "Soll das Druckprofil wirklich gelöscht werden?"
+
+        If MessageBox.Show(sMsg, "Druckprofil löschen", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) = DialogResult.OK Then
+            Dim gesuchtesProfil As String = tsbcbDruck.Text.Trim()
+
+            If arDruckZimmer IsNot Nothing Then
+                For i As Integer = 0 To arDruckZimmer.Length - 1
+                    If AtLeft(arDruckZimmer(i), ";", 1).Trim() = gesuchtesProfil Then
+                        arDruckZimmer(i) = "" ' Eintrag leeren
+                    End If
                 Next
             End If
 
-        Next
-
-        ' Call LoadDruckList(tsbcbDruck.Text)
-    End Sub
-    Private Sub tsbDruckDel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbDruckDel.Click
-        Dim sMsg As String = "Soll das Druckprofil Gelöscht werden ?"
-
-        If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
-            For i = 0 To arDruckZimmer.Length - 1
-
-                If AtLeft(arDruckZimmer(i), ";", 1) = tsbcbDruck.Text Then
-                    arDruckZimmer(i) = " ;"
-                End If
-            Next
             tsbcbDruck.Text = ""
-            Call prDruckSave()
+            prDruckSave()
         End If
     End Sub
+
+    ''' <summary>
+    ''' Befüllt die Druckprofil-Combobox mit den gültigen Profilnamen aus dem Array
+    ''' und wählt den ersten verfügbaren Eintrag standardmäßig aus.
+    ''' </summary>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Index-Absturzschutz hinzugefügt, falls das Array leer ist.
+    ''' - Validierung für leere Einträge optimiert.
+    ''' </remarks>
     Private Sub prtsbcbDruckLoad()
-        For i = 0 To arDruckZimmer.Length - 1
-            If AtLeft(arDruckZimmer(i), ";", 1).Trim <> "" Then
-                tsbcbDruck.Items.Add(AtLeft(arDruckZimmer(i), ";", 1))
-            End If
-        Next
-        tsbcbDruck.Text = AtLeft(arDruckZimmer(0), ";", 1)
-    End Sub
-    Private Sub prDruckSave()
-        Dim sZeile As String = tsbcbDruck.Text
-        Dim nFond As String = 0
-        Dim nLength As Integer = arDruckZimmer.Length
-        For j = 0 To lvDruck.Items.Count - 1
-            If lvDruck.Items(j).Checked = True Then
-                sZeile = sZeile & ";" & lvDruck.Items(j).SubItems(5).Text
-            End If
-        Next
-        For i = 0 To arDruckZimmer.Length - 1
-            If AtLeft(arDruckZimmer(i), ";", 1) = AtLeft(sZeile, ";", 1) Then
-                nFond = 1
-                arDruckZimmer(i) = sZeile
-            End If
-        Next
-        If nFond = 1 Then
-            sZeile = ""
-        Else
-            sZeile = sZeile & "#"
-        End If
-        For i = 0 To arDruckZimmer.Length - 1
-            If arDruckZimmer(i).ToString.Trim <> "" Then
-                sZeile = sZeile & arDruckZimmer(i) & "#"
-            End If
-        Next
-        Call SaveOneValueInSystemDb("Druckprofil", sZeile)
         tsbcbDruck.Items.Clear()
-        arDruckZimmer = Split(ReadOneValueFromSystemDb("Druckprofil"), "#")
-        Call prtsbcbDruckLoad()
+
+        If arDruckZimmer Is Nothing OrElse arDruckZimmer.Length = 0 Then Exit Sub
+
+        For i As Integer = 0 To arDruckZimmer.Length - 1
+            Dim profilName As String = AtLeft(arDruckZimmer(i), ";", 1).Trim()
+            If profilName <> "" Then
+                tsbcbDruck.Items.Add(profilName)
+            End If
+        Next
+
+        ' Den ersten Eintrag als Standardtext setzen, falls Profile vorhanden sind
+        If tsbcbDruck.Items.Count > 0 Then
+            tsbcbDruck.Text = tsbcbDruck.Items(0).ToString()
+        End If
     End Sub
-#End Region
-
-
-#Region "Zusätze bearbeiten........................................................................."
-
     ''' <summary>
-    ''' Tabelle "Zusatz" erstellen
+    ''' Sammelt die IDs der ausgewählten Zimmer, aktualisiert oder ergänzt das entsprechende 
+    ''' Druckprofil im Array und serialisiert die Gesamtstruktur zur dauerhaften Sicherung in der Systemdatenbank.
     ''' </summary>
     ''' <remarks>
-    ''' 26.01.2012 Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Logischen Serialisierungsfehler (Doppelspeicherung von Profilen) vollständig behoben.
+    ''' - 'nFond' (impliziter String-Zahlen-Mix) durch ein sauberes Boolean ('profilGefunden') ersetzt.
+    ''' - 'StringBuilder' zur performanten Zusammenstellung der Profildaten eingeführt.
+    ''' - Dynamische Array-Erweiterung (ReDim Preserve) für neue Profile stabilisiert.
+    ''' - Veraltete 'Call'-Syntax bei allen Methodenaufrufen vollständig entfernt.
     ''' </remarks>
-    Private Sub prCreateTabelleZusatz()
-        Dim nWidth As Integer
-        '   Call prColorRead()
-        With lvZusatz
-            nWidth = .Width / 3
-            .Clear()
-            .Columns.Add("Leistung", nWidth, HorizontalAlignment.Left)
-            .Columns.Add("Brutto", nWidth, HorizontalAlignment.Left)
-            .Columns.Add("Steuer", nWidth, HorizontalAlignment.Left)
-            .FullRowSelect = True
-            .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
-            .HideSelection = False
-            .MultiSelect = False
-            '.Sorting = SortOrder.Ascending
-            .Sorting = SortOrder.Ascending
-            .TabIndex = 0
-            .View = View.Details
-        End With
-    End Sub
+    Private Sub prDruckSave()
+        Dim profilName As String = tsbcbDruck.Text.Trim()
+        If String.IsNullOrEmpty(profilName) Then Exit Sub
 
-    ''' <summary>
-    ''' Tabelle Saison mit daten aus der Datei "Saison.ini" füllen
-    ''' </summary>
-    ''' <remarks>
-    ''' 26.01.2012 Create
-    ''' </remarks>
-    Private Sub prLoadZusatzInList()
-        Dim arTmp() As String = Split(ReadOneValueFromSystemDb("Zusatzkosten"), vbCrLf)
-        Dim nMax As Integer = arTmp.Length - 1
-        Dim arT() As String
-        '  Dim nColor As Integer
-        With lvZusatz
-            .Items.Clear()
-            For i As Integer = 0 To nMax
-                If Trim(arTmp(i)) <> "" Then
-                    arT = Split(arTmp(i), ";")
-                    Dim lv As ListViewItem
-                    lv = .Items.Add(arT(0).Trim)
-                    lv.SubItems.Add(arT(1))
-                    lv.SubItems.Add(arT(2))
-                    '  nColor = arT(0).Trim.Substring(0, 1)
-                    '  .Items(i).BackColor = fcStringRGB(arFarbe(nColor, 1))
+        Dim sbZeile As New StringBuilder(profilName)
+
+        ' 1. Alle ausgewählten Zimmer-IDs ermitteln und mit Semikolon getrennt anhängen
+        For j As Integer = 0 To lvDruck.Items.Count - 1
+            If lvDruck.Items(j).Checked Then
+                sbZeile.Append(";").Append(lvDruck.Items(j).SubItems(5).Text)
+            End If
+        Next
+
+        Dim neueZeile As String = sbZeile.ToString()
+        Dim profilGefunden As Boolean = False
+
+        ' 2. Prüfen, ob das Profil bereits existiert und im Array ersetzt werden kann
+        If arDruckZimmer IsNot Nothing Then
+            For i As Integer = 0 To arDruckZimmer.Length - 1
+                If AtLeft(arDruckZimmer(i), ";", 1).Trim() = profilName Then
+                    arDruckZimmer(i) = neueZeile
+                    profilGefunden = True
+                    Exit For
                 End If
             Next
-            ' .Select()
-            ' If .Items.Count > 0 Then .TopItem.Selected = True
-        End With
-    End Sub
-
-    Private Sub lvZusatz_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvZusatz.SelectedIndexChanged
-        Call prGetInfolvZusatz()
-    End Sub
-
-    ''' <summary>
-    ''' Informationen aus der Kontenliste in die Eingabefelder übertragen
-    ''' </summary>
-    ''' <remarks>
-    ''' 18.12.2011 Create
-    ''' </remarks>
-    Private Sub prGetInfolvZusatz()
-
-        With lvZusatz
-            If .SelectedItems.Count <> 0 Then
-                tbLeistung.Text = .SelectedItems(0).SubItems(0).Text
-                tbBrutto.Text = .SelectedItems(0).SubItems(1).Text
-                tbSteuer.Text = .SelectedItems(0).SubItems(2).Text
-                '  mcSaisonAnfang.SelectionStart = sDAnfang
-                ' mcSaisonEnde.SelectionStart = sDEnde
-            End If
-        End With
-    End Sub
-
-    Private Sub tsbZusatzNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbZusatzNew.Click
-        lNew = True
-        'sDAnfang = sDAK
-        'sDEnde = sDAK
-        'mcSaisonAnfang.SelectionStart = sDAnfang
-        'mcSaisonEnde.SelectionStart = sDEnde
-        Call prLoockZusatz(True)
-        ' coSaison.Select()
-    End Sub
-    ''' <summary>
-    ''' Steuerung der Button und Eingabefelder
-    ''' </summary>
-    ''' <param name="lStatus"></param>
-    ''' <remarks>
-    ''' 18.12.2011 Create
-    ''' </remarks>
-    Private Sub prLoockZusatz(ByVal lStatus As Boolean)
-        tsbZusatzEdit.Enabled = Not lStatus
-        tsbZusatzNew.Enabled = Not lStatus
-        tsbZusatzSave.Enabled = lStatus
-        tsbZusatzOld.Enabled = lStatus
-        tsbZusatzDel.Enabled = Not lStatus
-        lvZusatz.Enabled = Not lStatus
-        tbLeistung.Enabled = lStatus
-        tbBrutto.Enabled = lStatus
-        tbSteuer.Enabled = lStatus
-
-
-    End Sub
-
-    Private Sub tsZusatzSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbZusatzSave.Click
-        Dim sb As New StringBuilder
-
-        If lNew = True Then
-            Dim lv As ListViewItem
-            With lvZusatz
-                lv = .Items.Add(Trim(tbLeistung.Text))
-                lv.SubItems.Add(Trim(tbBrutto.Text))
-                lv.SubItems.Add(Trim(tbSteuer.Text))
-            End With
-        Else
-            With lvZusatz
-                If .SelectedItems.Count <> 0 Then
-                    .SelectedItems(0).SubItems(0).Text = tbLeistung.Text
-                    .SelectedItems(0).SubItems(1).Text = tbBrutto.Text
-                    .SelectedItems(0).SubItems(2).Text = tbSteuer.Text
-                End If
-            End With
         End If
-        Call prLoockZusatz(False)
-        For i = 0 To lvZusatz.Items.Count - 1
-            sb.Append(lvZusatz.Items(i).SubItems(0).Text & ";")
-            sb.Append(lvZusatz.Items(i).SubItems(1).Text & ";")
-            sb.Append(lvZusatz.Items(i).SubItems(2).Text & vbCrLf)
+
+        ' 3. Wenn es ein neues Profil ist, das globale Array sicher erweitern
+        If Not profilGefunden Then
+            If arDruckZimmer Is Nothing OrElse arDruckZimmer.Length = 0 Then
+                arDruckZimmer = New String() {neueZeile}
+            Else
+                Dim alteLaenge As Integer = arDruckZimmer.Length
+                ReDim Preserve arDruckZimmer(alteLaenge)
+                arDruckZimmer(alteLaenge) = neueZeile
+            End If
+        End If
+
+        ' 4. Das gesamte Array sauber mit '#' als Trennzeichen serialisieren
+        Dim sbGesamt As New StringBuilder()
+        For i As Integer = 0 To arDruckZimmer.Length - 1
+            Dim eintrag As String = arDruckZimmer(i).ToString().Trim()
+            ' Verhindert, dass leere Fragmente oder reine Semikolons in die DB geschrieben werden
+            If eintrag <> "" AndAlso eintrag <> ";" Then
+                sbGesamt.Append(eintrag).Append("#")
+            End If
         Next
-        SaveOneValueInSystemDb("Zusatzkosten", sb.ToString)
-        ' Call prSaisonColor()
 
+        ' 5. In der Systemdatenbank sichern
+        SaveOneValueInSystemDb("Druckprofil", sbGesamt.ToString())
 
+        ' 6. Datenstruktur neu einlesen und UI-Elemente aktualisieren
+        Dim rawData As String = ReadOneValueFromSystemDb("Druckprofil")
+        arDruckZimmer = rawData.Split(New String() {"#"}, StringSplitOptions.RemoveEmptyEntries)
+
+        prtsbcbDruckLoad()
+        tsbcbDruck.Text = profilName
     End Sub
 
-    Private Sub tsbZusatzEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbZusatzEdit.Click
-        lNew = False
-        Call prLoockZusatz(True)
-
-        ' coSaison.Select()
-    End Sub
-
-
-
-
-    Private Sub tsbZusatzOld_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbZusatzOld.Click
-        prGetInfolvZusatz()
-        prLoockZusatz(False)
-    End Sub
-
-    Private Sub tsbZusatzDel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbZusatzDel.Click
-        Dim sb As New StringBuilder
-        Dim sMsg As String = "Wollen Sie diese Datensatz wirklich löschen?"
-        Dim X As Integer
-        Dim inhalt As String = ""
-        If X <> -1 Then
-            If MsgBox(sMsg, vbExclamation + vbOKCancel, "Löschen") = MsgBoxResult.Ok Then
-                X = lvZusatz.SelectedIndices.Item(0)
-                lvZusatz.Items.RemoveAt(X)
-                lvZusatz.Select()
-                If lvZusatz.Items.Count > 0 Then
-                    lvZusatz.TopItem.Selected = True
-                    inhalt = ""
-                    Call prLoockZusatz(False)
-                    For i = 0 To lvZusatz.Items.Count - 1
-                        sb.Append(lvZusatz.Items(i).SubItems(0).Text & ";")
-                        sb.Append(lvZusatz.Items(i).SubItems(1).Text & ";")
-                        sb.Append(lvZusatz.Items(i).SubItems(2).Text & vbCrLf)
-                    Next
-                    SaveOneValueInSystemDb("Zusatzkosten", sb.ToString)
-                End If
-            End If
-        End If
-        ' Call prSaisonColor()
-    End Sub
 #End Region
 
 #Region "Sprache"

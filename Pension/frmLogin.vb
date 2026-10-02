@@ -121,7 +121,6 @@ Public Class frmLogin
         frmMain.tsbSystem.Enabled = False
         frmMain.tsbStatistik.Enabled = False
         frmMain.tsbPersonen.Enabled = False
-        frmMain.tsbDatev.Enabled = False
         frmMain.tsbDruck.Enabled = False
         frmMain.tsbKunde.Enabled = False
 
@@ -131,7 +130,6 @@ Public Class frmLogin
                 frmMain.tsbSystem.Enabled = True
                 frmMain.tsbStatistik.Enabled = True
                 frmMain.tsbPersonen.Enabled = True
-                frmMain.tsbDatev.Enabled = True
                 frmMain.tsbDruck.Enabled = True
                 frmMain.tsbKunde.Enabled = True
 

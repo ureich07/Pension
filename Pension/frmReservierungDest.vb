@@ -126,10 +126,8 @@ Public Class frmReservierungDest
         Call prLoadBText()
         Me.Cursor = Cursors.Default
         bLoad = True
-        tssSteuer.Text = sMwstU & "% / " & sMwstS & "% / " & sMwstG & "%"
-        tssGKonto.Text = sGKUa & " / " & sGKSa & " / " & sGKGa
         tsmtNeu.Text = arIni(11) & "/" & arIni(23) & "/" & arIni(10) & "/" & "Aktuell"
-        tsmtAlt.Text = arMwstAlt(0) & "/" & arMwstAlt(1) & "/" & arMwstAlt(2) & "/" & arMwstAlt(3)
+        tsmtAlt.Text = arMwstAlt(0) ' & "/" & arMwstAlt(1)' & "/" & arMwstAlt(2)' & "/" & arMwstAlt(3)
         tsmtAkt.Text = sMwstUa & "/" & sMwstSa & "/" & sMwstGa & "/" & "Gespeichert"
         tsmtNeu1.Text = arMwstNeu1(0) & "/" & arMwstNeu1(1) & "/" & arMwstNeu1(2) & "/" & arMwstNeu1(3)
         tsmtNeu2.Text = arMwstNeu2(0) & "/" & arMwstNeu2(1) & "/" & arMwstNeu2(2) & "/" & arMwstNeu2(3)
@@ -2611,8 +2609,6 @@ Public Class frmReservierungDest
         sGKG = arIni(21)
         sGKS = arIni(25)
         sGKU = arIni(20)
-        tssSteuer.Text = sMwstU & "% / " & sMwstS & "% / " & sMwstG & "%"
-        tssGKonto.Text = sGKU & " / " & sGKS & " / " & sGKG
         Call prSaveMwst()
     End Sub
 
@@ -2623,8 +2619,6 @@ Public Class frmReservierungDest
         sGKG = arGKAlt(2)
         sGKS = arGKAlt(1)
         sGKU = arGKAlt(0)
-        tssSteuer.Text = sMwstU & "% / " & sMwstS & "% / " & sMwstG & "%"
-        tssGKonto.Text = sGKU & " / " & sGKS & " / " & sGKG
         Call prSaveMwst()
     End Sub
 
@@ -2635,8 +2629,6 @@ Public Class frmReservierungDest
         sGKG = sGKGa
         sGKS = sGKSa
         sGKU = sGKUa
-        tssSteuer.Text = sMwstU & "% / " & sMwstS & "% / " & sMwstG & "%"
-        tssGKonto.Text = sGKU & " / " & sGKS & " / " & sGKG
         Call prSaveMwst()
     End Sub
 
@@ -2647,8 +2639,6 @@ Public Class frmReservierungDest
         sGKG = arGKNeu2(2)
         sGKS = arGKNeu2(1)
         sGKU = arGKNeu2(0)
-        tssSteuer.Text = sMwstU & "% / " & sMwstS & "% / " & sMwstG & "%"
-        tssGKonto.Text = sGKU & " / " & sGKS & " / " & sGKG
         Call prSaveMwst()
     End Sub
 
@@ -2659,8 +2649,6 @@ Public Class frmReservierungDest
         sGKG = arGKNeu1(2)
         sGKS = arGKNeu1(1)
         sGKU = arGKNeu1(0)
-        tssSteuer.Text = sMwstU & "% / " & sMwstS & "% / " & sMwstG & "%"
-        tssGKonto.Text = sGKU & " / " & sGKS & " / " & sGKG
         Call prSaveMwst()
     End Sub
 

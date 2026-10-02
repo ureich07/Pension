@@ -175,33 +175,6 @@ Pension
  <para>Grund: Es wurden Sicherheitsprüfungen für die Array-Längen (<c>aText</c> und <c>aName</c>) integriert, um Abstürze (<c>IndexOutOfRangeException</c>) bei leeren Datenbank-Rückgaben zu verhindern. Zudem wurde die Performance durch <c>BeginUpdate</c> und <c>EndUpdate</c> bei der ListView-Befüllung massiv verbessert und ein Fehler-Logging (<c>Try-Catch</c>) hinzugefügt.</para>
  </remarks>
 </member>
-<member name="M:Pension.frmTSend.frmTSend_Load(System.Object,System.EventArgs)">
- <summary>
- Formular-Lade-Ereignis: Initialisiert die ListView, parst ausstehende RFID-Transponder-Daten,
- überträgt diese sequenziell an die PHP-Schnittstelle und speichert nicht-gesendete Datensätze für einen späteren Versuch.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Fehlerhafte, doppelte 'fcUmDatum'-Konvertierung korrigiert.
- - Veraltetes VB-spezifisches 'Split()' durch typsicheres '.Split()' ersetzt.
- - Variable 'bFehler' semantisch korrigiert (hieß vorher True, obwohl sie Erfolg trackte).
- - Konstante 'System.Windows.Forms.ColumnHeaderStyle.Nonclickable' auf Kurzschreibweise reduziert.
- - Redundante UI-Refreshes entfernt, um Performance zu steigern.
- </remarks>
-</member>
-<member name="M:Pension.frmTSend.buEnde_Click(System.Object,System.EventArgs)">
- <summary>
- Schließt das Sende-Formular manuell.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- </remarks>
-</member>
 <member name="M:Pension.frmReadRFID.prLoadRFIDInList(System.String)">
  <summary>
  Tabelle Zimmer mit daten aus der DataTabel "Zimmer" füllen
@@ -233,6 +206,32 @@ Pension
  <param name="e"></param>
  <remarks>
  27.12.2011 Create
+ </remarks>
+</member>
+<member name="M:Pension.frmPensionIni.frmPensionsIni_Load(System.Object,System.EventArgs)">
+ <summary>
+ Wird beim Laden des Pensions-Einstellungsformulars ausgelöst. 
+ Lädt den hinterlegten Konfigurationswert für die Pension aus der Systemdatenbank.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses (das Formular).</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+ - Direkte Zuweisung des ausgelesenen Datenbankwertes an das Textfeld implementiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmPensionIni.buSave_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Speichern-Schaltfläche. 
+ Sichert den aktuellen Inhalt des Textfeldes dauerhaft in der Systemdatenbank.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses (die Schaltfläche).</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+ - Übergabe des bereinigten Textes (mittels Trim) zur Vermeidung ungewollter Leerzeichen.
  </remarks>
 </member>
 <member name="M:Pension.frmCorona.prCreateTabelleCorona">
@@ -1836,48 +1835,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  11.04.2012 Create
  </remarks>
 </member>
-<member name="M:Pension.frmTermine.prSetTable">
- <summary>
- Create Tabelle 
- </summary>
- <remarks>
- 04.04.2012 Create 
- </remarks>
-</member>
-<member name="M:Pension.frmTermine.prFuelleTabelle(System.Data.DataTable)">
- <summary>
- Tabelle mit Daten füllen
- </summary>
- <remarks>
- 04.04.2012 Create 
- </remarks>
-</member>
-<member name="M:Pension.frmTermine.prSaveTermin">
- <summary>
- Speicherung durchführen
- </summary>
- <remarks>
- 04.04.2012 Create
- </remarks>
-</member>
-<member name="M:Pension.frmTermine.fcSaveTermin(System.String)">
- <summary>
- Zu speichernde Daten aufbereiten
- </summary>
- <returns></returns>
- <remarks>
- 04.04.2012 Create
- </remarks>
-</member>
-<member name="M:Pension.frmTermine.prLoockZusatz(System.Boolean)">
- <summary>
- Steuerung der Button und Eingabefelder
- </summary>
- <param name="lStatus"></param>
- <remarks>
- 04.04.2012 Create
- </remarks>
-</member>
 <member name="M:Pension.frmZusatz.prSetTableZusatz">
  <summary>
  Create Tabelle Zusatz
@@ -1966,256 +1923,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  29.02.2012 Create
  </remarks>
 </member>
-<member name="M:Pension.frmDatev.frmDatev_Load(System.Object,System.EventArgs)">
- <summary>
- Formular-Lade-Ereignis: Bereinigt alte DATEV-Datensätze (älter als 2 Jahre), 
- aktualisiert Konten-Zuordnungen in der Datenbank, lädt die Daten und initialisiert die UI.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax vollständig entfernt.
- - Array-Erzeugung radikal vereinfacht (redundante Split-Aufrufe entfernt).
- - Doppelten Aufruf von 'prColorRead()' eliminiert.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.frmDatev_Resize(System.Object,System.EventArgs)">
- <summary>
- Fängt das Resize-Ereignis des Formulars ab und stößt die Layout-Anpassung an.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
-</member>
-<member name="M:Pension.frmDatev.prMainResize">
- <summary>
- Passt die Dimensionen des DataGridViews dynamisch an die aktuelle Fenstergröße an.
- </summary>
-</member>
-<member name="M:Pension.frmDatev.tsbClose_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Schließen-Button. Ruft die zentrale Schließen-Logik auf.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax entfernt.
- - Namespace-Deklarationen in der Signatur bereinigt.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.prCloseForm">
- <summary>
- Blendet die Hauptmenüleiste des Hauptformulars (frmMain) wieder ein und schließt das aktuelle Formular.
- </summary>
- <remarks>
- 18.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Inline-Kommentar zur besseren Lesbarkeit hinzugefügt.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.prSetTabelleDatev">
- <summary>
- Erstellt die Spaltenstruktur für das DATEV-DataGridView, formatiert die Spaltenbreiten, 
- Ausrichtungen, Selektionsfarben und deaktiviert das Sortieren der Spalten.
- </summary>
- <remarks>
- 17.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Magische Zahlen-Schleife ('14 + 5') durch saubere, lesbare Spaltenindizes ersetzt.
- - Erste Spalte (Index 0) über '.Visible = False' sicher ausgeblendet (statt Width = 0).
- - 'AutoResizeRows' auf performante 'DisplayedCells' umgestellt, um Hänger bei großen Tabellen zu vermeiden.
- - Datentyp-Deklaration in der 'ForEach'-Schleife direkt inline deklariert.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.prFillTabelleDatev(System.Data.DataTable)">
- <summary>
- Befüllt das DATEV-DataGridView basierend auf den Filter-Einstellungen mit den Daten aus der DataTable
- und setzt zeilenweise die entsprechenden Hintergrund- und Schriftfarben.
- </summary>
- <param name="dt">Die DataTable mit den zu ladenden Buchungsdaten.</param>
- <remarks>
- 17.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax und VB6-'Trim()'-Aufrufe entfernt.
- - Ungenutzte 'StringBuilder'-Variable gelöscht.
- - UI-Performance optimiert: 'SuspendLayout' und 'ResumeLayout' verhindern Flackern beim Laden großer Datenmengen.
- - Flexibilität erhöht: Übergabe der korrekten Parameter-DataTable 'dt' an 'prShowData' sichergestellt.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.prShowData(System.Data.DataTable,System.Int32,System.Int32)">
- <summary>
- Erstellt eine neue Zeile im DataGridView und kopiert die formatierten Werte aus dem DataTable-Datensatz hinein.
- </summary>
- <param name="dt">Die Quell-DataTable.</param>
- <param name="ii">Der Ziel-Zeilenindex im DataGridView (wird zur Zeilenreferenzierung genutzt).</param>
- <param name="i">Der Quell-Zeilenindex in der DataTable.</param>
- <remarks>
- 17.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Falsche 'ByRef'-Parameter auf sicheres und standardkonformes 'ByVal' umgestellt.
- - Redundantes Auslesen/Zurückschreiben der Umsatz- und MwSt-Zellen eliminiert (Werte werden direkt berechnet).
- - Fehleranfälliges '.Rows.Add(" ")' durch gezieltes Hinzufügen optimiert.
- - 'Val()'-Aufrufe durch null-sichere Konvertierungen ersetzt.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.FormatCurrencyValue(System.Object)">
- <summary>
- Hilfsfunktion zur null-sicheren mathematischen Konvertierung und Formatierung von Cent-Beträgen.
- Konvertiert den Rohwert aus der Datenbank, teilt ihn durch 100 und gibt einen formatierten Dezimal-String zurück.
- </summary>
- <param name="rawValue">Der zu konvertierende Wert (z. B. aus einer DataRow).</param>
- <returns>Ein formatierter String mit zwei Nachkommastellen.</returns>
- <remarks>
- 28.09.2026 - Code-Optimierung:
- - 'IsDBNull' durch die modernere .NET-Variante 'Convert.IsDBNull' ersetzt.
- - 'CultureInfo.InvariantCulture' beim Parsen hinzugefügt, um Ländereinstellungskonflikte (Punkt/Komma) zu vermeiden.
- - Redundante String-Konvertierungen innerhalb der Validierung minimiert.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.tsbFilter_Click(System.Object,System.EventArgs)">
- <summary>
- Schaltet den Buchungsfilter (lFilter) um, aktualisiert den Button-Status 
- und lädt die DATEV-Tabelle mit den gefilterten Daten neu.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 17.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax beim Aufruf von 'prFillTabelleDatev' entfernt.
- - 'If-Else'-Block durch direkten Boolschen Wechsel ('lFilter = Not lFilter') ersetzt.
- - Namespace-Deklarationen in der Signatur auf .NET-Standard gekürzt.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.fcKasseID(System.Int32)">
- <summary>
- Setzt den Status der Kassen-ID, aktualisiert das UI-Label (Farbe und Text) und weist das entsprechende Konto zu.
- </summary>
- <param name="i">Die zu setzende Kassen-ID (z. B. 0 = Löschen, 3 = Kasse, 4 = Bank, -1 = Rückgängig).</param>
- <returns>Gibt die übergebene Kassen-ID unverändert zurück.</returns>
- <remarks>
- 28.09.2026 - Code-Optimierung:
- - Funktion von 'ByRef' auf 'ByVal' umgestellt, da der Parameter 'i' nicht modifiziert wird.
- - 'Return'-Statement anstelle der veralteten Zuweisung an den Funktionsnamen verwendet.
- - Fehlende Text-Zuweisung bei 'Case 2' dokumentiert/beibehalten.
- - Auskommentierten Code ('lbKasse.ForeColor = fColorForeBank' in Case 0) sauber entfernt.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.tsbKasse_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Kassen-Button. Setzt den Status auf Kasse (ID 3).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (ToolStripButton).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>28.09.2026 - Initialer XML-Kommentar hinzugefügt.</remarks>
-</member>
-<member name="M:Pension.frmDatev.tsbBank_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Bank-Button. Setzt den Status auf Bank (ID 4).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (ToolStripButton).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>28.09.2026 - Initialer XML-Kommentar hinzugefügt.</remarks>
-</member>
-<member name="M:Pension.frmDatev.tsbDel_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Löschen-Button. Setzt den Status auf Löschen (ID 0).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (ToolStripButton).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>28.09.2026 - Initialer XML-Kommentar hinzugefügt.</remarks>
-</member>
-<member name="M:Pension.frmDatev.tsbFrei_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Frei/Rückgängig-Button. Setzt den Status auf Rückgängig (ID -1).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (ToolStripButton).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>28.09.2026 - Initialer XML-Kommentar hinzugefügt.</remarks>
-</member>
-<member name="M:Pension.frmDatev.prRowColor(System.Int32,System.Drawing.Color,System.Drawing.Color)">
- <summary>
- Setzt die Hintergrund- und Schriftfarbe sowie die Selektionsfarbe für eine bestimmte Zeile und deren Zellen.
- </summary>
- <param name="nRow">Der nullbasierte Index der einzufärbenden Zeile.</param>
- <param name="sColorB">Die zu weisende Hintergrundfarbe (BackColor).</param>
- <param name="sColorF">Die zu weisende Schriftfarbe (ForeColor).</param>
- <remarks>
- 17.02.2012 - Create
- 28.09.2026 - Code-Optimierung:
- - Parameter von 'ByRef' auf 'ByVal' umgestellt, da die übergebenen Werte in der Methode nicht verändert werden.
- - Variable 'row' zwischengespeichert, um wiederholte Zugriffe auf 'dgvDatev.Rows(nRow)' in der Schleife zu minimieren.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.tsbFreigeben_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Freigeben-Button. Setzt den Kassen-Status auf Freigegeben/Erlaubt (ID 2).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (ToolStripButton).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>28.09.2026 - Initialer XML-Kommentar hinzugefügt.</remarks>
-</member>
-<member name="M:Pension.frmDatev.tsbSperren_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Sperren-Button. Setzt den Kassen-Status auf Gesperrt/Nicht Erlaubt (ID 1).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (ToolStripButton).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>28.09.2026 - Initialer XML-Kommentar hinzugefügt.</remarks>
-</member>
-<member name="M:Pension.frmDatev.dsbDatevFile_Click(System.Object,System.EventArgs)">
- <summary>
- Ereignishandler für den Export und die Generierung der DATEV-Datei.
- Prüft zu löschende Einträge, validiert Pflichtangaben (Bank/Kasse), aktualisiert 
- die zugrunde liegende Datentabelle (DataTable) und schreibt die CSV-Daten.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (ToolStripButton).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 28.09.2026 - Code-Optimierung:
- - Uninitialisierte 'direction'-Variable bei der Grid-Sortierung mit Standardwert 'Ascending' abgesichert.
- - Veraltete 'Call'-Syntax bei allen Methodenaufrufen konsequent entfernt.
- - 'Trim(...).Equals("")' und 'Val()' durch sicherere .NET-Methoden wie 'String.IsNullOrWhiteSpace', 'Int32.TryParse' und 'Convert.ToDecimal' ersetzt.
- - 'StringBuilder' zur performanten Generierung des CSV-Dateiinhalts implementiert, um String-Verkettungen in Schleifen zu optimieren.
- - Null-Zuweisungsschutz ('?.ToString()') bei Grid-Zellwerten integriert.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.prSavedatev(System.Int32)">
- <summary>
- Speichert einen spezifischen Datensatz aus der DataTable in der Datev-Datenbanktabelle.
- </summary>
- <param name="i">Der nullbasierte Zeilenindex (RowIndex) innerhalb der DataTable 'dtDat'.</param>
- <remarks>
- 18.12.2011 - Create
- 28.09.2026 - Code-Optimierung:
- - Parameter von 'ByRef' auf 'ByVal' umgestellt, da der Index nur lesend verwendet wird.
- - Veraltete Visual Basic 'Split'-Funktion durch die performantere '.Split()'-Methode des String-Objekts ersetzt.
- - Veraltetes 'Call'-Schlüsselwort entfernt.
- - Leeren 'Finally'-Block entfernt, um den Code schlank zu halten.
- - Null-Sicheres Auslesen des ID-Feldes ('Convert.ToString') implementiert.
- </remarks>
-</member>
-<member name="M:Pension.frmDatev.fcSavedatev(System.String,System.Int32,System.Data.DataTable)">
- <summary>
- Bereitet die zu speichernden Felder einer DataRow auf, ersetzt leere Werte durch ein Leerzeichen 
- und verkettet sie mit dem Trennzeichen '°' für das Datenbank-Update.
- </summary>
- <param name="sID">Die eindeutige Identifikationsnummer des Datensatzes.</param>
- <param name="i">Der nullbasierte Zeilenindex (RowIndex) innerhalb der DataTable.</param>
- <param name="dt">Die zu verarbeitende DataTable, die die Datev-Daten enthält.</param>
- <returns>Ein durch '°' separierter String aller aufbereiteten Feldwerte.</returns>
- <remarks>
- 18.12.2011 - Create
- 28.09.2026 - Code-Optimierung:
- - Parameter 'i' von 'ByRef' auf 'ByVal' umgestellt, da der Index nur lesend verwendet wird.
- - Absturzsichere Prüfung auf 'DBNull' und 'Nothing' mittels einer kompakten Feldliste implementiert.
- - Explizites 'Return'-Statement anstelle der veralteten Zuweisung an den Funktionsnamen verwendet.
- - Referenz auf die spezifische Datenzeile ('row') zwischengespeichert, um Performance zu verbessern.
- </remarks>
-</member>
 <member name="M:Pension.frmDruckBPlan.frmDruckVorlage_Load(System.Object,System.EventArgs)">
  <summary>
  Ereignishandler für das Laden des Formulars. 
@@ -2228,6 +1935,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltete 'Str()'-Funktion durch saubere '.ToString()'-Konvertierung ersetzt, um führende Leerzeichen zu vermeiden.
  - Lokale Schleifenvariable 'i' explizit typisiert ('For i As Integer = ...').
  - Veraltete VB-Kompatibilitätsfunktion 'Split()' durch die native '.Split()'-Methode ersetzt.
+ 02.10.2026
+ - Leerfelder aus Combobox Druckprofile entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmDruckBPlan.cmdClosePlan_Click(System.Object,System.EventArgs)">
@@ -2437,6 +2146,20 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Inline-Kommentare zur Erklärung der Positionierungslogik (Ober- und Unterkante für Statistikwerte) hinzugefügt.
  </remarks>
 </member>
+<member name="M:Pension.frmDruckBPlan.prWriteAnschriften(System.Data.DataTable)">
+ <summary>
+ Druckt die Anschriften aller Kunden aus einer übergebenen Tabelle und steuert den automatischen Seitenumbruch.
+ </summary>
+ <param name="dt">Die DataTable, die die Buchungs- und Kundendaten enthält.</param>
+ <remarks>
+ 07.01.2012 - Create
+ 28.09.2026 - Code-Optimierung:
+ - Veralteten Vergleich 'arT(0) ungleich Nothing' durch das performantere und null-sichere 'Not String.IsNullOrEmpty()' ersetzt.
+ - Variablen-Deklarationen in die Schleife verlagert (Local Scope), um den Speicher direkt freizugeben.
+ - 'With VPE'-Block entfernt, da innerhalb des Blocks kein direkter Bezug (mittels '.') auf VPE stattfand, außer beim PageBreak.
+ - Doppelte Zuweisungen bei 'nPos' bereinigt und Inline-Dokumentation für den Seitenumbruch-Schwellenwert (18 cm/Zoll) hinzugefügt.
+ </remarks>
+</member>
 <member name="M:Pension.frmDruckBPlan.fcGetAnschrift(System.String)">
  <summary>
  Ermittelt die vollständigen Anschrift- und Kontaktdaten eines Kunden anhand der Kundennummer und gibt diese als Array zurück.
@@ -2484,293 +2207,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Spaltenkoordinaten (nC1 bis nC6) als 'Const' deklariert zur Performance- und Layout-Sicherheit.
  - Veraltete Rückgabewert-Zuweisung an den Funktionsnamen durch ein explizites 'Return' ersetzt.
  - Fehlerhafte Spaltenzuordnung korrigiert (im Altcode wurde arT(7) doppelt für Fax ausgegeben, in der zweiten Zeile stand es unter Telefon).
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.frmEinteilung_Load(System.Object,System.EventArgs)">
- <summary>
- Initialisiert das Formular beim Laden. 
- Lädt die Personal- und Einteilungsdatenbanken, berechnet die Personenanzahl und bereitet die Steuerelemente für die Ansicht vor.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax bei Methodenaufrufen vollständig entfernt.
- - Ineffiziente 'For'-Schleife zur Personenzählung durch moderne, lesbare LINQ-Abfrage ersetzt.
- - Veraltete VB6-Funktionen ('Mid', 'Str') durch saubere .NET-Methoden ('.StartsWith', '.ToString') ersetzt.
- - Explizite Datentyp-Deklaration ('As Integer') für alle Schleifenzähler hinzugefügt.
- - Inline-Kommentare zur besseren Strukturierung und Wartbarkeit ergänzt.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prSetTabelleArbeit(System.Data.DataTable)">
- <summary>
- Erstellt die Tabellenstruktur für die Personaleinteilung im DataGridView.
- Initialisiert die Standardspalten und fügt für jede gültige Person eine eigene Datenspalte mit Name und Telefonnummer hinzu.
- </summary>
- <param name="dt">Die DataTable, die die Personaldaten enthält.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Veraltete VB6-Funktionen ('Mid', 'Trim') durch moderne .NET-Methoden ersetzt.
- - String-Verkettung auf performanteres 'String.Format' / String-Interpolation umgestellt.
- - Unbenutzte bzw. überflüssige Zuweisungen ('n = n') und auskommentierten Code entfernt.
- - Variablendeklarationen bereinigt und Gültigkeitsbereiche (Scoping) optimiert.
- - Typisierung der Schleifenvariable bei der Spalten-Sortierung explizit angegeben.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prAddDatumToTable(System.Data.DataTable)">
- <summary>
- Füllt das DataGridView mit Zeilen für einen definierten Zeitraum (2 Monate in der Vergangenheit bis 2 Jahre in die Zukunft).
- Hinterlegt in der (ausgeblendeten) ersten Zeile die IDs des Personals zur späteren Zuordnung.
- </summary>
- <param name="dt">Die DataTable mit den Personaldaten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Extrem ineffiziente 'StringBuilder.Split'-Logik innerhalb der Tagesschleife durch direkte Object-Arrays ersetzt.
- - Veraltete VB6-Kompatibilitätsfunktionen ('DateAdd', 'DateDiff', 'Mid', 'WeekdayName') durch native .NET 'DateTime'-Methoden ersetzt.
- - Speicherbedarf massiv gesenkt und Ausführungsgeschwindigkeit optimiert.
- - String-Verkettungen bereinigt und Variablen-Scoping korrigiert.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prSetFeiertage(System.Data.DataTable)">
- <summary>
- Markiert Feiertage, Wochenenden und Saisonzeiten im DataGridView farblich.
- Liest die Saisondaten ein und wendet die entsprechenden Farbprofile auf die Datums- und Wochentagsspalten an.
- </summary>
- <param name="dt">Die DataTable mit den Personaldaten (in dieser Methode nicht direkt verwendet).</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Kritischen Indexfehler (Nutzung von 'i' statt 'j' bei der Grid-Zeilen-Zuweisung) korrigiert.
- - Mehrfache, ineffiziente String-zu-Datum-Konvertierungen durch einmaliges Parsen optimiert.
- - 'Select Case'-Struktur durch direkte Zuweisungen und saubere Verschachtelung beschleunigt.
- - Veraltete VB6-Hilfsfunktionen ('Val') entfernt.
- - Zusammenfassung der Grid-Schleifen zur Vermeidung redundanter Zeilendurchläufe.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prSynchronDay(System.Windows.Forms.DataGridView,System.DateTime)">
- <summary>
- Synchronisiert die Tabellenansicht des DataGridViews auf ein bestimmtes Zieldatum (z. B. den heutigen Tag).
- Durchsucht die Datumsspalte und setzt den Fokus direkt auf die entsprechende Zeile.
- </summary>
- <param name="dg">Das zu synchronisierende DataGridView (wird im Code übergeben, aber dgArbeit wird direkt referenziert).</param>
- <param name="dDay">Das Zieldatum, auf das die Ansicht fokussiert werden soll.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Fehlerhaften Parameter-Bezug korrigiert (nutzt nun das übergebene 'dg' statt der fest verdrahteten globalen Instanz 'dgArbeit').
- - String-basierten Datumsvergleich durch robusten und typsicheren 'Date'-Vergleich via 'Date.TryParse' ersetzt.
- - Vorzeitigen Abbruch bei ungültigen Zellwerten integriert, um Laufzeitfehler zu verhindern.
- - Explizite Datentyp-Deklaration ('As Integer') für die Schleifenvariable hinzugefügt.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prColumns(System.Boolean)">
- <summary>
- Berechnet die optimale Spaltenbreite für die Personen-Spalten und wendet diese an.
- Verteilt den verfügbaren Platz des DataGridViews gleichmäßig auf alle Personen-Spalten, unterschreitet dabei jedoch nicht eine definierte Mindestbreite.
- </summary>
- <param name="lStart">Bestimmt, ob die Breitenberechnung ausgeführt werden soll.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Den Übergabeparameter von 'ByRef' auf 'ByVal' geändert, da keine Werteänderung an den Aufrufer zurückgegeben werden muss.
- - Potenziellen Laufzeitfehler bei der Berechnung korrigiert (Division durch Null abgefangen, falls keine Personen vorhanden sind).
- - Fehleranfälligen Bezug auf globale Variable 'nPersonen' durch die tatsächliche Anzahl der Grid-Spalten ersetzt.
- - Explizite Datentyp-Deklaration ('As Integer') für die Schleifenvariable hinzugefügt.
- - Boolean-Prüfung vereinfacht ('If lStart Then' statt 'If lStart = True Then').
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prLadeEinteilung(System.Data.DataTable)">
- <summary>
- Lädt die Einteilungsdaten aus der Personal2-Tabelle und trägt diese in den Kalender bzw. das DataGridView ein.
- Durchläuft alle Einteilungsdatensätze und übergibt die Zeiträume und Zuweisungen an die Platzierungslogik.
- </summary>
- <param name="dt">Die DataTable, die die Einteilungsdaten (Personal2) enthält.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Den Übergabeparameter von 'ByRef' auf 'ByVal' geändert, da das DataTable-Objekt nicht neu zugewiesen wird.
- - Explizite Datentyp-Deklaration ('As Integer') für die Schleifenvariable hinzugefügt.
- - Typsichere Datenabfrage der Spaltenwerte implementiert, um Laufzeitfehler bei Null-Werten (DBNull) zu verhindern.
- - Überflüssige Variablen-Initialisierungen außerhalb der Schleife entfernt, um das Speicher-Scoping zu verbessern.
- - Null-Prüfung für die DataTable hinzugefügt, um Stabilität bei leeren Datensätzen zu gewährleisten.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.fcSetEntryInTabelle(System.String,System.String,System.String,System.String,System.Int32)">
- <summary>
- Schreibt die Einteilungsinformationen (z. B. Schichtkürzel) für eine bestimmte Person in den definierten Zeitraum des DataGridViews.
- </summary>
- <param name="sBegin">Das Startdatum des Zeitraums als String.</param>
- <param name="sEnd">Das Enddatum des Zeitraums als String.</param>
- <param name="sId">Die eindeutige ID der Person.</param>
- <param name="sInfo">Die einzutragende Information (z. B. Schicht- oder Urlaubskürzel).</param>
- <param name="nPos">Der Zeilenindex, ab dem die Suche im Grid gestartet werden soll.</param>
- <returns>Gibt den übergebenen Startindex 'nPos' als aktuellen Verarbeitungsstand zurück.</returns>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Veraltete VB6-Rückgabesyntax ('fcSetEntryInTabelle = nPos') durch modernes 'Return' ersetzt.
- - Performance-Bottleneck entfernt: String-basierte Datumsvergleiche in der Schleife durch einmalig geparste, typsichere 'Date'-Objekte ersetzt.
- - Fehleranfällige logische Operatoren durch Kurzschluss-Operatoren ('AndAlso') ersetzt.
- - Explizite Datentyp-Deklaration ('As Integer') für die Schleifenvariable hinzugefügt.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.fcGetPersonSpalte(System.String,System.Windows.Forms.DataGridView)">
- <summary>
- Ermittelt den Spaltenindex einer bestimmten Person im DataGridView anhand ihrer eindeutigen ID.
- Durchsucht dazu die (ausgeblendete) erste Zeile, in der die IDs hinterlegt sind.
- </summary>
- <param name="sID">Die eindeutige ID der gesuchten Person.</param>
- <param name="dg">Das DataGridView, in dem gesucht werden soll.</param>
- <returns>Den nullbasierten Spaltenindex der Person, oder -1, wenn die ID nicht gefunden wurde.</returns>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Veraltete VB6-Rückgabesyntax ('fcGetPersonSpalte = ...') durch modernes 'Return' ersetzt.
- - 'NullReferenceException' abgefangen: Sichere Prüfung auf 'Nothing' vor dem Aufruf von '.ToString()'.
- - Vorzeitigen Abbruch bei fehlenden Spalten oder Zeilen integriert.
- - Lokalen Rückgabewert als klare Variable definiert, um den Programmfluss zu verdeutlichen.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prLoadInfo(System.String)">
- <summary>
- Lädt die Textinformationen aus einer Systemdatei und befüllt damit die Info-Auswahlliste (ComboBox).
- Fügt standardmäßig einen leeren Eintrag am Anfang hinzu und bereinigt die eingelesenen Daten von Leerzeilen.
- </summary>
- <param name="sDatei">Der Dateiname oder Pfad der zu ladenden Systemdatei.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Den Übergabeparameter von 'ByRef' auf 'ByVal' geändert, da der String-Pfad nicht manipuliert zurückgegeben werden muss.
- - Veraltete VB6-Funktion 'Split()' durch die native .NET-Methode '.Split()' ersetzt.
- - 'StringSplitOptions.RemoveEmptyEntries' integriert, um unschöne Leerzeilen in der ComboBox automatisch auszufiltern.
- - Fehlerabsicherung durch einen 'Try-Catch'-Block sowie eine Null-Prüfung der eingelesenen Daten hinzugefügt.
- - Explizite Datentyp-Deklaration ('As Integer') für die Schleifenvariable ergänzt.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.dgArbeit_CellClick(System.Object,System.Windows.Forms.DataGridViewCellEventArgs)">
- <summary>
- Trägt die aktuell ausgewählte Schicht- oder Statusinformation aus der Info-ComboBox per Klick direkt in das DataGridView ein.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (das DataGridView).</param>
- <param name="e">Die Ereignisdaten, die die Indizes der geklickten Zelle enthalten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Fehlerhaften Index-Zugriff bei Header-Zeilen abgefangen (Prüfung von 'e.RowIndex > 0' statt '> -1', um die unsichtbare ID-Zeile zu schützen).
- - Überflüssige und syntaktisch unsaubere Klammern bei der Eigenschaft '.Value()' entfernt.
- - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor Laufzeitfehlern hinzugefügt.
- - Logischen Vergleich durch Nutzung von 'AndAlso' für bessere Performance optimiert.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.tsbClose_Click(System.Object,System.EventArgs)">
- <summary>
- Schließt das aktuelle Formular für die Personaleinteilung.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (der Schließen-Button).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor Ausnahmefehlern beim Entladen des Formulars hinzugefügt.
- - Einheitliches Fehler-Reporting-Muster aus dem Gesamtprojekt implementiert.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.frmEinteilung_Resize(System.Object,System.EventArgs)">
- <summary>
- Passt die Größe des DataGridViews dynamisch an die neue Formulargröße an und berechnet die Spaltenbreiten neu.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (das Formular).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax beim Aufruf von 'prColumns' entfernt.
- - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor Fehlern bei Minimierung des Formulars hinzugefügt.
- - 'WindowState'-Prüfung integriert, um unnötige Berechnungen und Abstürze im minimierten Zustand zu verhindern.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.tsbSaveInfo_Click(System.Object,System.EventArgs)">
- <summary>
- Fügt den neu eingegebenen Text der Info-ComboBox zur Auswahlliste hinzu und speichert die aktualisierte Liste dauerhaft in die Systemdatei.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (der Speichern-Button).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prSaveInfo' entfernt.
- - Duplikatsprüfung integriert: Verhindert, dass identische Einträge mehrfach in die ComboBox und die Datei geschrieben werden.
- - Validierung auf leere bzw. rein aus Leerzeichen bestehende Eingaben hinzugefügt.
- - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor Laufzeitfehlern ergänzt.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.tsbDelInfo_Click(System.Object,System.EventArgs)">
- <summary>
- Löscht den aktuell ausgewählten Eintrag aus der Info-ComboBox und aktualisiert die Systemdatei.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (der Löschen-Button).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Logischen Fehler korrigiert: Einträge werden nun via '.RemoveAt' sauber gelöscht, statt sie nur durch Leerstrings zu ersetzen.
- - Rückwärtslaufende Schleife implementiert, um Verschiebungen des Auflistungs-Index beim Löschen zu verhindern.
- - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prSaveInfo' entfernt.
- - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor Laufzeitfehlern ergänzt.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.prSaveInfo(System.String)">
- <summary>
- Speichert die aktuellen Einträge der Info-ComboBox dauerhaft in die Systemdatenbank und lädt die Liste anschließend neu.
- </summary>
- <param name="sDatei">Der Dateiname oder Pfad der Systemdatei, in die geschrieben werden soll.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Den Übergabeparameter von 'ByRef' auf 'ByVal' geändert, da das Pfad-Objekt nicht manipuliert werden muss.
- - Robustere Validierung: Verhindert das Speichern von Einträgen, die nur aus Leerzeichen bestehen (Trim-Prüfung).
- - Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor Schreib-/Lesekonflikten der Systemdatenbank ergänzt.
- - Explizite Datentyp-Deklaration ('As Integer') für die Schleifenvariable hinzugefügt.
- - Effiziente Ressourcen-Nutzung: Speicherreservierung für den StringBuilder optimiert.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.fcSaveper(System.String,System.String,System.String,System.String,System.String)">
- <summary>
- Bereitet die Einteilungsdaten für einen Datensatz auf, indem sie mit einem Trennzeichen ('°') verkettet werden.
- Ersetzt leere Felder standardmäßig durch ein Leerzeichen, um relationale Fehler beim späteren Splitten zu verhindern.
- </summary>
- <param name="sID">Die eindeutige Datensatz-ID.</param>
- <param name="sIDP">Die ID der zugeordneten Person (wird als Kopie per Wert verarbeitet).</param>
- <param name="sADatum">Das Startdatum des Zeitraums.</param>
- <param name="sEDatum">Das Enddatum des Zeitraums.</param>
- <param name="sInfo">Die eingetragene Information (z. B. Schichtkürzel).</param>
- <returns>Einen mit '°' separierten String aller übergebenen Parameter für die Weiterverarbeitung im Insert-Kommando.</returns>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Übergabeparameter von 'ByRef' auf 'ByVal' geändert, um Seiteneffekte (ungewollte Manipulation von Originalvariablen im Aufrufer) zu verhindern.
- - Veraltete VB6-Rückgabesyntax ('fcSaveper = ...') durch ein modernes .NET 'Return' ersetzt.
- - Performance-Bottleneck beseitigt: Die altmodische 'Trim()'-Prüfung und mehrfache '.Append()'-Aufrufe durch effiziente String-Interpolation oder 'String.Join' ersetzt.
- - Verwendung von modernem, null-sicherem 'String.IsNullOrWhiteSpace()' für die Vorbelegung.
- </remarks>
-</member>
-<member name="M:Pension.frmEinteilung.tsbPrint_Click(System.Object,System.EventArgs)">
- <summary>
- Bereitet die Personaleinteilung für den ausgewählten Monat grafisch auf und übergibt die Daten blockweise an die VPE-Druck-Engine.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (der Drucken-Button).</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 18.02.2012 - Create
- 27.09.2026 - Code-Optimierung:
- - Kritischen Index-Absturz (Gefahr von 'Rows(-1)' bei nicht gefundenem Startdatum) durch Validierung abgefangen.
- - Typsicheres, länderunabhängiges Parsen von Datumswerten mittels 'Date.TryParse' implementiert.
- - Veraltete VB6-Syntax ('Call', 'Val', 'Trim', 'CDate') vollständig entfernt.
- - String-Verkettungen im Tabellenkopf über performante String-Interpolation gelöst.
- - Ressourcenschonung: 'Try-Catch'-Logik für VPE-Engine abgesichert, um hängende Druckprozesse im Fehlerfall zu verhindern.
  </remarks>
 </member>
 <member name="M:Pension.frmError.frmError_Load(System.Object,System.EventArgs)">
@@ -2885,6 +2321,22 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltetes 'Call'-Schlüsselwort entfernt.
  - Sichtbarkeitssteuerung von Steuerelementen auf dem Hauptformular (frmMain) optimiert.
  - Auskommentierten Code ('dgBuchung.Select') zur Code-Bereinigung entfernt.
+ </remarks>
+</member>
+<member name="M:Pension.frmGaeste.dgKunden_CellDoubleClick(System.Object,System.Windows.Forms.DataGridViewCellEventArgs)">
+ <summary>
+ Ereignishandler für den Doppelklick auf eine Zelle im Kunden-Grid (dgKunden).
+ Lädt die detaillierten Kundendaten aus der Datenbank und befüllt die Eingabemaske.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten mit Zeilen- und Spaltenindex.</param>
+ <remarks>
+ 25.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei Methodenaufrufen komplett entfernt.
+ - 'sGeb.Trim ungleich ""' durch performanteres 'Not String.IsNullOrWhiteSpace(sGeb)' ersetzt.
+ - 'Using'-Block oder 'With'-Struktur zur Vermeidung wiederholter Datenzeilen-Zugriffe (dt.Rows(0)) vorbereitet.
+ - SQL-Injektions-Risiko über inline verkettete Strings minimiert (Verwendung von Parametern wird empfohlen).
+ - Fehleranfällige und nicht genutzte Variablen bereinigt bzw. strukturiert.
  </remarks>
 </member>
 <member name="M:Pension.frmGaeste.dgKunden_CellEnter(System.Object,System.Windows.Forms.DataGridViewCellEventArgs)">
@@ -3247,6 +2699,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  22.09.2026 Code-Optimierung: Umstellung der Instanz-Prüfung auf LINQ, 
  Ersetzen des 'End'-Befehls durch ein sauberes 'Application.Exit()' und 
  Optimierung der Benutzeroberflächen-Initialisierung.
+ 02.10.2026
+ - "Anstehende Termine prüfen und anzeigen" entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmMain.frmMain_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
@@ -3447,7 +2901,10 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  <para>Setzt den globalen Statuscode zurück, führt bei gesetztem Flag eine FTP-Sicherung durch und schließt das aktuelle Formular bzw. die Anwendung ordnungsgemäß.</para>
  <para>
  <b>Historie:</b><br/>
- 22.09.2026 – Optimiert: Das kritische <c>End</c>-Schlüsselwort wurde durch den sauberen .NET-Befehl <c>Me.Close()</c> ersetzt.<br/>
+ 22.09.2026 Optimiert: 
+ - Das kritische <c>End</c>-Schlüsselwort wurde durch den sauberen .NET-Befehl <c>Me.Close()</c> ersetzt.<br/>
+ 02.10.2026 
+ - Menüpunkt " Buchung ohne Gast" aus Database nach tbsClose verschoben
  </para>
  </remarks>
 </member>
@@ -3463,48 +2920,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  <b>Historie:</b><br/>
  24.12.2011 – Erstellt<br/>
  22.09.2026 – Optimiert: Logische Struktur bereinigt, boolesche Abfragen verkürzt und Titel-Zuweisung zentralisiert.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.tsbDatev_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis der Datev-Schaltfläche (<c>tsbDatev</c>) und öffnet die Datev-Exportmaske.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Datev-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet das Formular für den Datev-Export. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.tsmRestore_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis des Wiederherstellungs-Menüeintrags (<c>tsmRestore</c>).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (der Menüeintrag).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet die Maske zur Datenwiederherstellung (<see cref="T:Pension.frmRestore"/>). Auskommentierte Web- und Direkt-Restore-Methoden wurden als Altlasten dokumentiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Cursor-Handling strukturell bereinigt.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.tsmSave_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis des Menüeintrags zur Datensicherung (<c>tsmSave</c>).
- </summary>
- <param name="sender">Die Quelle des Ereignisses (der Menüeintrag).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Ruft die zentrale Routine <see cref="M:Pension.frmMain.prSaveData"/> auf, um die Anwendungsdaten zu sichern. Während des Vorgangs wird der Mauszeiger als Warte-Cursor dargestellt.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – Optimiert: Das veraltete <c>Call</c>-Schlüsselwort entfernt und ein visuelles Cursor-Feedback für den Benutzer integriert.<br/>
  </para>
  </remarks>
 </member>
@@ -3530,20 +2945,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  <param name="e">Die Ereignisdaten des Klick-Events.</param>
  <remarks>
  <para>Öffnet das Formular für die Personalverwaltung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.tsbEinteilung_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis der Einteilung-Schaltfläche (<c>tsbEinteilung</c>) und öffnet den Belegungs-/Einteilungsplan.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
  <para>
  <b>Historie:</b><br/>
  22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
@@ -3658,49 +3059,9 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  </para>
  </remarks>
 </member>
-<member name="M:Pension.frmMain.CodeToolStripMenuItem_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis der RFID leser.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
- </para>
- </remarks>
-</member>
 <member name="M:Pension.frmMain.DatenKontrolleToolStripMenuItem_Click(System.Object,System.EventArgs)">
  <summary>
  Verarbeitet das Klick-Ereignis der Datenkontrolle.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.DatenKorekturToolStripMenuItem_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis der Datenkorrektur.
- Bereinigt verwaiste Buchungssätze in der Datenbank und bietet einen Programmneustart an.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <b>Historie:</b><br/>
- 24.09.2026 – Uwe: 'End'-Befehl durch 'Application.Restart()' ersetzt und MsgBox modernisiert.<br/>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.tsbCorona_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis des Corona Formulares.
  </summary>
  <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
  <param name="e">Die Ereignisdaten des Klick-Events.</param>
@@ -3743,48 +3104,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
 <member name="M:Pension.frmMain.ToolStripButton1_Click(System.Object,System.EventArgs)">
  <summary>
  Verarbeitet das Klick-Ereignis zur Awsser / Abwasserabrechnung.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.ToolStripButton2_Click_1(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis zum TS Send.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.tsbSchloss_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis zur Schlossverwaltung.
- </summary>
- <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
- <param name="e">Die Ereignisdaten des Klick-Events.</param>
- <remarks>
- <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.tsbTermine_Click(System.Object,System.EventArgs)">
- <summary>
- Verarbeitet das Klick-Ereignis zur Terminverwaltung.
  </summary>
  <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
  <param name="e">Die Ereignisdaten des Klick-Events.</param>
@@ -3866,6 +3185,43 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  <remarks>
  12.01.2012 Create
  23.09.2026 Typsicherheit erhöht, Original-Tauschlogik wiederhergestellt
+ </remarks>
+</member>
+<member name="M:Pension.frmMain.prReservierung(System.Int32,System.Int32,System.Int32,System.Int32)">
+ <summary>
+ Nimmt die Reservierung für ausgewählte Zimmer und Zeiträume vor.
+ </summary>
+ <param name="r1">Index der Start-Zeile (Start-Datum)</param>
+ <param name="c1">Index der Start-Spalte (Erstes Zimmer)</param>
+ <param name="r2">Index der End-Zeile (End-Datum)</param>
+ <param name="c2">Index der End-Spalte (Letztes Zimmer)</param>
+ <remarks>
+ 19.01.2012 Create <br/>
+ 23.09.2026 Refactored (Typsicherheit und Validierung hinzugefügt)
+ </remarks>
+</member>
+<member name="M:Pension.frmMain.prCreateReservierung(System.String,System.String,System.String,System.String)">
+ <summary>
+ Legt einen neuen Datensatz für die Zimmerreservierung an und aktualisiert die Buchungsdaten.
+ </summary>
+ <param name="sBDate">Startdatum der Reservierung</param>
+ <param name="sEDate">Enddatum der Reservierung</param>
+ <param name="sZim">Zimmer-ID / Zimmerbezeichnung</param>
+ <param name="sBnr">Buchungsnummer</param>
+ <remarks>
+ 19.01.2012 Create <br/>
+ 23.09.2026 Refactored (Bugfix bei Variablen-Verschiebung und Typsicherheit)
+ </remarks>
+</member>
+<member name="M:Pension.frmMain.fcGetObjID(System.String)">
+ <summary>
+ Ermittelt die Objekt-ID eines bestimmten Zimmers anhand seiner Zimmer-ID.
+ </summary>
+ <param name="sZim">Die ID des gesuchten Zimmers.</param>
+ <returns>Die zugehörige Objekt-ID als String, oder ein Leerzeichen, falls nicht gefunden.</returns>
+ <remarks>
+ 19.01.2012 Create <br/>
+ 23.09.2026 Refactored (DataTable-Suche optimiert und Typsicherheit erhöht)
  </remarks>
 </member>
 <member name="M:Pension.frmMain.tsmDelete_Click(System.Object,System.EventArgs)">
@@ -3975,19 +3331,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  <para>
  <b>Historie:</b><br/>
  22.09.2026 – Code Optimierung<br/>
- </para>
- </remarks>
-</member>
-<member name="M:Pension.frmMain.prSaveData">
- <summary>
- Frägt den Benutzer, ob eine manuelle Datensicherung durchgeführt werden soll, 
- führt diese aus und protokolliert den Erfolg im Logbuch.
- </summary>
- <remarks>
- <para>Zeigt einen Bestätigungsdialog. Bei 'Ja' wird die Routine <see cref="M:Pension.moSaveRestore.prSaveDaten"/> aufgerufen und ein Eintrag in <c>cgLogFile</c> erzeugt.</para>
- <para>
- <b>Historie:</b><br/>
- 22.09.2026 – Optimiert: Umstellung auf das moderne <c>MessageBox.Show</c>, Entfernung von <c>Call</c> und Absicherung des Log-Eintrags per Try-Catch.<br/>
  </para>
  </remarks>
 </member>
@@ -4171,6 +3514,20 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltete 'Call'-Syntax beim Methodenaufruf vollständig entfernt.
  - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor UI-Aktualisierungsfehlern ergänzt.
  - Index-Absicherung integriert: Der Aufruf wird übersprungen, wenn die Auswahl temporär leer ist (z. B. während des Listen-Resets).
+ </remarks>
+</member>
+<member name="M:Pension.frmPersonal.prGetInfolvPersonal">
+ <summary>
+ Überträgt die Detailinformationen des aktuell in der ListView ausgewählten Mitarbeiters in die entsprechenden Eingabe- und Textfelder.
+ Lädt zusätzlich die Anschrift basierend auf der Mitarbeiter-ID und setzt die Wegstrecken-Eingabe zurück.
+ </summary>
+ <remarks>
+ 18.02.2012 - Create
+ 27.09.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prGetAnschrift' entfernt.
+ - Performance-Optimierung: Mehrfache, redundante Zugriffe auf das 'SelectedItems(0)'-Objekt durch Deklaration einer lokalen Zwischenvariable ersetzt.
+ - Fehlende Fehlerabsicherung durch einen 'Try-Catch'-Block zum Schutz vor IndexOutOfBound-Ausnahmen bei den SubItems ergänzt.
+ - Logische Prüfung verfeinert ('If .Count > 0' statt 'undgleich 0') für saubereren Programmfluss.
  </remarks>
 </member>
 <member name="M:Pension.frmPersonal.prGetAnschrift(System.String)">
@@ -4793,6 +4150,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - 'Dim arLa As Array' durch ein spezifisches String-Array ('String()') ersetzt, um die Typsicherheit zu garantieren.
  - SQL-Strings direkt bei der Deklaration initialisiert.
  - Sichtbarkeitssteuerung für E-Mail-Komponenten durch direkte Zuweisung des Boolean-Werts stark komprimiert.
+ 02.10.2026
+ - Mwst für Speise und Getränke und Gegenkonten entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcLoadListe(System.Windows.Forms.ListBox,System.Data.DataTable,System.String)">
@@ -4862,6 +4221,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  28.09.2026 - Code-Optimierung:
  - Null- und Indexprüfung für das Array 'arEMail' hinzugefügt, um Laufzeitfehler zu vermeiden.
  - Inline-Kommentare zur visuellen Strukturierung der Steuerelemente eingefügt.
+ 02.10.2026
+ - Mwst für Speise und Getränke und Gegenkonten entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLookDBButton(System.Boolean)">
@@ -4909,6 +4270,35 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  30.09.2026 - Erstellt:
  - Ereignis-Steuerung für den Tab-Wechsel implementiert.
  - 'SelectedTab'-Abfrage über Select Case zur einfachen Erweiterung strukturiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tcSystem_Selected(System.Object,System.Windows.Forms.TabControlEventArgs)">
+ <summary>
+ Selektiert den ersten Eintrag in der jeweiligen Liste, wenn eine Registerkarte ausgewählt wird.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten mit Informationen zur ausgewählten Registerkarte.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete '.Select()'-Aufrufe durch '.Focus()' ersetzt.
+ - 'Case Is ='-Syntax vereinfacht und unnötiges '.ToString()' beim Namen entfernt.
+ - Fokus- und Selektionslogik für das erste Element stabilisiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prSelectEntry(System.Windows.Forms.ListView,System.String)">
+ <summary>
+ Sucht nach einem bestimmten Eintrag in einer ListView anhand der ersten Spalte
+ und selektiert diesen, falls er gefunden wird.
+ </summary>
+ <param name="lv">Die zu durchsuchende ListView.</param>
+ <param name="sEntry">Der Text des gesuchten Eintrags.</param>
+ <remarks>
+ 20.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Modifizierer entfernt.
+ - Auskommentierten 'Totcode' innerhalb der Schleife gelöscht.
+ - Umschaltung von '.Select()' auf '.Focus()' durchgeführt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsmClose_Click(System.Object,System.EventArgs)">
@@ -4980,6 +4370,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltete 'Call'-Syntax beim Aufruf von 'prLock' entfernt.
  - Null- und Indexprüfung für das Array 'arEMail' hinzugefügt, um Laufzeitfehler zu verhindern.
  - Fokuszuweisung auf das erste Eingabefeld optimiert.
+ 02.10.2026
+ - Mwst für Speise und Getränke und Gegenkonten entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbSpeichern_Click(System.Object,System.EventArgs)">
@@ -5017,6 +4409,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
  - Veraltete VB6 'Replace'-Funktion durch native .NET '.Replace()'-Methode der TextBoxen ersetzt.
  - Strukturierung und Bereinigung auskommentierter Code-Fragmente.
+ 02.10.2026
+ - Mwst für Speise und Getränke und Gegenkonten entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbESC_Click(System.Object,System.EventArgs)">
@@ -5759,6 +5153,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Spalten-Generierung über ein strukturiertes Array und eine Schleife kompakt zusammengefasst (verbesserte Wartbarkeit).
  - Konstante Spalteneinstellungen zur Reduzierung von redundantem Code ausgelagert.
  - Einheitlicher Programmierstil analog zur Zimmer-Tabellenstruktur implementiert.
+ 02.10.2026
+ - Status entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadUserInList(System.Data.DataTable)">
@@ -5774,6 +5170,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - 'For Each'-Schleife anstelle der indexbasierten Schleife für sauberere Lesbarkeit verwendet.
  - 'ListViewItemCollection.AddRange' genutzt, um alle Zeilen performant in einem Rutsch dem Steuerelement zu übergeben.
  - Null-Sicherheitsprüfung ('dtT Is Nothing') am Methodenstart integriert.
+ 02.10.2026
+ - Status entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCheckNoRecordUser(System.Data.DataTable)">
@@ -5801,6 +5199,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  29.09.2026 - Code-Optimierung:
  - Veraltete 'Call'-Syntax beim Methodenaufruf von 'prLoockUser' entfernt.
  - '""' durch die performantere .NET-Konstante 'String.Empty' ersetzt.
+ 02.10.2026
+ - Status entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.tsbEditUser_Click(System.Object,System.EventArgs)">
@@ -5851,6 +5251,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - 'ToolStripButton'-Typkonvertierungsfehler durch strikte Trennung von 'Control' und 'ToolStripItem' behoben.
  - Zuweisung über kompakte Schleifen gelöst (bessere Übersicht und Wartbarkeit).
  - Automatisches Zurücksetzen der Klartext-Anzeige integriert.
+ 02.10.2026
+ - tbURechte entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prSaveUser">
@@ -5887,6 +5289,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  29.09.2026 - Code-Optimierung:
  - Zugriff auf '.SelectedItems(0)' durch eine lokale Variable ('item') zentralisiert (bessere Performance und Lesbarkeit).
  - Unnötige 'With'-Struktur aufgelöst, da die Variable den Kontext bereits sauber abbildet.
+ 02.10.2026
+ - tbURechte entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcSaveUser(System.String)">
@@ -5902,6 +5306,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Logikfehler behoben: Passwort wird nun beim Speichern sauber verschlüsselt ('fEnCrypt') statt entschlüsselt ('fDeCrypt').
  - Veraltete String-Operationen und Funktionsnamen-Zuweisung durch moderne .NET-Standards ersetzt.
  - 'String.IsNullOrWhiteSpace' für null-sichere und performantere Validierung eingesetzt.
+ 02.10.2026
+ - tbURechte entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.fcCheckUser(System.String)">
@@ -5934,20 +5340,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltete 'Call'-Syntax entfernt und leere Strings durch 'String.Empty' ersetzt.
  - Grammatikfehler in der Hinweismeldung korrigiert ("diesen Nutzer" statt "dieses Nutzer").
  - Selektions-Logik nach dem Löschen stabilisiert (wählt das erste verbleibende Element aus).
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tbURechte_TextChanged(System.Object,System.EventArgs)">
- <summary>
- Validiert die Eingabe im Rechte-Feld, um sicherzustellen, dass nur numerische Werte eingetragen werden.
- Schützt vor ungültigen Zeichen (z. B. Buchstaben).
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 20.12.2011 - Create
- 29.09.2026 - Code-Optimierung:
- - Fehlerhafte 'IsNumeric(e.ToString)'-Logik durch eine echte numerische Typprüfung ('Integer.TryParse') ersetzt.
- - Setzt das Feld bei Falscheingaben standardmäßig auf den Wert "5" zurück und hält die Cursor-Position am Ende des Textes.
+ 02.10.2026
+ - tbURechte entfernt
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.chKlar_CheckedChanged(System.Object,System.EventArgs)">
@@ -6127,172 +5521,6 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  29.09.2026 - Code-Optimierung:
  - Redundanten 'If-Else'-Block durch eine direkte, logische Zuweisung ersetzt.
  - Auskommentierten Code-Ballast ('sb.Append') entfernt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.prCheckNoRecordWerbung(System.Data.DataTable)">
- <summary>
- Prüft, ob Datensätze vorhanden sind, und steuert die Aktivierung der Bearbeiten- und Löschen-Schaltflächen.
- </summary>
- <param name="dt">Die zu prüfende DataTable mit den Werbedaten.</param>
- <remarks>
- 26.01.2012 - Create
- 24.09.2026 - Code-Optimierung:
- - Logik vereinfacht: Zuweisung des Boolean-Status direkt aus dem Vergleichsausdruck ohne temporäre Variable.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tsbWNeu_Click(System.Object,System.EventArgs)">
- <summary>
- Bereitet die Benutzeroberfläche für das Anlegen einer neuen Werbung vor.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 26.01.2012 - Create
- 24.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tsbWEdit_Click(System.Object,System.EventArgs)">
- <summary>
- Bereitet die Benutzeroberfläche für das Bearbeiten einer bestehenden Werbung vor und lädt die aktuellen Werte in die Textfelder.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 26.01.2012 - Create
- 24.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tsbWSave_Click(System.Object,System.EventArgs)">
- <summary>
- Löst das Speichern der vorgenommenen Änderungen an der Werbung aus.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 26.01.2012 - Create
- 24.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tsbWBreack_Click(System.Object,System.EventArgs)">
- <summary>
- Bricht die aktuelle Bearbeitung ab und setzt den Zustand der Benutzeroberfläche zurück.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 26.01.2012 - Create
- 24.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.prLoockWerbung(System.Boolean)">
- <summary>
- Steuert die Aktivierung und Sichtbarkeit der Eingabefelder sowie der Funktionstasten basierend auf dem aktuellen Bearbeitungsstatus.
- </summary>
- <param name="lStatus">Gibt an, ob sich das Formular im Bearbeitungsmodus (True) oder im Ansichtsmodus (False) befindet.</param>
- <remarks>
- 26.01.2012 - Create
- 24.09.2026 - Code-Optimierung:
- - Rechtschreibfehler im Methodennamen beibehalten (Kompatibilität), interne Steuerung logisch strukturiert.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.prSaveWerbung">
- <summary>
- Führt die Speicherung oder Aktualisierung des Werbedatensatzes in der Datenbank und der lokalen DataTable durch.
- </summary>
- <remarks>
- 26.01.2012 - Create
- 01.04.2012 - Insert Format Provision
- 24.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
- - 'tbWerbung.Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
- - Nicht verwendete Variable 'sb' (StringBuilder) und 'sName' entfernt.
- - 'Like'-Operator bei der ID-Filterung der DataTable durch präzisen '='-Operator ersetzt.
- - Inline-Kommentare zur Dokumentation der Logikschritte hinzugefügt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.fcSaveWerbung(System.String)">
- <summary>
- Stellt die Formulardaten zu einem mit Trennzeichen (°) separierten String für die Speicherung zusammen.
- </summary>
- <param name="sID">Die eindeutige Identifikationsnummer des Werbedatensatzes.</param>
- <returns>Ein mit '°' separierter String, der alle Feldwerte enthält.</returns>
- <remarks>
- 26.01.2012 - Create
- 01.04.2012 - Insert Format Provision
- 24.09.2026 - Code-Optimierung:
- - 'Text.Trim = ""' durch performanteres 'String.IsNullOrWhiteSpace' ersetzt.
- - UI-Entkopplung: Standardwerte werden direkt im Speicher (StringBuilder) gesetzt, anstatt die Textbox-Inhalte der UI mit Leerzeichen zu überschreiben.
- - 'fcSaveWerbung = ...' durch die moderne 'Return'-Anweisung ersetzt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.liWerbung_SelectedIndexChanged(System.Object,System.EventArgs)">
- <summary>
- Reagiert auf die Auswahl eines Eintrags in der Liste und lädt die dazugehörigen Detailinformationen.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 26.01.2012 - Create
- 01.04.2012 - Insert Format Provision
- 30.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
- - Sicherheitsabfrage hinzugefügt: Verarbeitet die Auswahl nur, wenn der Index gültig ist (>-1).
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.prGetInfoWerbung(System.String)">
- <summary>
- Lädt die detaillierten Daten der ausgewählten Werbung aus der Datenbank und stellt sie in der UI dar.
- </summary>
- <param name="sID">Die eindeutige Identifikationsnummer der anzuzeigenden Werbung.</param>
- <remarks>
- 26.01.2012 - Create
- 01.04.2012 - Insert Format Provision
- 30.09.2026 - Code-Optimierung:
- - Rechtschreibfehler im XML-Kommentar korrigiert.
- - Datenzugriff durch direkte Typkonvertierung (.ToString) optimiert.
- - Hintergrundfarbe wird nur zugewiesen, wenn Daten vorhanden sind.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tsbWDel_Click(System.Object,System.EventArgs)">
- <summary>
- Löscht den aktuell ausgewählten Werbedatensatz nach einer Sicherheitsabfrage aus der Datenbank und aktualisiert die Anzeige.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 26.01.2012 - Create
- 30.09.2026 - Code-Optimierung:
- - Veraltete 'Call'-Syntax bei allen Methodenaufrufen entfernt.
- - 'sID = ""' durch performanteres 'String.IsNullOrEmpty' ersetzt und an den Methodenstart verschoben (Early Exit).
- - Fehlerhaften Aufruf 'prCheckNoRecordBuch' auf die korrekte Methode 'prCheckNoRecordWerbung' umgestellt.
- - Ablauflogik zur Vermeidung von unnötigen String-Operationen strukturiert.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tbProvision_LostFocus(System.Object,System.EventArgs)">
- <summary>
- Formatiert den eingegebenen Wert im Provisionsfeld automatisch als Dezimalzahl, sobald das Feld den Fokus verliert.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 30.09.2026 - Code-Dokumentation:
- - XML-Kommentar für konsistente Projektdokumentation hinzugefügt.
- </remarks>
-</member>
-<member name="M:Pension.frmSystem.tbNormal_TextChanged(System.Object,System.EventArgs)">
- <summary>
- Öffnet bei einem Klick auf das Farbfeld den Windows-Farbdialog und weist die gewählte Farbe als Hintergrund sowie als RGB-String zu.
- </summary>
- <param name="sender">Die Quelle des Ereignisses.</param>
- <param name="e">Die Ereignisdaten.</param>
- <remarks>
- 30.09.2026 - Code-Optimierung:
- - XML-Kommentar hinzugefügt.
- - 'ColorDialog' in einen 'Using'-Block eingebettet, um eine saubere Freigabe der Systemressourcen (Dispose) zu garantieren.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadComboZimmer">
@@ -6610,12 +5838,18 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Castet den 'sender' dynamisch, um die Formatierung fehlerfrei auf das aktive Feld anzuwenden.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prCreateTabelleSasion">
+<member name="M:Pension.frmSystem.prCreateTabelleSaison">
  <summary>
- Tabelle "Sasion" erstellen
+ Erstellt die Spaltenstruktur für die Saison-Tabelle (ListView) und 
+ lädt die verfügbaren Events aus der Systemdatenbank in die Combobox.
  </summary>
  <remarks>
- 26.01.2012 Create
+ 26.01.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Rechtschreibfehler "Sasion" zu "Saison" korrigiert (Methodenname, Steuerelemente, Spalten).
+ - Veraltete 'Call'-Syntax entfernt.
+ - Robusten String-Split für Zeilenumbrüche implementiert, um unsichtbare Steuerzeichen zu verhindern.
+ - Schleifenvariable explizit deklariert und doppelten Code (.Sorting) entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadSaisonInList">
@@ -6630,148 +5864,350 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Fehlerhaften '.TopItem.Selected'-Aufruf durch die neue, sichere Methode 'prSelectFirstListViewItemIfNeeded' ersetzt.
  </remarks>
 </member>
+<member name="M:Pension.frmSystem.lvSaison_SelectedIndexChanged(System.Object,System.EventArgs)">
+ <summary>
+ Reagiert auf die Änderung der Auswahl in der Saison-ListView und 
+ aktualisiert die Detailanzeige in den Eingabefeldern.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Doppeltes 'Handles'-Ereignis in der Signatur entfernt.
+ - Veraltete 'Call'-Syntax eliminiert.
+ - Methodenname an korrekte Schreibweise (Saison) angepasst.
+ </remarks>
+</member>
 <member name="M:Pension.frmSystem.prGetInfolvSaison">
  <summary>
- Informationen aus der Kontenliste in die Eingabefelder übertragen
+ Überträgt die Informationen der ausgewählten Saison aus der ListView 
+ in die entsprechenden Textfelder und Kalender-Steuerelemente.
  </summary>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Modifizierer entfernt.
+ - Sicheres Konvertieren der Datumsstrings mittels 'Date.TryParse' integriert, 
+   um Abstürze bei Fehlformaten im MonthCalendar zu verhindern.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prLoocksaison(System.Boolean)">
+<member name="M:Pension.frmSystem.tsbNeuSaison_Click(System.Object,System.EventArgs)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Bereitet die Benutzeroberfläche für die Erfassung einer neuen Saison vor.
+ Setzt die Datumsfelder auf den Standardwert und aktiviert den Bearbeitungsmodus.
  </summary>
- <param name="lStatus"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax entfernt.
+ - Wechsel von '.Select()' auf das modernere '.Focus()' für das Steuerelement.
+ - Fehlerbereinigung beim Methodennamen (prLoocksaison zu prLockSaison).
+ - Typensichere Zuweisung des Startdatums an die Kalenderelemente integriert.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.tcSystem_Selected(System.Object,System.Windows.Forms.TabControlEventArgs)">
+<member name="M:Pension.frmSystem.prLockSaison(System.Boolean)">
  <summary>
- Ersten eintrag in der Liste selectieren, wenn die Seite ausgewählt wird
+ Steuert die Aktivierung und Deaktivierung der Schaltflächen und Eingabefelder 
+ in Abhängigkeit vom aktuellen Bearbeitungsstatus.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="lStatus">True, wenn sich das Formular im Bearbeitungs-/Neumodus befindet; andernfalls False.</param>
  <remarks>
- 20.12.2011 Create
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Modifizierer entfernt.
+ - Methodenname korrigiert (prLoocksaison zu prLockSaison).
+ - XML-Dokumentation für den Parameter 'lStatus' präzisiert.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prSelectEntry(System.Windows.Forms.ListView,System.String)">
+<member name="M:Pension.frmSystem.tsbEditSaison_Click(System.Object,System.EventArgs)">
  <summary>
- Bestimmten Eintrag in der Liste selektieren
+ Schaltet die Benutzeroberfläche in den Bearbeitungsmodus für eine bestehende Saison um
+ und setzt den Fokus auf das Namen-Auswahlfeld.
  </summary>
- <param name="lv"></param>
- <param name="sEntry"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 20.12.2011 Create
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax entfernt.
+ - 'coSaison.Select()' durch das modernere 'coSaison.Focus()' ersetzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.mcSaison_Anfang_DateChanged(System.Object,System.Windows.Forms.DateRangeEventArgs)">
+ <summary>
+ Aktualisiert die String-Variable für das Startdatum, sobald sich die Auswahl im Start-Kalender ändert.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten des Datumsbereichs.</param>
+ <remarks>
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Datentypen verkürzt und Rechtschreibfehler im Methodennamen korrigiert (Sasion zu Saison).
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.mcSaison_Ende_DateChanged(System.Object,System.Windows.Forms.DateRangeEventArgs)">
+ <summary>
+ Aktualisiert die String-Variable für das Enddatum, sobald sich die Auswahl im End-Kalender ändert.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten des Datumsbereichs.</param>
+ <remarks>
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Datentypen verkürzt und ByVal-Modifizierer entfernt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsbBreackSaison_Click(System.Object,System.EventArgs)">
+ <summary>
+ Bricht den aktuellen Erfassungs- oder Bearbeitungsmodus ab, 
+ stellt den vorherigen Zustand des ausgewählten ListView-Eintrags wieder her und sperrt die Eingabefelder.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Bereinigung der Methodensignatur und Anpassung an den aktuellen XML-Standard.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsbDelSaison_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Löschen-Schaltfläche.
+ Prüft, ob ein Eintrag ausgewählt ist, fordert eine Bestätigung an und entfernt 
+ den Datensatz anschließend aus der ListView sowie dauerhaft aus der Systemdatenbank.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 18.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Kritischen Logikfehler bei der Indexprüfung (Variable X) behoben.
+ - 'MsgBox' durch das moderne '.NET MessageBox.Show' ersetzt und Rechtschreibung korrigiert.
+ - Kompletten Totcode (alte PadR- und Dateipfad-Logik) entfernt.
+ - 'StringBuilder' durch performantes Method Chaining optimiert.
+ - Veraltete 'Call'-Syntax eliminiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prCreateTabelleColor">
  <summary>
- Tabelle Farben erstellen
+ Erstellt die Spaltenstruktur für die Objekt-Farbtabelle (ListView) 
+ und liest die bestehenden Farbeinstellungen ein.
  </summary>
  <remarks>
- 12.02.2012 Create
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax beim Methodenaufruf vollständig entfernt.
+ - Auskommentierten 'Totcode' bei der Breitenberechnung und Sortierung bereinigt.
+ - Führende Leerzeichen im Spaltenheader "Objekt" entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadColor">
  <summary>
- Farben aus der Datei "Color.ini" laden
+ Lädt die Farbeinstellungen aus der Systemdatenbank, splittet die Datensätze
+ und befüllt die ListView inklusive der visuellen Hintergrund- und Schriftfarben.
  </summary>
  <remarks>
- 12.02.2012 Create
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Logikfehler bei der Farbzuweisung (.Items(i)) behoben, der bei Leerzeilen zu Abstürzen führte.
+ - Farbzuweisung direkt auf die erstellte 'ListViewItem'-Instanz umgestellt.
+ - Robusten Zeilenumbruch-Split integriert, um Steuerzeichen sauber zu entfernen.
+ - Veraltetes '.Select()' durch '.Focus()' ersetzt und XML-Beschreibung korrigiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.lvColor_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Farbe auswählen
+ Reagiert auf die Auswahl eines Objekts in der Farbtabelle,
+ lädt dessen Farbwerte und aktualisiert die Vorschau-Elemente sowie Buttons.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 12.02.2012 Create
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+ - Lokale Variable für das ausgewählte ListViewItem eingeführt, um den Zugriff zu beschleunigen.
+ - XML-Kommentare um Parameterbeschreibungen erweitert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.btBackColor_Click(System.Object,System.EventArgs)">
  <summary>
- Hintergrundfarbe setzen
+ Öffnet den Farbauswahldialog für die Hintergrundfarbe, aktualisiert bei Erfolg 
+ die Vorschau-Elemente und aktiviert die Speichern-Schaltfläche.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses (die Schaltfläche).</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 12.02.2012 Create
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Ressourcen-Management durch Einführung eines 'Using'-Blocks für den ColorDialog optimiert.
+ - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+ - XML-Kommentare um präzise Parameterbeschreibungen ergänzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.btForeColor_Click(System.Object,System.EventArgs)">
  <summary>
- Schriftfarbe setzen
+ Öffnet den Farbauswahldialog für die Schriftfarbe, aktualisiert bei Erfolg 
+ die Vorschau-Elemente und aktiviert die Speichern-Schaltfläche.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses (die Schaltfläche).</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 12.02.2012 Create
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Ressourcen-Management durch Einführung eines 'Using'-Blocks für den ColorDialog optimiert.
+ - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+ - XML-Kommentare um präzise Parameterbeschreibungen ergänzt.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.btSaveColor_Click(System.Object,System.EventArgs)">
  <summary>
- Farbe speichern in Datei und array
+ Aktualisiert die Farbwerte des ausgewählten Objekts in der ListView, 
+ serialisiert die gesamte Farbtabelle und sichert diese dauerhaft in der Systemdatenbank.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses (die Schaltfläche).</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 12.02.2012 Create
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Kritischen Selektions-Logikfehler in der Schleife (.SelectedItems(0)) korrigiert.
+ - Datenzugriff direkt über den Schleifenindex ohne Manipulation der GUI-Auswahl umgestellt.
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen vollständig entfernt.
+ - 'StringBuilder' durch Method-Chaining für maximale Performance optimiert.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prCreateWerbelink">
+<member name="M:Pension.frmSystem.prSaisonColor">
  <summary>
- Tabelle Zimmer mit daten aus der DataTabel "Zimmer" füllen
+ Verknüpft die bestehenden Saisons mit den dazugehörigen Farbeinstellungen.
+ Durchsucht die Datensätze, gleicht die Objektnamen ab und speichert die erweiterte 
+ Saison-Struktur (inklusive Farb-RGB-Werten) wieder in der Systemdatenbank.
  </summary>
- <param name="dtT"></param>
  <remarks>
- 19.12.2011 Create
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Generische 'Array'-Typen durch stark typisierte String-Arrays ersetzt.
+ - String-Verkettungen in den verschachtelten Schleifen durch einen performanten 'StringBuilder' ersetzt.
+ - Veraltete VB-Funktion 'Mid' durch die native '.Substring'-Methode ausgetauscht.
+ - Fehlerschutz bei der Array-Länge der Farbzeilen integriert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.LoadDruck">
+ <summary>
+ Lädt die verfügbaren Druckprofile aus der Systemdatenbank, splittet diese in das 
+ globale Profil-Array und initialisiert die Anzeige sowie die verknüpfte Liste.
+ </summary>
+ <remarks>
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen vollständig entfernt.
+ - Wechsel auf das performantere Char-Splitting ('#'c) durchgeführt.
+ - Auskommentierten 'Totcode' am Anfang der Methode gelöscht.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prCreateTabelleZimmerDruck">
+ <summary>
+ Erstellt die Spaltenstruktur für die Zimmer-Drucktabelle (ListView)
+ und definiert das visuelle Verhalten der Liste.
+ </summary>
+ <remarks>
+ 02.10.2026 - Code-Optimierung:
+ - Namespaces gekürzt (ColumnHeaderStyle.Nonclickable).
+ - Strukturierung und Formatierung des With-Blocks für bessere Lesbarkeit optimiert.
  </remarks>
 </member>
 <member name="M:Pension.frmSystem.prLoadZimInListDruck(System.Data.DataTable)">
  <summary>
- Tabelle Zimmer mit daten aus der DataTabel "Zimmer" füllen
+ Befüllt die Zimmer-Drucktabelle (ListView) mit den Datensätzen aus einer DataTable.
+ Ignoriert dabei gelöschte Zeilen und löst IDs in lesbare Objektnamen auf.
  </summary>
- <param name="dtT"></param>
+ <param name="dtT">Die DataTable, die die Zimmerdaten enthält.</param>
  <remarks>
- 19.12.2011 Create
+ 19.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Auf performantere 'For Each'-Schleife für DataRows umgestellt.
+ - 'ByVal'-Modifizierer aus der Signatur entfernt.
+ - Inline-Bedingung (If-Operator) für die FeWo-Kennzeichnung ("Ja"/"Nein") eingeführt.
+ - Variablen-Gültigkeitsbereiche (Scope) optimiert und in die Schleife verlagert.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prCreateTabelleZusatz">
+<member name="M:Pension.frmSystem.LoadDruckList(System.String)">
  <summary>
- Tabelle "Zusatz" erstellen
+ Lädt die Zimmerstruktur für das ausgewählte Druckprofil, baut die Tabelle neu auf,
+ befüllt sie und setzt die Auswahlhaken (Checked) bei den im Profil hinterlegten Zimmer-IDs.
  </summary>
+ <param name="sProfil">Der Name des zu ladenden Druckprofils.</param>
  <remarks>
- 26.01.2012 Create
+ 02.10.2026 - Code-Optimierung:
+ - Möglichen Absturz (NullReferenceException) abgefangen, falls das Profil nicht existiert.
+ - Parameterübergabe von 'ByRef' auf den Standard (Wertübergabe) korrigiert.
+ - Generischen Typ 'Array' durch ein stark typisiertes String-Array ersetzt.
+ - Veraltete 'Call'-Syntax bei Methodenaufrufen vollständig entfernt.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prLoadZusatzInList">
+<member name="M:Pension.frmSystem.tsbDruckSave_Click(System.Object,System.EventArgs)">
  <summary>
- Tabelle Saison mit daten aus der Datei "Saison.ini" füllen
+ Verarbeitet den Klick auf die Speichern-Schaltfläche der Drucksteuerung
+ und stößt den eigentlichen Speichervorgang an.
  </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 26.01.2012 Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'Call'-Syntax vollständig entfernt.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prGetInfolvZusatz">
+<member name="M:Pension.frmSystem.tsbcbDruck_TextChanged(System.Object,System.EventArgs)">
  <summary>
- Informationen aus der Kontenliste in die Eingabefelder übertragen
+ Reagiert auf die Textänderung der Druckprofil-Combobox. 
+ Lädt das ausgewählte Profil, sofern es existiert; andernfalls werden alle Auswahlhaken zurückgesetzt.
  </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 02.10.2026 - Code-Optimierung:
+ - Kritischen Logikfehler im Else-Zweig behoben, der bei jedem Schleifendurchlauf fälschlicherweise Haken entfernte.
+ - Logik gestrafft: Setzt Haken nur zurück, wenn das Profil im gesamten Array nicht existiert.
+ - Schleifenvariablen lokal typisiert und veraltete 'Call'-Syntax entfernt.
  </remarks>
 </member>
-<member name="M:Pension.frmSystem.prLoockZusatz(System.Boolean)">
+<member name="M:Pension.frmSystem.tsbDruckDel_Click(System.Object,System.EventArgs)">
  <summary>
- Steuerung der Button und Eingabefelder
+ Löscht das aktuell ausgewählte Druckprofil nach einer Bestätigungsabfrage
+ aus dem Array und stößt die Aktualisierung der Systemdatenbank an.
  </summary>
- <param name="lStatus"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
  <remarks>
- 18.12.2011 Create
+ 02.10.2026 - Code-Optimierung:
+ - 'MsgBox' durch modernes 'MessageBox.Show' ersetzt.
+ - Veraltete 'Call'-Syntax entfernt und Schleifenvariable lokal typisiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prtsbcbDruckLoad">
+ <summary>
+ Befüllt die Druckprofil-Combobox mit den gültigen Profilnamen aus dem Array
+ und wählt den ersten verfügbaren Eintrag standardmäßig aus.
+ </summary>
+ <remarks>
+ 02.10.2026 - Code-Optimierung:
+ - Index-Absturzschutz hinzugefügt, falls das Array leer ist.
+ - Validierung für leere Einträge optimiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prDruckSave">
+ <summary>
+ Sammelt die IDs der ausgewählten Zimmer, aktualisiert oder ergänzt das entsprechende 
+ Druckprofil im Array und serialisiert die Gesamtstruktur zur dauerhaften Sicherung in der Systemdatenbank.
+ </summary>
+ <remarks>
+ 02.10.2026 - Code-Optimierung:
+ - Logischen Serialisierungsfehler (Doppelspeicherung von Profilen) vollständig behoben.
+ - 'nFond' (impliziter String-Zahlen-Mix) durch ein sauberes Boolean ('profilGefunden') ersetzt.
+ - 'StringBuilder' zur performanten Zusammenstellung der Profildaten eingeführt.
+ - Dynamische Array-Erweiterung (ReDim Preserve) für neue Profile stabilisiert.
+ - Veraltete 'Call'-Syntax bei allen Methodenaufrufen vollständig entfernt.
  </remarks>
 </member>
 <member name="M:Pension.moDB.StruckturINI(System.String,System.String)">
@@ -8190,6 +7626,8 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  <remarks>
  17.12.2011 Create <br/>
  20.09.2026 Code-Optimierung: Zusammenfassung sequentieller Array-Indizes in Schleifenstrukturen zur Reduzierung von Redundanz und Erhöhung der Lesbarkeit.
+ 02.10.2026
+ - Mwst für Speise und Getränke und Gegenkonten entfernt
  </remarks>
 </member>
 <member name="M:Pension.moStart.prInitDatenBankGlobal">

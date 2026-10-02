@@ -157,28 +157,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
-    <Compile Include="Form1.Designer.vb">
-      <DependentUpon>Form1.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Form1.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmCheckin.Designer.vb">
       <DependentUpon>frmCheckin.vb</DependentUpon>
     </Compile>
     <Compile Include="frmCheckin.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmSchloss.Designer.vb">
-      <DependentUpon>frmSchloss.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmSchloss.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmTSend.Designer.vb">
-      <DependentUpon>frmTSend.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmTSend.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmWasser.Designer.vb">
@@ -232,12 +214,6 @@
     <Compile Include="moGlobals.vb" />
     <Compile Include="moZugferd.vb" />
     <Compile Include="PHP.vb" />
-    <Compile Include="frmRestore.Designer.vb">
-      <DependentUpon>frmRestore.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmRestore.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="myInit.vb" />
     <Compile Include="frmReservierung820.designer.vb">
       <DependentUpon>frmReservierung820.vb</DependentUpon>
@@ -277,34 +253,16 @@
     <Compile Include="frmRechnung.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmTermine.Designer.vb">
-      <DependentUpon>frmTermine.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmTermine.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmZusatz.Designer.vb">
       <DependentUpon>frmZusatz.vb</DependentUpon>
     </Compile>
     <Compile Include="frmZusatz.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmDatev.designer.vb">
-      <DependentUpon>frmDatev.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmDatev.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmDruckBPlan.Designer.vb">
       <DependentUpon>frmDruckBPlan.vb</DependentUpon>
     </Compile>
     <Compile Include="frmDruckBPlan.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmEinteilung.Designer.vb">
-      <DependentUpon>frmEinteilung.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmEinteilung.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmError.designer.vb">
@@ -381,17 +339,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmCheckin.resx">
       <DependentUpon>frmCheckin.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmSchloss.resx">
-      <DependentUpon>frmSchloss.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmTSend.resx">
-      <DependentUpon>frmTSend.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWasser.resx">
       <DependentUpon>frmWasser.vb</DependentUpon>
@@ -429,25 +378,11 @@
     <EmbeddedResource Include="frmReservierung820.resx">
       <DependentUpon>frmReservierung820.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmRestore.resx">
-      <DependentUpon>frmRestore.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmTermine.resx">
-      <DependentUpon>frmTermine.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmZusatz.resx">
       <DependentUpon>frmZusatz.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmDatev.resx">
-      <DependentUpon>frmDatev.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmDruckBPlan.resx">
       <DependentUpon>frmDruckBPlan.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmEinteilung.resx">
-      <DependentUpon>frmEinteilung.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmError.resx">

@@ -239,9 +239,6 @@
 
     End Sub
 
-    Private Sub tsbSchlossSet_Click(sender As Object, e As EventArgs) Handles tsbSchlossSet.Click
-        frmSchloss.Show()
-    End Sub
 
 
 
