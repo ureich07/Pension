@@ -6210,6 +6210,118 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  - Veraltete 'Call'-Syntax bei allen Methodenaufrufen vollständig entfernt.
  </remarks>
 </member>
+<member name="M:Pension.frmSystem.prSpracheIni">
+ <summary>
+ Initialisiert die Spracheinstellungen, baut die Struktur des DataGridViews (dgvSprache) auf,
+ befüllt die Sprachauswahl-Combobox und lädt die Übersetzungstexte in ein zweidimensionales Datenarray.
+ </summary>
+ <remarks>
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Kritischen IndexOutOfRangeException-Fehler beim Befüllen des zweidimensionalen Arrays (arFeld2) behoben.
+ - Robustes String-Splitting für Zeilenumbrüche integriert, um Dateninkonsistenzen zu vermeiden.
+ - Absturzschutz für leere Combobox-Zuweisungen hinzugefügt.
+ - Alle Zähl- und Schleifenvariablen (x, y, i, j) lokal deklariert und stark typisiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.dgvSprache_MouseDown(System.Object,System.Windows.Forms.MouseEventArgs)">
+ <summary>
+ Steuert die Editierbarkeit des DataGridViews abhängig davon, wohin der Benutzer klickt.
+ Ermöglicht das Bearbeiten nur in der Text-Spalte (Index 1).
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Maus-Ereignisdaten mit den Klickkoordinaten.</param>
+ <remarks>
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Schlüsselwörter entfernt und Datentypen vereinfacht.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.prSaveCurrentLanguageToArray(System.Object,System.EventArgs)">
+ <summary>
+ Sichert die aktuellen Änderungen aus dem DataGridView im temporären Array (arFeld2),
+ bevor der Benutzer eine neue Sprache auswählt.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Methodenname an Funktion angepasst (prSaveCurrentLanguageToArray).
+ - Kritischen Index-Überlauf (IndexOutOfRangeException) durch GetUpperBound behoben.
+ - NullReferenceException bei leeren Tabellenzellen abgefangen.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.cbText_SelectedIndexChanged(System.Object,System.EventArgs)">
+ <summary>
+ Lädt die Übersetzungstexte der neu ausgewählten Sprache aus dem Datenarray (arFeld2)
+ und zeigt diese in der Text-Spalte des DataGridViews an.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Indexgrenzen korrigiert, um Abstürze zu verhindern.
+ - Namespaces in der Signatur verkürzt und Schleifenvariablen typisiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsSpracheVerw_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Sprachverwaltungsschaltfläche.
+ Aktualisiert das Datenarray mit den aktuellen Tabellenwerten und stellt sicher,
+ dass die Anzeige für die ausgewählte Sprache korrekt geladen ist.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Kritischen Absturz durch nicht deklarierte Variable 'arText' und Indexüberlauf (1 To x) behoben.
+ - Logik korrigiert: Sichert erst die Grid-Daten im Array und lädt anschließend die Ansicht neu.
+ - 'NullReferenceException' bei leeren Zellen abgefangen und Schleifenvariablen typisiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsSpracheSave_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Speichern-Schaltfläche der Sprachverwaltung.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+</member>
+<member name="M:Pension.frmSystem.prSpracheSave">
+ <summary>
+ Sichert die aktuellen Texte aus dem DataGridView im Array, serialisiert die gesamte 
+ Sprachmatrix (inklusive Erkennung neuer Sprachen) und speichert das Ergebnis in der Systemdatenbank.
+ </summary>
+ <remarks>
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Kritischen Fehler bei der String-Generierung (fehlerhafte Mid-Verkettung) behoben.
+ - Index-Überläufe (1 To x) durch sichere GetUpperBound-Abfragen ersetzt.
+ - 'StringBuilder' für die gesamte CSV-Generierung eingeführt, um massive Performance-Vorteile zu erzielen.
+ - 'NullReferenceException' bei leeren Zellen im DataGridView abgefangen.
+ - Veraltete VB-Syntax entfernt.
+ </remarks>
+</member>
+<member name="M:Pension.frmSystem.tsSpracheDel_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Löschen-Schaltfläche der Sprachverwaltung.
+ Fordert eine Bestätigung an, entfernt die ausgewählte Sprache aus der Matrix
+ und speichert die aktualisierten Daten in der Systemdatenbank.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 12.02.2012 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Sicherheitsabfrage (MessageBox) vor dem Löschvorgang integriert.
+ - Kritischen Serialisierungsfehler (fehlerhafte Mid-Verkettung) analog zum Speichern behoben.
+ - Index-Überläufe (1 To x) durch sichere GetUpperBound-Abfragen ersetzt.
+ - 'StringBuilder' zur performanten Generierung des CSV-Strings eingeführt.
+ - Auskommentierten Totcode entfernt.
+ </remarks>
+</member>
 <member name="M:Pension.moDB.StruckturINI(System.String,System.String)">
  <summary>
  Stellt die Struktur der INI-Datei bereit

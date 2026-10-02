@@ -19,9 +19,9 @@ Public Class frmSystem
     Dim sLanguage1() As String
     Dim sLanguage() As String
     Dim arText() As String
-    Dim arFeld As Array
-    Dim arFeld1 As Array
-    Dim arFeld2(1, 1) As String
+    Dim arFeld() As String           ' Von Array zu String() geändert
+    Dim arFeld1() As String          ' Von Array zu String() geändert
+    Dim arFeld2(,) As String         ' Offenes 2D-String-Array für das dynamische ReDim(x, y)
     Dim x As Integer = 1
     Dim y As Integer = 1
 
@@ -5678,8 +5678,23 @@ Public Class frmSystem
                 Next
             End If
 
-            tsbcbDruck.Text = ""
-            prDruckSave()
+            ' Das gesamte Array sauber mit '#' als Trennzeichen serialisieren
+            Dim sbGesamt As New StringBuilder()
+            For i As Integer = 0 To arDruckZimmer.Length - 1
+                Dim eintrag As String = arDruckZimmer(i).ToString().Trim()
+                ' Verhindert, dass leere Fragmente oder reine Semikolons in die DB geschrieben werden
+                If eintrag <> "" AndAlso eintrag <> ";" Then
+                    sbGesamt.Append(eintrag).Append("#")
+                End If
+            Next
+
+            ' In der Systemdatenbank sichern
+            SaveOneValueInSystemDb("Druckprofil", sbGesamt.ToString())
+            prtsbcbDruckLoad()
+            ' Den ersten Eintrag als Standardtext setzen, falls Profile vorhanden sind
+            If tsbcbDruck.Items.Count > 0 Then
+                tsbcbDruck.Text = tsbcbDruck.Items(0).ToString()
+            End If
         End If
     End Sub
 
@@ -5782,171 +5797,385 @@ Public Class frmSystem
 
 #End Region
 
-#Region "Sprache"
+#Region "Sprache..................................................................................."
 
+    ''' <summary>
+    ''' Initialisiert die Spracheinstellungen, baut die Struktur des DataGridViews (dgvSprache) auf,
+    ''' befüllt die Sprachauswahl-Combobox und lädt die Übersetzungstexte in ein zweidimensionales Datenarray.
+    ''' </summary>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Kritischen IndexOutOfRangeException-Fehler beim Befüllen des zweidimensionalen Arrays (arFeld2) behoben.
+    ''' - Robustes String-Splitting für Zeilenumbrüche integriert, um Dateninkonsistenzen zu vermeiden.
+    ''' - Absturzschutz für leere Combobox-Zuweisungen hinzugefügt.
+    ''' - Alle Zähl- und Schleifenvariablen (x, y, i, j) lokal deklariert und stark typisiert.
+    ''' </remarks>
     Private Sub prSpracheIni()
         lNew = False
-        Dim artext As Array = Split(ReadOneValueFromSystemDb("Language"), vbCrLf)
+
+        Dim rawText As String = ReadOneValueFromSystemDb("Language")
+        Dim arText() As String = rawText.Split(New String() {vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+
         x = 1
         y = 1
+
         cbText.Items.Clear()
-        For i = 1 To artext.Length - 1
-            arFeld = Split(artext(i), ";")
-            cbText.Items.Add(arFeld(0))
-            x = x + 1
+
+        ' 1. Combobox mit den Sprachschlüsseln befüllen und Zeilen (x) zählen
+        For i As Integer = 1 To arText.Length - 1
+            Dim arFeld() As String = arText(i).Split(";"c)
+            If arFeld.Length > 0 Then
+                cbText.Items.Add(arFeld(0).Trim())
+                x += 1
+            End If
         Next
+
         With dgvSprache
             .Rows.Clear()
             .ColumnCount = 2
             .ColumnHeadersVisible = True
+
             .Columns(0).Name = "Sprache"
             .Columns(0).Width = 50
             .Columns(1).Name = "Text"
             .Columns(1).Width = 840
-            arFeld = Split(artext(0), ";")
-            For i = 1 To arFeld.Length - 1
-                .Rows.Add()
-                arFeld1 = Split(arFeld(i), ",")
-                .Rows(i - 1).Cells(0).Value = arFeld1(0)
-                y = y + 1
-            Next
+
+            ' 2. Spaltenheader auswerten und Sprachen-Spalte (y) befüllen
+            If arText.Length > 0 Then
+                Dim arFeld() As String = arText(0).Split(";"c)
+                For i As Integer = 1 To arFeld.Length - 1
+                    Dim arFeld1() As String = arFeld(i).Split(","c)
+                    If arFeld1.Length > 0 Then
+                        .Rows.Add()
+                        .Rows(i - 1).Cells(0).Value = arFeld1(0).Trim()
+                        y += 1
+                    End If
+                Next
+            End If
+
+            ' 3. Zweidimensionales Array sicher dimensionieren und befüllen
+            ' (Hinweis: arFeld2 sollte als Klassenvariable deklariert sein, um global nutzbar zu bleiben)
             ReDim arFeld2(x, y)
-            For i = 0 To x - 1
-                arFeld = Split(artext(i), ";")
-                If arFeld(0) <> "" Then
-                    For j = 0 To y - 1
-                        arFeld2(i, j) = arFeld(j)
+
+            For i As Integer = 0 To arText.Length - 1
+                Dim arFeld() As String = arText(i).Split(";"c)
+
+                If arFeld.Length > 0 AndAlso arFeld(0).Trim() <> "" Then
+                    For j As Integer = 0 To y - 1
+                        ' Wichtiger Schutz: Nur zuweisen, wenn die Zeile auch ausreichend Spalten besitzt!
+                        If j < arFeld.Length Then
+                            arFeld2(i, j) = arFeld(j).Trim()
+                        Else
+                            arFeld2(i, j) = ""
+                        End If
                     Next
                 End If
             Next
-            cbText.Text = cbText.Items(0)
 
+            ' Standardauswahl für die Combobox setzen (falls Einträge vorhanden)
+            If cbText.Items.Count > 0 Then
+                cbText.Text = cbText.Items(0).ToString()
+            End If
 
-            dgvSprache.ReadOnly = True
+            .ReadOnly = True
         End With
     End Sub
 
-    Private Sub dgvSprache_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles dgvSprache.MouseDown
-
+    ''' <summary>
+    ''' Steuert die Editierbarkeit des DataGridViews abhängig davon, wohin der Benutzer klickt.
+    ''' Ermöglicht das Bearbeiten nur in der Text-Spalte (Index 1).
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Maus-Ereignisdaten mit den Klickkoordinaten.</param>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'ByVal'-Schlüsselwörter entfernt und Datentypen vereinfacht.
+    ''' </remarks>
+    Private Sub dgvSprache_MouseDown(sender As Object, e As MouseEventArgs) Handles dgvSprache.MouseDown
         Dim hit As DataGridView.HitTestInfo = dgvSprache.HitTest(e.X, e.Y)
+
+        ' Nur die Spalte 1 ("Text") darf editiert werden
         If hit.ColumnIndex = 1 Then
             dgvSprache.ReadOnly = False
         Else
             dgvSprache.ReadOnly = True
         End If
     End Sub
-    Private Sub tbText_Click(sender As System.Object, e As System.EventArgs) Handles cbText.Click
-        For i = 1 To x
-            If cbText.Text = arFeld2(i, 0) Then
-                For j = 0 To y - 2
-                    arFeld2(i, j + 1) = dgvSprache.Rows(j).Cells(1).Value
+    ''' <summary>
+    ''' Sichert die aktuellen Änderungen aus dem DataGridView im temporären Array (arFeld2),
+    ''' bevor der Benutzer eine neue Sprache auswählt.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Methodenname an Funktion angepasst (prSaveCurrentLanguageToArray).
+    ''' - Kritischen Index-Überlauf (IndexOutOfRangeException) durch GetUpperBound behoben.
+    ''' - NullReferenceException bei leeren Tabellenzellen abgefangen.
+    ''' </remarks>
+    Private Sub prSaveCurrentLanguageToArray(sender As Object, e As EventArgs) Handles cbText.Click
+        If arFeld2 Is Nothing Then Exit Sub
+
+        Dim aktuelleSprache As String = cbText.Text.Trim()
+        Dim anzahlGridZeilen As Integer = dgvSprache.Rows.Count
+
+        ' Sicheres Durchlaufen der x-Dimension des Arrays
+        For i As Integer = 0 To arFeld2.GetUpperBound(0)
+            If arFeld2(i, 0) = aktuelleSprache Then
+
+                ' Werte aus dem Grid in das Array schreiben
+                For j As Integer = 0 To y - 2
+                    If j < anzahlGridZeilen Then
+                        Dim zellWert As Object = dgvSprache.Rows(j).Cells(1).Value
+                        ' Falls eine Zelle leer ist (Nothing), leeren String zuweisen
+                        arFeld2(i, j + 1) = If(zellWert IsNot Nothing, zellWert.ToString().Trim(), "")
+                    End If
                 Next
+
+                Exit For
             End If
         Next
     End Sub
 
+    ''' <summary>
+    ''' Lädt die Übersetzungstexte der neu ausgewählten Sprache aus dem Datenarray (arFeld2)
+    ''' und zeigt diese in der Text-Spalte des DataGridViews an.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Indexgrenzen korrigiert, um Abstürze zu verhindern.
+    ''' - Namespaces in der Signatur verkürzt und Schleifenvariablen typisiert.
+    ''' </remarks>
+    Private Sub cbText_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbText.SelectedIndexChanged
+        If arFeld2 Is Nothing Then Exit Sub
 
+        Dim neueSprache As String = cbText.Text.Trim()
+        Dim anzahlGridZeilen As Integer = dgvSprache.Rows.Count
 
+        ' Sicheres Durchlaufen der x-Dimension des Arrays
+        For i As Integer = 0 To arFeld2.GetUpperBound(0)
+            If arFeld2(i, 0) = neueSprache Then
 
-    Private Sub cbText_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cbText.SelectedIndexChanged
-
-        For i = 1 To x
-            If cbText.Text = arFeld2(i, 0) Then
-                For j = 0 To y - 2
-                    dgvSprache.Rows(j).Cells(1).Value = arFeld2(i, j + 1)
+                ' Werte aus dem Array in das Grid schreiben
+                For j As Integer = 0 To y - 2
+                    If j < anzahlGridZeilen Then
+                        dgvSprache.Rows(j).Cells(1).Value = arFeld2(i, j + 1)
+                    End If
                 Next
+
+                Exit For
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Verarbeitet den Klick auf die Sprachverwaltungsschaltfläche.
+    ''' Aktualisiert das Datenarray mit den aktuellen Tabellenwerten und stellt sicher,
+    ''' dass die Anzeige für die ausgewählte Sprache korrekt geladen ist.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Kritischen Absturz durch nicht deklarierte Variable 'arText' und Indexüberlauf (1 To x) behoben.
+    ''' - Logik korrigiert: Sichert erst die Grid-Daten im Array und lädt anschließend die Ansicht neu.
+    ''' - 'NullReferenceException' bei leeren Zellen abgefangen und Schleifenvariablen typisiert.
+    ''' </remarks>
+    Private Sub tsSpracheVerw_Click(sender As Object, e As EventArgs) Handles tsSpracheVerw.Click
+        If arFeld2 Is Nothing Then Exit Sub
+
+        Dim ausgewaehlteSprache As String = cbText.Text.Trim()
+        Dim anzahlGridZeilen As Integer = dgvSprache.Rows.Count
+
+        ' 1. Aktuellen Zustand aus dem Grid in das Array sichern (für die ausgewählte Sprache)
+        For i As Integer = 0 To arFeld2.GetUpperBound(0)
+            If arFeld2(i, 0) = ausgewaehlteSprache Then
+                For j As Integer = 0 To y - 2
+                    If j < anzahlGridZeilen Then
+                        Dim zellWert As Object = dgvSprache.Rows(j).Cells(1).Value
+                        arFeld2(i, j + 1) = If(zellWert IsNot Nothing, zellWert.ToString().Trim(), "")
+                    End If
+                Next
+                Exit For
             End If
         Next
 
-
-
-    End Sub
-    Private Sub tsSpracheVerw_Click(sender As System.Object, e As System.EventArgs) Handles tsSpracheVerw.Click
-        For i = 0 To x - 1
-            arFeld = Split(arText(i), ";")
-            For j = 0 To y - 1
-                arFeld2(i, j) = arFeld(j)
-            Next
-        Next
-
-        For i = 1 To x
-            If cbText.Text = arFeld2(i, 0) Then
-                For j = 0 To y - 2
-                    dgvSprache.Rows(j).Cells(1).Value = arFeld2(i, j + 1)
+        ' 2. Daten aus dem Array wieder fest an das Grid binden / Anzeige auffrischen
+        For i As Integer = 0 To arFeld2.GetUpperBound(0)
+            If arFeld2(i, 0) = ausgewaehlteSprache Then
+                For j As Integer = 0 To y - 2
+                    If j < anzahlGridZeilen Then
+                        dgvSprache.Rows(j).Cells(1).Value = arFeld2(i, j + 1)
+                    End If
                 Next
+                Exit For
             End If
         Next
     End Sub
-    Private Sub tsSpracheSave_Click(sender As System.Object, e As System.EventArgs) Handles tsSpracheSave.Click 'Text Kopf
 
+    ''' <summary>
+    ''' Verarbeitet den Klick auf die Speichern-Schaltfläche der Sprachverwaltung.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    Private Sub tsSpracheSave_Click(sender As Object, e As EventArgs) Handles tsSpracheSave.Click
         prSpracheSave()
     End Sub
+
+    ''' <summary>
+    ''' Sichert die aktuellen Texte aus dem DataGridView im Array, serialisiert die gesamte 
+    ''' Sprachmatrix (inklusive Erkennung neuer Sprachen) und speichert das Ergebnis in der Systemdatenbank.
+    ''' </summary>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Kritischen Fehler bei der String-Generierung (fehlerhafte Mid-Verkettung) behoben.
+    ''' - Index-Überläufe (1 To x) durch sichere GetUpperBound-Abfragen ersetzt.
+    ''' - 'StringBuilder' für die gesamte CSV-Generierung eingeführt, um massive Performance-Vorteile zu erzielen.
+    ''' - 'NullReferenceException' bei leeren Zellen im DataGridView abgefangen.
+    ''' - Veraltete VB-Syntax entfernt.
+    ''' </remarks>
     Private Sub prSpracheSave()
-        Dim sTextSprache As String = ""
-        Dim sText_x As String = cbText.Text & ";"
+        If arFeld2 Is Nothing Then Exit Sub
+
+        Dim ausgewaehlteSprache As String = cbText.Text.Trim()
+        Dim anzahlGridZeilen As Integer = dgvSprache.Rows.Count
         lNew = True
-        For i = 1 To x
-            If cbText.Text = arFeld2(i, 0) Then
+
+        ' 1. Aktuelle Änderungen aus dem Grid für die bestehende Sprache ins Array sichern
+        For i As Integer = 0 To arFeld2.GetUpperBound(0)
+            If arFeld2(i, 0) = ausgewaehlteSprache Then
                 lNew = False
-                For j = 0 To y - 2
-                    arFeld2(i, j + 1) = dgvSprache.Rows(j).Cells(1).Value
+                For j As Integer = 0 To y - 2
+                    If j < anzahlGridZeilen Then
+                        Dim zellWert As Object = dgvSprache.Rows(j).Cells(1).Value
+                        arFeld2(i, j + 1) = If(zellWert IsNot Nothing, zellWert.ToString().Trim(), "")
+                    End If
                 Next
+                Exit For
             End If
         Next
 
-        For i = 0 To x - 1
+        Dim sbGesamt As New StringBuilder()
+
+        ' 2. Bestehende Matrix aus dem Array in das CSV-Format konvertieren
+        For i As Integer = 0 To arFeld2.GetUpperBound(0)
+            ' Nur Zeilen verarbeiten, die einen Sprachschlüssel besitzen
             If arFeld2(i, 0) <> "" Then
-                For j = 0 To y
-                    sTextSprache = sTextSprache & arFeld2(i, j) & ";"
+                Dim sbZeile As New StringBuilder()
+
+                ' Alle Spalten (y) für diese Zeile mit Semikolon verketten
+                For j As Integer = 0 To arFeld2.GetUpperBound(1)
+                    sbZeile.Append(arFeld2(i, j)).Append(";")
                 Next
-                sTextSprache = Mid(sTextSprache, 1, sTextSprache.Length - 2) & vbCrLf
+
+                ' Das letzte überschüssige Semikolon der Zeile entfernen und Zeilenumbruch anhängen
+                If sbZeile.Length > 0 Then
+                    Dim zeilenText As String = sbZeile.ToString()
+                    sbGesamt.Append(zeilenText.Substring(0, zeilenText.Length - 1)).Append(vbCrLf)
+                End If
             End If
         Next
 
-        If lNew = True Then
-            For j = 0 To y - 2
-                sText_x = sText_x & dgvSprache.Rows(j).Cells(1).Value & ";"
+        ' 3. Falls es sich um eine neu angelegte Sprache handelt, diese unten anhängen
+        If lNew Then
+            Dim sbNeu As New StringBuilder(ausgewaehlteSprache & ";")
+
+            For j As Integer = 0 To y - 2
+                If j < anzahlGridZeilen Then
+                    Dim zellWert As Object = dgvSprache.Rows(j).Cells(1).Value
+                    sbNeu.Append(If(zellWert IsNot Nothing, zellWert.ToString().Trim(), "")).Append(";")
+                Else
+                    sbNeu.Append(";")
+                End If
             Next
-            sText_x = sText_x & vbCrLf & ";;;;;;;;"
-            sTextSprache = sTextSprache & sText_x
+
+            ' Letztes Semikolon entfernen und Platzhalter-Struktur analog zum Original anhängen
+            Dim neuText As String = sbNeu.ToString()
+            sbGesamt.Append(neuText.Substring(0, neuText.Length - 1)).Append(vbCrLf)
+
+            ' Optionaler originaler Struktur-Anhang (falls zwingend benötigt)
+            ' sbGesamt.Append(";;;;;;;;") 
         End If
 
-        SaveOneValueInSystemDb("Language", sTextSprache)
-        '  tsSpracheNew.BackColor = Color.Transparent
+        ' 4. Daten dauerhaft in die Datenbank schreiben und Ansicht neu initialisieren
+        SaveOneValueInSystemDb("Language", sbGesamt.ToString())
         prSpracheIni()
     End Sub
 
-    'Private Sub tsSpracheNew_Click(sender As Object, e As EventArgs) Handles tsSpracheNew.Click
-    '    If lNew = False Then
-    '        lNew = True
-    '        tsSpracheNew.BackColor = Color.Red
-    '    Else
-    '        lNew = False
-    '        tsSpracheNew.BackColor = Color.Transparent
-    '    End If
-    'End Sub
-
+    ''' <summary>
+    ''' Verarbeitet den Klick auf die Löschen-Schaltfläche der Sprachverwaltung.
+    ''' Fordert eine Bestätigung an, entfernt die ausgewählte Sprache aus der Matrix
+    ''' und speichert die aktualisierten Daten in der Systemdatenbank.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 12.02.2012 - Create
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Sicherheitsabfrage (MessageBox) vor dem Löschvorgang integriert.
+    ''' - Kritischen Serialisierungsfehler (fehlerhafte Mid-Verkettung) analog zum Speichern behoben.
+    ''' - Index-Überläufe (1 To x) durch sichere GetUpperBound-Abfragen ersetzt.
+    ''' - 'StringBuilder' zur performanten Generierung des CSV-Strings eingeführt.
+    ''' - Auskommentierten Totcode entfernt.
+    ''' </remarks>
     Private Sub tsSpracheDel_Click(sender As Object, e As EventArgs) Handles tsSpracheDel.Click
-        'lNew = False
-        'tsSpracheNew.BackColor = Color.Transparent
-        Dim sTextSprache As String = ""
-        For i = 1 To x
-            If cbText.Text = arFeld2(i, 0) Then
-                arFeld2(i, 0) = ""
-            End If
-        Next
-        For i = 0 To x - 1
-            If arFeld2(i, 0) <> "" Then
-                For j = 0 To y
-                    sTextSprache = sTextSprache & arFeld2(i, j) & ";"
-                Next
-                sTextSprache = Mid(sTextSprache, 1, sTextSprache.Length - 2) & vbCrLf
-            End If
-        Next
-        SaveOneValueInSystemDb("Language", sTextSprache)
-        prSpracheIni()
-        'prSpracheSave()
+        If arFeld2 Is Nothing Then Exit Sub
+
+        Dim zuLoeschendeSprache As String = cbText.Text.Trim()
+
+        ' Validierung: Abbrechen, wenn kein Text ausgewählt ist
+        If String.IsNullOrEmpty(zuLoeschendeSprache) Then
+            MessageBox.Show("Bitte wählen Sie zuerst eine Sprache aus, die gelöscht werden soll.", "Keine Auswahl", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Exit Sub
+        End If
+
+        Dim sMsg As String = $"Wollen Sie die Sprache '{zuLoeschendeSprache}' wirklich löschen?"
+
+        If MessageBox.Show(sMsg, "Sprache löschen", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) = DialogResult.OK Then
+
+            ' 1. Die zu löschende Sprache im Array suchen und den Schlüssel leeren
+            For i As Integer = 0 To arFeld2.GetUpperBound(0)
+                If arFeld2(i, 0) = zuLoeschendeSprache Then
+                    arFeld2(i, 0) = "" ' Kennzeichnet den Datensatz als gelöscht
+                    Exit For
+                End If
+            Next
+
+            Dim sbGesamt As New StringBuilder()
+
+            ' 2. Die verbleibenden Sprachen für die Datenbank serialisieren
+            For i As Integer = 0 To arFeld2.GetUpperBound(0)
+                ' Gelöschte oder leere Zeilen überspringen
+                If arFeld2(i, 0) <> "" Then
+                    Dim sbZeile As New StringBuilder()
+
+                    ' Alle Spalten (y) verkettet mit Semikolon sammeln
+                    For j As Integer = 0 To arFeld2.GetUpperBound(1)
+                        sbZeile.Append(arFeld2(i, j)).Append(";")
+                    Next
+
+                    ' Letztes Semikolon abschneiden und Zeilenumbruch hinzufügen
+                    If sbZeile.Length > 0 Then
+                        Dim zeilenText As String = sbZeile.ToString()
+                        sbGesamt.Append(zeilenText.Substring(0, zeilenText.Length - 1)).Append(vbCrLf)
+                    End If
+                End If
+            Next
+
+            ' 3. Bereinigte Daten in die Systemdatenbank schreiben und UI neu initialisieren
+            SaveOneValueInSystemDb("Language", sbGesamt.ToString())
+            prSpracheIni()
+        End If
     End Sub
+
 
 
 

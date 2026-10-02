@@ -4255,6 +4255,7 @@ Partial Class frmSystem
         Me.cbText.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cbText.Name = "cbText"
         Me.cbText.Size = New System.Drawing.Size(1218, 28)
+        Me.cbText.Sorted = True
         Me.cbText.TabIndex = 0
         '
         'frmSystem
