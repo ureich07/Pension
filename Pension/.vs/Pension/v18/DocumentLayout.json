@@ -1,0 +1,108 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|c:\\users\\uerei\\desktop\\github\\pension\\pension\\frmrfid.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|solutionrelative:frmrfid.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\mofunction.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|solutionrelative:mofunction.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|solutionrelative:frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|c:\\users\\uerei\\desktop\\github\\pension\\pension\\frmrfid.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "RelativeMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|solutionrelative:frmrfid.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|c:\\users\\uerei\\desktop\\github\\pension\\pension\\frmsqlerror.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{9B0E1635-3CF6-44C1-83AF-B1A6D3D6CE57}|Pension.vbproj|solutionrelative:frmsqlerror.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{a80febb4-e7e0-4147-b476-21aaf2453969}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "frmRFID.vb",
+              "DocumentMoniker": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmRFID.vb",
+              "RelativeDocumentMoniker": "frmRFID.vb",
+              "ToolTip": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmRFID.vb",
+              "RelativeToolTip": "frmRFID.vb",
+              "ViewState": "AgIAAE4BAAAAAAAAAAAuwGMBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-10-02T17:24:04.766Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "frmSQLError.vb",
+              "DocumentMoniker": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmSQLError.vb",
+              "RelativeDocumentMoniker": "frmSQLError.vb",
+              "ToolTip": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmSQLError.vb",
+              "RelativeToolTip": "frmSQLError.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-10-02T17:21:39.627Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "frmRFID.vb [Entwurf]",
+              "DocumentMoniker": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmRFID.vb",
+              "RelativeDocumentMoniker": "frmRFID.vb",
+              "ToolTip": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmRFID.vb [Entwurf]",
+              "RelativeToolTip": "frmRFID.vb [Entwurf]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-10-02T17:21:19.781Z",
+              "EditorCaption": " [Entwurf]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "frmMain.vb",
+              "DocumentMoniker": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmMain.vb",
+              "RelativeDocumentMoniker": "frmMain.vb",
+              "ToolTip": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\frmMain.vb",
+              "RelativeToolTip": "frmMain.vb",
+              "ViewState": "AgIAAFwEAAAAAAAAAAApwG8EAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-10-02T17:14:47.268Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "moFunction.vb",
+              "DocumentMoniker": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\moFunction.vb",
+              "RelativeDocumentMoniker": "moFunction.vb",
+              "ToolTip": "C:\\Users\\uerei\\Desktop\\GitHub\\Pension\\Pension\\moFunction.vb",
+              "RelativeToolTip": "moFunction.vb",
+              "ViewState": "AgIAAA8FAAAAAAAAAAAcwAEFAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-10-02T17:14:47.483Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -108,7 +108,7 @@ Partial Class frmMain
         Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.DatenKontrolleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.IDKundeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.IDKundeBuchung = New System.Windows.Forms.ToolStripMenuItem()
         Me.ServerFehlerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IniToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsVersion = New System.Windows.Forms.ToolStripLabel()
@@ -689,7 +689,7 @@ Partial Class frmMain
         '
         Me.tsbClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.tsbClose.ForeColor = System.Drawing.SystemColors.ControlLight
-        Me.tsbClose.Image = Global.Pension.My.Resources.Resources.door02
+        Me.tsbClose.Image = CType(resources.GetObject("tsbClose.Image"), System.Drawing.Image)
         Me.tsbClose.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbClose.Name = "tsbClose"
         Me.tsbClose.Size = New System.Drawing.Size(34, 36)
@@ -720,7 +720,7 @@ Partial Class frmMain
         '
         Me.tsbStatistik.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.tsbStatistik.ForeColor = System.Drawing.SystemColors.ControlLight
-        Me.tsbStatistik.Image = Global.Pension.My.Resources.Resources.umsatz
+        Me.tsbStatistik.Image = CType(resources.GetObject("tsbStatistik.Image"), System.Drawing.Image)
         Me.tsbStatistik.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbStatistik.Name = "tsbStatistik"
         Me.tsbStatistik.Size = New System.Drawing.Size(34, 36)
@@ -735,7 +735,7 @@ Partial Class frmMain
         '
         Me.tsbPersonen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.tsbPersonen.ForeColor = System.Drawing.SystemColors.ControlLight
-        Me.tsbPersonen.Image = Global.Pension.My.Resources.Resources.UrPersonal
+        Me.tsbPersonen.Image = CType(resources.GetObject("tsbPersonen.Image"), System.Drawing.Image)
         Me.tsbPersonen.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbPersonen.Name = "tsbPersonen"
         Me.tsbPersonen.Size = New System.Drawing.Size(34, 36)
@@ -750,7 +750,7 @@ Partial Class frmMain
         '
         Me.tsbDruck.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.tsbDruck.ForeColor = System.Drawing.SystemColors.ControlLight
-        Me.tsbDruck.Image = Global.Pension.My.Resources.Resources.comdlg32_dll_Ico18_ico_Ico1
+        Me.tsbDruck.Image = CType(resources.GetObject("tsbDruck.Image"), System.Drawing.Image)
         Me.tsbDruck.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbDruck.Name = "tsbDruck"
         Me.tsbDruck.Size = New System.Drawing.Size(34, 36)
@@ -765,7 +765,7 @@ Partial Class frmMain
         '
         Me.tsbSuchen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.tsbSuchen.ForeColor = System.Drawing.SystemColors.ControlLight
-        Me.tsbSuchen.Image = Global.Pension.My.Resources.Resources.shell32_dll_Ico82_ico_Ico1
+        Me.tsbSuchen.Image = CType(resources.GetObject("tsbSuchen.Image"), System.Drawing.Image)
         Me.tsbSuchen.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbSuchen.Name = "tsbSuchen"
         Me.tsbSuchen.Size = New System.Drawing.Size(34, 36)
@@ -780,9 +780,8 @@ Partial Class frmMain
         '
         Me.tsbSystem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.tsbSystem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmSystem, Me.ToolStripSeparator12, Me.ToolStripMenuItem1})
-        Me.tsbSystem.Enabled = False
         Me.tsbSystem.ForeColor = System.Drawing.SystemColors.ControlLight
-        Me.tsbSystem.Image = Global.Pension.My.Resources.Resources.WRENCH
+        Me.tsbSystem.Image = CType(resources.GetObject("tsbSystem.Image"), System.Drawing.Image)
         Me.tsbSystem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbSystem.Name = "tsbSystem"
         Me.tsbSystem.Size = New System.Drawing.Size(41, 36)
@@ -791,19 +790,19 @@ Partial Class frmMain
         'tsmSystem
         '
         Me.tsmSystem.Name = "tsmSystem"
-        Me.tsmSystem.Size = New System.Drawing.Size(270, 40)
+        Me.tsmSystem.Size = New System.Drawing.Size(220, 40)
         Me.tsmSystem.Text = "Anpassen"
         '
         'ToolStripSeparator12
         '
         Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
-        Me.ToolStripSeparator12.Size = New System.Drawing.Size(267, 6)
+        Me.ToolStripSeparator12.Size = New System.Drawing.Size(217, 6)
         '
         'ToolStripMenuItem1
         '
-        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DatenKontrolleToolStripMenuItem, Me.IDKundeToolStripMenuItem, Me.ServerFehlerToolStripMenuItem, Me.IniToolStripMenuItem})
+        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DatenKontrolleToolStripMenuItem, Me.IDKundeBuchung, Me.ServerFehlerToolStripMenuItem, Me.IniToolStripMenuItem})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(270, 40)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(220, 40)
         Me.ToolStripMenuItem1.Text = "Database"
         '
         'DatenKontrolleToolStripMenuItem
@@ -812,11 +811,11 @@ Partial Class frmMain
         Me.DatenKontrolleToolStripMenuItem.Size = New System.Drawing.Size(308, 40)
         Me.DatenKontrolleToolStripMenuItem.Text = "Kunden doppelt"
         '
-        'IDKundeToolStripMenuItem
+        'IDKundeBuchung
         '
-        Me.IDKundeToolStripMenuItem.Name = "IDKundeToolStripMenuItem"
-        Me.IDKundeToolStripMenuItem.Size = New System.Drawing.Size(308, 40)
-        Me.IDKundeToolStripMenuItem.Text = "Kunde->Buchung"
+        Me.IDKundeBuchung.Name = "IDKundeBuchung"
+        Me.IDKundeBuchung.Size = New System.Drawing.Size(308, 40)
+        Me.IDKundeBuchung.Text = "Kunde->Buchung"
         '
         'ServerFehlerToolStripMenuItem
         '
@@ -860,7 +859,7 @@ Partial Class frmMain
         'tsbRFID
         '
         Me.tsbRFID.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbRFID.Image = Global.Pension.My.Resources.Resources.rfidsign_rfi_13599
+        Me.tsbRFID.Image = CType(resources.GetObject("tsbRFID.Image"), System.Drawing.Image)
         Me.tsbRFID.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbRFID.Name = "tsbRFID"
         Me.tsbRFID.Size = New System.Drawing.Size(34, 36)
@@ -907,7 +906,7 @@ Partial Class frmMain
         'ToolStripButton1
         '
         Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = Global.Pension.My.Resources.Resources.wasser
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
         Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton1.Name = "ToolStripButton1"
         Me.ToolStripButton1.Size = New System.Drawing.Size(34, 36)
@@ -1051,7 +1050,7 @@ Partial Class frmMain
     Friend WithEvents Label13 As System.Windows.Forms.Label
     Friend WithEvents ToolStripSeparator18 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents tssNet As System.Windows.Forms.ToolStripStatusLabel
-    Friend WithEvents IDKundeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents IDKundeBuchung As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents tslTabelle As System.Windows.Forms.ToolStripLabel
     Friend WithEvents tslGesammt As System.Windows.Forms.ToolStripLabel
     Friend WithEvents tslSatznummer As System.Windows.Forms.ToolStripLabel

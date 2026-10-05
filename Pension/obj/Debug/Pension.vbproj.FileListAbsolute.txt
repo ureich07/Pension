@@ -6,7 +6,6 @@ C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.vbproj.ResolveCo
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmCheckin.resources
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmWasser.resources
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmCorona.resources
-C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmReadRFID.resources
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmRFID.resources
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmPensionIni.resources
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmReservierungDest.resources
@@ -52,3 +51,4 @@ C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.vbproj.Up2Date
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.exe
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.xml
 C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.pdb
+C:\Users\uerei\Desktop\GitHub\Pension\Pension\obj\Debug\Pension.frmReadRFID.resources

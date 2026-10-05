@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Pension.exe" size="1277440">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Pension.exe" size="1431552">
       <assemblyIdentity name="Pension" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>0gl3WbCGGB1gY4XXi7zL/uHvIlEy1Ar1S0ZrErVcO40=</dsig:DigestValue>
+        <dsig:DigestValue>47W/O91jjlFc/eeDCq7EmATje/rj1YiVa1UhGH4czHM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

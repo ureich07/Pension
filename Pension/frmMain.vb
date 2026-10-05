@@ -1075,7 +1075,7 @@ Public Class frmMain
     ''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
     ''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
     ''' <remarks>
-    ''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
+    ''' <para>Öffnet das Formular für SQLError. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
     ''' <para>
     ''' <b>Historie:</b><br/>
     ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
@@ -1098,28 +1098,10 @@ Public Class frmMain
     ''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
     ''' </para>
     ''' </remarks>
-    Private Sub IDKundeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles IDKundeToolStripMenuItem.Click
+    Private Sub IDKundeBuchung_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles IDKundeBuchung.Click
         Dim sIP As String = cgIPWeb
         PHP.KunTOBuc(sIP)
     End Sub
-
-    '''' <summary>
-    '''' Verarbeitet das Klick-Ereignis der RFID leser.
-    '''' </summary>
-    '''' <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
-    '''' <param name="e">Die Ereignisdaten des Klick-Events.</param>
-    '''' <remarks>
-    '''' <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
-    '''' <para>
-    '''' <b>Historie:</b><br/>
-    '''' 22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
-    '''' </para>
-    '''' </remarks>
-    'Private Sub CodeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CodeToolStripMenuItem.Click
-
-    '    frmReadRFID.Show()
-    '    frmReadRFID.BringToFront()
-    'End Sub
 
     ''' <summary>
     ''' Verarbeitet das Klick-Ereignis der Datenkontrolle.

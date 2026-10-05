@@ -47,38 +47,43 @@ Partial Class frmRFID
         Me.cbBisZeitM = New System.Windows.Forms.ComboBox()
         Me.tbBemerkung = New System.Windows.Forms.TextBox()
         Me.dgZimmerChip = New System.Windows.Forms.DataGridView()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
         Me.ToolStrip1.SuspendLayout()
         CType(Me.dgZimmerChip, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'tbRFID
         '
-        Me.tbRFID.Location = New System.Drawing.Point(56, 255)
-        Me.tbRFID.Margin = New System.Windows.Forms.Padding(4)
+        Me.tbRFID.Location = New System.Drawing.Point(63, 358)
+        Me.tbRFID.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.tbRFID.Name = "tbRFID"
-        Me.tbRFID.Size = New System.Drawing.Size(124, 22)
+        Me.tbRFID.Size = New System.Drawing.Size(139, 26)
         Me.tbRFID.TabIndex = 0
         '
         'mcVon
         '
-        Me.mcVon.Location = New System.Drawing.Point(186, 254)
-        Me.mcVon.Margin = New System.Windows.Forms.Padding(12, 11, 12, 11)
+        Me.mcVon.Location = New System.Drawing.Point(219, 318)
+        Me.mcVon.Margin = New System.Windows.Forms.Padding(14)
         Me.mcVon.Name = "mcVon"
         Me.mcVon.TabIndex = 1
         '
         'mcBis
         '
-        Me.mcBis.Location = New System.Drawing.Point(547, 255)
-        Me.mcBis.Margin = New System.Windows.Forms.Padding(12, 11, 12, 11)
+        Me.mcBis.Location = New System.Drawing.Point(586, 315)
+        Me.mcBis.Margin = New System.Windows.Forms.Padding(14)
         Me.mcBis.Name = "mcBis"
         Me.mcBis.TabIndex = 2
         '
         'lvRFID
         '
-        Me.lvRFID.Location = New System.Drawing.Point(56, 34)
-        Me.lvRFID.Margin = New System.Windows.Forms.Padding(4)
+        Me.lvRFID.HideSelection = False
+        Me.lvRFID.Location = New System.Drawing.Point(63, 42)
+        Me.lvRFID.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.lvRFID.Name = "lvRFID"
-        Me.lvRFID.Size = New System.Drawing.Size(781, 205)
+        Me.lvRFID.Size = New System.Drawing.Size(878, 255)
         Me.lvRFID.TabIndex = 3
         Me.lvRFID.UseCompatibleStateImageBehavior = False
         '
@@ -88,7 +93,7 @@ Partial Class frmRFID
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbClose, Me.ToolStripSeparator1, Me.tsbSammelChip, Me.ToolStripSeparator2, Me.tsbNew, Me.tsbEdit, Me.tsbReturn, Me.tsbSave, Me.tsbDel, Me.tsbReadRFID, Me.tsbSchlossSet, Me.ToolStripSeparator3, Me.tsbReturn1, Me.tsbSave1})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1924, 27)
+        Me.ToolStrip1.Size = New System.Drawing.Size(2164, 29)
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -98,13 +103,13 @@ Partial Class frmRFID
         Me.tsbClose.Image = Global.Pension.My.Resources.Resources.door02
         Me.tsbClose.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbClose.Name = "tsbClose"
-        Me.tsbClose.Size = New System.Drawing.Size(24, 24)
+        Me.tsbClose.Size = New System.Drawing.Size(34, 24)
         Me.tsbClose.Text = "tsbClose"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(6, 27)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(6, 29)
         '
         'tsbSammelChip
         '
@@ -112,13 +117,14 @@ Partial Class frmRFID
         Me.tsbSammelChip.Image = Global.Pension.My.Resources.Resources.ARW01DN
         Me.tsbSammelChip.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbSammelChip.Name = "tsbSammelChip"
-        Me.tsbSammelChip.Size = New System.Drawing.Size(24, 24)
-        Me.tsbSammelChip.Text = "ToolStripSplitButton1"
+        Me.tsbSammelChip.Size = New System.Drawing.Size(34, 24)
+        Me.tsbSammelChip.Text = "SammelChip"
+        Me.tsbSammelChip.ToolTipText = "Sammel Chip"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 27)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 29)
         '
         'tsbNew
         '
@@ -126,8 +132,8 @@ Partial Class frmRFID
         Me.tsbNew.Image = Global.Pension.My.Resources.Resources.cabview_dll_Ico14_ico_Ico1
         Me.tsbNew.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbNew.Name = "tsbNew"
-        Me.tsbNew.Size = New System.Drawing.Size(24, 24)
-        Me.tsbNew.Text = "tsbNew"
+        Me.tsbNew.Size = New System.Drawing.Size(34, 24)
+        Me.tsbNew.Text = "Neuer Chip"
         '
         'tsbEdit
         '
@@ -135,8 +141,8 @@ Partial Class frmRFID
         Me.tsbEdit.Image = Global.Pension.My.Resources.Resources.shell32_dll_Ico1474_ico_Ico1
         Me.tsbEdit.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbEdit.Name = "tsbEdit"
-        Me.tsbEdit.Size = New System.Drawing.Size(24, 24)
-        Me.tsbEdit.Text = "ToolStripButton1"
+        Me.tsbEdit.Size = New System.Drawing.Size(34, 24)
+        Me.tsbEdit.Text = "Chip bearbeiten"
         '
         'tsbReturn
         '
@@ -144,8 +150,8 @@ Partial Class frmRFID
         Me.tsbReturn.Image = Global.Pension.My.Resources.Resources.shell32_dll_Ico1491_ico_Ico1
         Me.tsbReturn.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbReturn.Name = "tsbReturn"
-        Me.tsbReturn.Size = New System.Drawing.Size(24, 24)
-        Me.tsbReturn.Text = "ToolStripButton1"
+        Me.tsbReturn.Size = New System.Drawing.Size(34, 24)
+        Me.tsbReturn.Text = "Bearbeitung abbrechen"
         '
         'tsbSave
         '
@@ -153,8 +159,8 @@ Partial Class frmRFID
         Me.tsbSave.Image = Global.Pension.My.Resources.Resources.ntbackup_exe_Ico8_ico_Ico1
         Me.tsbSave.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbSave.Name = "tsbSave"
-        Me.tsbSave.Size = New System.Drawing.Size(24, 24)
-        Me.tsbSave.Text = "ToolStripButton1"
+        Me.tsbSave.Size = New System.Drawing.Size(34, 24)
+        Me.tsbSave.Text = "Speichern"
         '
         'tsbDel
         '
@@ -162,8 +168,8 @@ Partial Class frmRFID
         Me.tsbDel.Image = Global.Pension.My.Resources.Resources.shell32_dll_Ico65_ico_Ico1
         Me.tsbDel.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbDel.Name = "tsbDel"
-        Me.tsbDel.Size = New System.Drawing.Size(24, 24)
-        Me.tsbDel.Text = "ToolStripButton1"
+        Me.tsbDel.Size = New System.Drawing.Size(34, 24)
+        Me.tsbDel.Text = "Chip löschen"
         '
         'tsbReadRFID
         '
@@ -171,8 +177,8 @@ Partial Class frmRFID
         Me.tsbReadRFID.Image = Global.Pension.My.Resources.Resources.rfidsign_rfi_13599
         Me.tsbReadRFID.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbReadRFID.Name = "tsbReadRFID"
-        Me.tsbReadRFID.Size = New System.Drawing.Size(24, 24)
-        Me.tsbReadRFID.Text = "ToolStripButton1"
+        Me.tsbReadRFID.Size = New System.Drawing.Size(34, 24)
+        Me.tsbReadRFID.Text = "Chips lesen und auflisten"
         '
         'tsbSchlossSet
         '
@@ -180,13 +186,13 @@ Partial Class frmRFID
         Me.tsbSchlossSet.Image = Global.Pension.My.Resources.Resources.WRENCH
         Me.tsbSchlossSet.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbSchlossSet.Name = "tsbSchlossSet"
-        Me.tsbSchlossSet.Size = New System.Drawing.Size(24, 24)
+        Me.tsbSchlossSet.Size = New System.Drawing.Size(34, 24)
         Me.tsbSchlossSet.Text = "SchlossSet"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(6, 27)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(6, 29)
         '
         'tsbReturn1
         '
@@ -194,8 +200,8 @@ Partial Class frmRFID
         Me.tsbReturn1.Image = Global.Pension.My.Resources.Resources.shell32_dll_Ico1491_ico_Ico1
         Me.tsbReturn1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbReturn1.Name = "tsbReturn1"
-        Me.tsbReturn1.Size = New System.Drawing.Size(24, 24)
-        Me.tsbReturn1.Text = "ToolStripButton2"
+        Me.tsbReturn1.Size = New System.Drawing.Size(34, 24)
+        Me.tsbReturn1.Text = "Reset Transponder"
         '
         'tsbSave1
         '
@@ -203,64 +209,109 @@ Partial Class frmRFID
         Me.tsbSave1.Image = Global.Pension.My.Resources.Resources.ntbackup_exe_Ico8_ico_Ico1
         Me.tsbSave1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tsbSave1.Name = "tsbSave1"
-        Me.tsbSave1.Size = New System.Drawing.Size(24, 24)
-        Me.tsbSave1.Text = "ToolStripButton3"
+        Me.tsbSave1.Size = New System.Drawing.Size(34, 24)
+        Me.tsbSave1.Text = "Speichen der mit x markierten Transponder"
         '
         'cbVonZeit
         '
         Me.cbVonZeit.FormattingEnabled = True
-        Me.cbVonZeit.Location = New System.Drawing.Point(439, 254)
-        Me.cbVonZeit.Margin = New System.Windows.Forms.Padding(4)
+        Me.cbVonZeit.Location = New System.Drawing.Point(498, 358)
+        Me.cbVonZeit.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cbVonZeit.Name = "cbVonZeit"
-        Me.cbVonZeit.Size = New System.Drawing.Size(53, 24)
+        Me.cbVonZeit.Size = New System.Drawing.Size(59, 28)
         Me.cbVonZeit.TabIndex = 5
         '
         'cbBisZeit
         '
         Me.cbBisZeit.FormattingEnabled = True
-        Me.cbBisZeit.Location = New System.Drawing.Point(790, 253)
-        Me.cbBisZeit.Margin = New System.Windows.Forms.Padding(4)
+        Me.cbBisZeit.Location = New System.Drawing.Point(881, 358)
+        Me.cbBisZeit.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cbBisZeit.Name = "cbBisZeit"
-        Me.cbBisZeit.Size = New System.Drawing.Size(47, 24)
+        Me.cbBisZeit.Size = New System.Drawing.Size(52, 28)
         Me.cbBisZeit.TabIndex = 6
         '
         'cbVonZeitM
         '
         Me.cbVonZeitM.FormattingEnabled = True
-        Me.cbVonZeitM.Location = New System.Drawing.Point(441, 285)
+        Me.cbVonZeitM.Location = New System.Drawing.Point(498, 394)
+        Me.cbVonZeitM.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.cbVonZeitM.Name = "cbVonZeitM"
-        Me.cbVonZeitM.Size = New System.Drawing.Size(51, 24)
+        Me.cbVonZeitM.Size = New System.Drawing.Size(59, 28)
         Me.cbVonZeitM.TabIndex = 7
         '
         'cbBisZeitM
         '
         Me.cbBisZeitM.FormattingEnabled = True
-        Me.cbBisZeitM.Location = New System.Drawing.Point(792, 285)
+        Me.cbBisZeitM.Location = New System.Drawing.Point(881, 394)
+        Me.cbBisZeitM.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.cbBisZeitM.Name = "cbBisZeitM"
-        Me.cbBisZeitM.Size = New System.Drawing.Size(45, 24)
+        Me.cbBisZeitM.Size = New System.Drawing.Size(52, 28)
         Me.cbBisZeitM.TabIndex = 8
         '
         'tbBemerkung
         '
-        Me.tbBemerkung.Location = New System.Drawing.Point(56, 399)
+        Me.tbBemerkung.Location = New System.Drawing.Point(63, 499)
+        Me.tbBemerkung.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.tbBemerkung.Name = "tbBemerkung"
-        Me.tbBemerkung.Size = New System.Drawing.Size(124, 22)
+        Me.tbBemerkung.Size = New System.Drawing.Size(139, 26)
         Me.tbBemerkung.TabIndex = 9
         '
         'dgZimmerChip
         '
         Me.dgZimmerChip.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgZimmerChip.Location = New System.Drawing.Point(844, 34)
+        Me.dgZimmerChip.Location = New System.Drawing.Point(950, 42)
+        Me.dgZimmerChip.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dgZimmerChip.Name = "dgZimmerChip"
+        Me.dgZimmerChip.RowHeadersWidth = 62
         Me.dgZimmerChip.RowTemplate.Height = 24
-        Me.dgZimmerChip.Size = New System.Drawing.Size(1068, 427)
+        Me.dgZimmerChip.Size = New System.Drawing.Size(1202, 534)
         Me.dgZimmerChip.TabIndex = 10
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(68, 326)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(48, 20)
+        Me.Label1.TabIndex = 11
+        Me.Label1.Text = "RFID"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(68, 475)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(91, 20)
+        Me.Label2.TabIndex = 12
+        Me.Label2.Text = "Bemerkung"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(498, 326)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(50, 20)
+        Me.Label3.TabIndex = 13
+        Me.Label3.Text = "Von..."
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(884, 326)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(43, 20)
+        Me.Label4.TabIndex = 14
+        Me.Label4.Text = "Bis..."
         '
         'frmRFID
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1924, 473)
+        Me.ClientSize = New System.Drawing.Size(2164, 591)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.dgZimmerChip)
         Me.Controls.Add(Me.tbBemerkung)
         Me.Controls.Add(Me.cbBisZeitM)
@@ -272,7 +323,7 @@ Partial Class frmRFID
         Me.Controls.Add(Me.mcBis)
         Me.Controls.Add(Me.mcVon)
         Me.Controls.Add(Me.tbRFID)
-        Me.Margin = New System.Windows.Forms.Padding(4)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmRFID"
         Me.Text = "RFID"
         Me.ToolStrip1.ResumeLayout(False)
@@ -307,4 +358,8 @@ Partial Class frmRFID
     Friend WithEvents ToolStripSeparator3 As ToolStripSeparator
     Friend WithEvents tsbReturn1 As ToolStripButton
     Friend WithEvents tsbSave1 As ToolStripButton
+    Friend WithEvents Label1 As Label
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Label3 As Label
+    Friend WithEvents Label4 As Label
 End Class

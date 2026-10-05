@@ -184,28 +184,321 @@ Pension
  19.12.2011 Create
  </remarks>
 </member>
-<member name="M:Pension.frmRFID.prLoadRFIDInList">
+<member name="M:Pension.frmRFID.prCreateTabelleRFID">
+ <summary>
+ Erstellt die Spaltenstruktur für die RFID-Code-Tabelle (ListView)
+ und definiert das visuelle Verhalten der Liste.
+ </summary>
  <remarks>
- 19.12.2011 Create
+ 02.10.2026 - Code-Optimierung:
+ - Doppelte Spaltenbezeichnung "Zeit" in "Von Zeit" und "Bis Zeit" zur besseren Übersicht geändert.
+ - Namespaces gekürzt (ColumnHeaderStyle.Nonclickable).
+ - Auskommentierten 'Totcode' (.Sorting) entfernt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prLoadRFIDInList">
+ <summary>
+ Bereinigt veraltete RFID-Code-Datensätze in der Datenbank und befüllt 
+ die ListView (lvRFID) mit den aktuell gültigen RFID-Zugangsdaten.
+ </summary>
+ <remarks>
+ 19.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Manuelle Stunden-Formatierung durch native .NET-Formatzeichenfolge ("HH") ersetzt.
+ - Auf performantere 'For Each'-Schleife für Datenzeilen umgestellt.
+ - XML-Dokumentation inhaltlich korrigiert (RFID statt Zimmer).
+ - Schleifenvariablen lokalisiert und typisiert.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.lvRFID_SelectedIndexChanged(System.Object,System.EventArgs)">
+ <summary>
+ Reagiert auf die Änderung der Auswahl in der RFID-ListView und 
+ überträgt die Detailinformationen des ausgewählten Codes in die Eingabefelder und Kalender.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 19.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Veraltete 'ByVal'-Modifizierer aus der Signatur entfernt.
+ - Lokale Variable für das ausgewählte ListViewItem eingeführt.
+ - 'Date.TryParse' für eine absturzsichere Zuweisung an die Kalender-Steuerelemente integriert.
+ - Veraltete 'Mid'-Funktion durch sichere '.Substring'-Operationen ersetzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.tsbNew_Click(System.Object,System.EventArgs)">
+ <summary>
+ Bereitet die Eingabemaske für die Erfassung eines neuen RFID-Codes vor.
+ Setzt die Textfelder zurück, aktiviert die Steuerelemente und initialisiert die Kalenderwerte.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 19.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Fehleranfällige implizite String-zu-Datum-Konvertierung (.ToString) bei den Kalendern entfernt.
+ - Direkte und typsichere Übergabe des DateTime-Objekts (Date.Today) implementiert.
+ - Veraltete 'ByVal'-Modifizierer entfernt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.tsbClose_Click(System.Object,System.EventArgs)">
+ <summary>
+ Schließt das RFID-Verwaltungsformular.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+</member>
+<member name="M:Pension.frmRFID.frmRFID_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
+ <summary>
+ Wird aufgerufen, während das Formular geschlossen wird. Bereinigt ungenutzten Totcode.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die FormClosing-Ereignisdaten.</param>
+</member>
+<member name="M:Pension.frmRFID.tsbEdit_Click(System.Object,System.EventArgs)">
+ <summary>
+ Schaltet die Maske in den Bearbeitungsmodus für einen bestehenden RFID-Code um.
+ Aktiviert die Steuerelemente, sperrt jedoch das RFID-Schlüsselfeld gegen Manipulation.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+</member>
+<member name="M:Pension.frmRFID.tsbReturn_Click(System.Object,System.EventArgs)">
+ <summary>
+ Bricht den aktuellen Bearbeitungs- oder Erfassungsmodus ab und sperrt die Eingabefelder wieder.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+</member>
+<member name="M:Pension.frmRFID.tsbDel_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Löschen-Schaltfläche.
+ Fordert eine Bestätigung an, sendet einen Löschbefehl (mit historischem Datum) an das RFID-Terminal
+ und entfernt den Datensatz anschließend aus der Datenbank.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 19.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Sicherheitsabfrage (MessageBox) vor dem Löschen integriert.
+ - Logikfehler behoben, bei dem die Bereinigungsfunktion fcWeg34 sofort überschrieben wurde.
+ - Ungenutzte Variablen entfernt und ByVal bereinigt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.tsbSave_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Speichern-Schaltfläche.
+ Validiert die RFID-Eingabe, prüft bei Neuanlagen auf Duplikate, sichert den Datensatz 
+ in der Datenbank und überträgt die Berechtigung an das RFID-Terminal.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 19.12.2011 - Create
+ 02.10.2026 - Code-Optimierung:
+ - Kritischen Fehler behoben: Methode bricht nun bei bereits vergebenem Chip korrekt ab (Exit Sub).
+ - 'MsgBox' durch modernes 'MessageBox.Show' ersetzt.
+ - Stringkonstruktion durch lesbare String-Interpolation ($) modernisiert.
+ - Doppelte Codeaufrufe strukturell bereinigt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prSaveSatz(System.String@,System.Boolean@)">
+ <summary>
+ Speichert oder aktualisiert einen Datensatz in der Datenbank anhand einer getrennten Zeichenkette.
+ Teilt die übergebenen Werte auf und führt je nach Status eine Insert- oder Update-Operation aus.
+ </summary>
+ <param name="Var">Die per Trennzeichen (°) strukturierten Datenwerte des Datensatzes.</param>
+ <param name="bNew">Bestimmt, ob ein neuer Datensatz eingefügt (True) oder ein bestehender aktualisiert wird (False).</param>
+ <remarks>
+ 19.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Veraltetes 'Call'-Schlüsselwort entfernt.
+ - Array-Initialisierung und Split-Funktion auf native .NET-Methoden modernisiert.
+ - String-Konstruktion für die WHERE-Bedingung via String-Interpolation ($) vereinfacht.
+ - Expliziten Boolean-Vergleich (bNew = True) auf direkten Ausdruck verkürzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.mcVon_DateChanged(System.Object,System.Windows.Forms.DateRangeEventArgs)">
+ <summary>
+ Verarbeitet die Änderung des Startdatums im Kalender (mcVon).
+ Formatiert das ausgewählte Startdatum über die Hilfsfunktion fcUmDatum.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten mit dem gewählten Datumsbereich.</param>
+ <remarks>
+ 19.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Fehleranfällige 'Mid'- und 'ToString'-Konvertierung durch native '.SelectionStart.ToShortDateString()' ersetzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.mcBis_DateChanged(System.Object,System.Windows.Forms.DateRangeEventArgs)">
+ <summary>
+ Verarbeitet die Änderung des Enddatums im Kalender (mcBis).
+ Formatiert das ausgewählte Enddatum über die Hilfsfunktion fcUmDatum.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten mit dem gewählten Datumsbereich.</param>
+ <remarks>
+ 19.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - 'Mid' durch die saubere .NET-Methode 'ToShortDateString()' ersetzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prSetMaskenStatus(System.Boolean)">
+ <summary>
+ Steuert die Aktivierung (Enabled) der Eingabemaske für die RFID- und Datumseinstellungen.
+ </summary>
+ <param name="bAktiv">Übergibt True, um die Bearbeitung zu erlauben, oder False, um die Maske zu sperren.</param>
+ <remarks>
+ 19.12.2011 - Create (als prEnabled und prDisEnabled)
+ 03.10.2026 - Code-Optimierung:
+ - Redundante Methoden 'prEnabled' und 'prDisEnabled' in eine zentrale Steuerungsfunktion zusammengeführt.
+ - Erhöht die Wartbarkeit und verhindert doppelten Code.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prSetButton(System.Boolean)">
+ <summary>
+ Steuert die Aktivierung (Enabled) der Buttons
+ </summary>
+ <param name="bAktiv">Übergibt True, um die Bearbeitung zu erlauben, oder False, um die Button zu sperren.</param>
+ <remarks>
+ 03.10.2026 - Create
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prSetButton1(System.Boolean)">
+ <summary>
+ Steuert die Aktivierung (Enabled) der Buttons1
+ </summary>
+ <param name="bAktiv">Übergibt True, um die Bearbeitung zu erlauben, oder False, um die Button1 zu sperren.</param>
+ <remarks>
+ 03.10.2026 - Create
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.tsbReadRFID_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Schaltfläche zum Einlesen der RFID-Karten.
+ Öffnet das entsprechende Dialogfenster (frmReadRFID) zur Erfassung der Chip-Daten.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 19.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Instanzprüfung hinzugefügt: Verhindert das doppelte Öffnen des Formulars.
+ - 'Activate' integriert, um ein bereits geöffnetes Fenster in den Vordergrund zu holen.
  </remarks>
 </member>
 <member name="M:Pension.frmRFID.prSetTabelleZimCh(System.Data.DataTable)">
  <summary>
- Tabelle ZimmerChip erstellen
+ Erstellt die Tabellenstruktur im DataGridView (dgZimmerChip) und befüllt es
+ mit den Zimmer- und Transponderdaten aus der übergebenen DataTable.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die DataTable, welche die Quellbepflanzung der Zimmer und Chips enthält.</param>
  <remarks>
- 24.12.2011 Create
+ 24.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Optimierung: Befüllung der Zeilen via 'AddRange' beschleunigt, statt jede Zeile einzeln visuell hinzuzufügen.
+ - Explizite Variablendeklaration (i As Integer) in den For-Schleifen erzwungen.
+ - Speicherzugriff optimiert: Direkte Instanziierung von 'DataGridViewRow'-Objekten für den Massenimport.
  </remarks>
 </member>
 <member name="M:Pension.frmRFID.dgZimmerChip_CellEnter(System.Object,System.Windows.Forms.DataGridViewCellEventArgs)">
  <summary>
- Buchungseintrag im Datagridview auswählen und Buchungsnummer ermitteln
+ Reagiert auf das Betreten einer Zelle im DataGridView (dgZimmerChip).
+ Schaltet bei Klick auf Spalte 0 alle Transponder der Zeile um, ansonsten gezielt den angewählten Transponder.
+ Markierte Transponder erhalten eine farbliche Kennzeichnung und ein führendes "x".
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten mit Zeilen- und Spaltenindex.</param>
  <remarks>
- 27.12.2011 Create
+ 27.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Fehleranfällige Schleifen-Abfrage korrigiert (zuvor wurde 5-mal starr Zelle 1 statt Zelle 'i' geprüft).
+ - Redundante UI-Logik in die Hilfsprozedur 'prToggleChipZelle' ausgelagert (DRY-Prinzip).
+ - VB6-Legacy-Funktion 'Mid' durch moderne .NET-Methoden '.StartsWith()' und '.Substring()' ersetzt.
+ - Explizite Typisierung der Schleifen-Laufvariablen ergänzt.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prToggleChipZelle(System.Windows.Forms.DataGridViewCell,System.Boolean)">
+ <summary>
+ Schaltet den Status einer einzelnen DataGridView-Zelle (Farbe und "x"-Präfix) um.
+ </summary>
+ <param name="cell">Die zu manipulierende DataGridViewCell.</param>
+ <param name="bMarkieren">True, um die Zelle auszuwählen (YellowGreen / "x"), False für den Standardzustand (Weiß / ohne "x").</param>
+</member>
+<member name="M:Pension.frmRFID.tsbSammelChip_Click(System.Object,System.EventArgs)">
+ <summary>
+ Schaltet die Benutzeroberfläche in den Modus für die Sammel-Chip-Bearbeitung um oder verlässt diesen wieder.
+ Aktiviert bzw. deaktiviert die entsprechenden Menüleisten-Schaltflächen (ToolStrips) und Eingabefelder.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 27.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Redundante If-Else-Struktur vollständig aufgelöst.
+ - UI-Statussteuerung über logische Invertierung (Not) zusammengefasst.
+ - Erhöht die Übersichtlichkeit und Wartbarkeit massiv (Code-Umfang halbiert).
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.tsbReturn1_Click(System.Object,System.EventArgs)">
+ <summary>
+ Setzt alle markierten Transponder im DataGridView (dgZimmerChip) zurück.
+ Entfernt bei allen Zellen das führende "x", welches zur Auswahlmarkierung genutzt wurde.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 27.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Fehleranfällige VB6-Legacy-Funktion 'Mid' durch moderne .NET-Methoden '.StartsWith()' und '.Substring()' ersetzt.
+ - Null-Checks integriert: Verhindert Abstürze bei leeren Zellen oder nicht vorhandenen Zeilen.
+ - Explizite Variablendeklaration (i, j As Integer) für die Schleifen erzwungen.
+ - Unnötige Abhängigkeit von 'dtZim.Rows.Count' gelöst; die Schleife läuft nun direkt und sicher über die Zeilen des Grids.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.tsbSave1_Click(System.Object,System.EventArgs)">
+ <summary>
+ Verarbeitet den Klick auf die Sammel-Speichern-Schaltfläche (tsbSave1).
+ Identifiziert alle mit "x" markierten Transponder, prüft in der Datenbank auf Existenz (Insert/Update)
+ und speichert die geänderten Sätze. Schließt den Vorgang mit der Terminal-Übertragung ab.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 27.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - String-Konstruktion vollständig auf lesbare String-Interpolation ($) modernisiert.
+ - 'Mid' und 'Trim' durch native .NET-Methoden '.StartsWith()', '.Substring()' und '.Trim()' ersetzt.
+ - Redundante UI-Steuerung am Ende durch Wiederverwendung der Methode 'tsbSammelChip_Click' (oder prSetMaskenStatus) ersetzt.
+ - Robustheit erhöht durch Null-Checks bei den Zellwerten des DataGridViews.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prSendCode(System.String@,System.String,System.String@,System.String@,System.String@)">
+ <summary>
+ Überträgt die Berechtigungsdaten eines einzelnen Transponders an das RFID-Terminal (PHP-Webservice).
+ </summary>
+ <param name="sc1">Der einzulesende Chip- oder Transpondercode.</param>
+ <param name="von">Das Startdatum der Gültigkeit.</param>
+ <param name="vonzeit">Die Startuhrzeit der Gültigkeit.</param>
+ <param name="bis">Das Enddatum der Gültigkeit.</param>
+ <param name="biszeit">Die Enduhrzeit der Gültigkeit.</param>
+ <remarks>
+ 27.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - String-Konstruktion auf moderne String-Interpolation ($) umgestellt.
+ - 'Try-Finally'-Block hinzugefügt: Garantiert das Zurücksetzen des Cursors bei Verbindungsfehlern.
+ </remarks>
+</member>
+<member name="M:Pension.frmRFID.prSendCodeAll">
+ <summary>
+ Signalisiert dem RFID-Terminal (PHP-Webservice), alle anstehenden Datensätze gesammelt zu verarbeiten.
+ </summary>
+ <remarks>
+ 27.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Absicherung der Benutzeroberfläche über 'Try-Finally' integriert, um ein Einfrieren des Cursors zu verhindern.
  </remarks>
 </member>
 <member name="M:Pension.frmPensionIni.frmPensionsIni_Load(System.Object,System.EventArgs)">
@@ -253,148 +546,245 @@ Pension
 </member>
 <member name="M:Pension.frmReservierungDest.frmReservierung_Load(System.Object,System.EventArgs)">
  <summary>
- Modul Reservierung laden
+ Initialisiert das Reservierungsmodul, bereitet die Benutzeroberfläche vor, 
+ initialisiert Datenstrukturen und lädt die Buchungs- sowie Preisdaten aus der Datenbank.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Das auslösende Objekt (das Formular selbst).</param>
+ <param name="e">Die Ereignisdaten des Load-Events.</param>
  <remarks>
- 25.02.2012 Create
+ 25.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: Zweidimensionale Array-Initialisierung ('arZim') durch 'Array.Clear' oder kompakte Schleifen modernisiert.
+ - String-Verarbeitung: Veraltete 'Split'-Funktion durch die native '.Split(","c)' Methode ersetzt.
+ - Robustheit erhöht: Sichere Typkonvertierung mit 'Integer.TryParse' statt der fehleranfälligen 'Val'-Funktion.
+ - Syntax bereinigt: Redundante 'Call'-Schlüsselwörter vollständig entfernt und Variablen-Deklarationen geschärft.
+ - UI-Flackern verhindert: Visuelle Vorbereitung findet vor den Datenbankzugriffen statt, Cursor-Steuerung über Try-Finally abgesichert.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLand">
  <summary>
- Tabelle "Preise" erstellen
+ Lädt die verfügbaren Länder aus der Systemdatenbank, bereinigt die Einträge von Steuerzeichen und befüllt die Länder-Auswahlliste (coLand).
  </summary>
  <remarks>
- 01.02.2012 Create
+ 01.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: 'BeginUpdate()' und 'EndUpdate()' für die ComboBox hinzugefügt, um das Zeichnen während des Befüllens zu unterdrücken.
+ - Logik-Korrektur: Splitten per 'StringSplitOptions.RemoveEmptyEntries' fängt sowohl 'vbCrLf' (Windows) als auch 'vbLf' (Linux/Web) sauber ab und eliminiert leere Einträge automatisch.
+ - Robustheit erhöht: Null-Prüfung für den Rückgabewert der Datenbank integriert, um Abstürze bei fehlenden Datenbankeinträgen zu verhindern.
+ - Syntax bereinigt: Explizite Typisierung der Schleifenvariable eingeführt.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prCreateTabellePreise">
  <summary>
- Tabelle "Preise" erstellen
+ Erstellt die Spaltenstruktur für die Preistabelle (lvPreise) und setzt die Steuerelement-Eigenschaften.
  </summary>
  <remarks>
- 01.02.2012 Create
+ 01.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - UI-Flackern unterdrückt: '.BeginUpdate()' und '.EndUpdate()' eingeführt, damit der Spaltenaufbau visuell nahtlos geschieht.
+ - Syntax bereinigt: Redundante Eigenschaftszuweisungen auf den Standard-Schnittstellen optimiert.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prCreateTabelleGast">
  <summary>
- Tabelle "Gast" erstellen
+ Erstellt die Spaltenstruktur für die Gästetabelle (lvGast) und setzt die Steuerelement-Eigenschaften.
  </summary>
  <remarks>
- 04.02.2012 Create
+ 04.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - UI-Flackern unterdrückt: '.BeginUpdate()' und '.EndUpdate()' hinzugefügt, um den Spaltenaufbau im Hintergrund durchzuführen.
+ - Namensräume bereinigt: Den vollqualifizierten Aufruf bei 'HeaderStyle' auf die native VB-Enumeration verkürzt.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLoadGastInList">
  <summary>
- Liste mit Gastdaten befüllen
+ Befüllt das ListView (lvGast) mit Kunden aus der Datenbank, deren Name mit dem Anfangsbuchstaben aus tbName1 übereinstimmt.
  </summary>
  <remarks>
- 04.02.2012 Create
+ 04.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: 'BeginUpdate()' und 'EndUpdate()' umschließen das Laden der Elemente, um UI-Flackern zu verhindern.
+ - API-Modernisierung: Veraltete VB6-Funktionen ('Len', 'Trim', 'Mid') durch moderne .NET-Methoden ersetzt ('.Length', '.Trim()', '.Substring()').
+ - Effizienz: Nutzt 'String.IsNullOrWhiteSpace' für eine saubere und performante Prüfung auf leere Eingaben.
+ - Robustheit: Null-Prüfung für die 'DataTable' eingeführt, um Abstürze bei Datenbankausfällen zu verhindern.
+ </remarks>
+</member>
+<member name="M:Pension.frmReservierungDest.prFindGast">
+ <summary>
+ Durchsucht das ListView (lvGast) nach Einträgen, die mit den Texten aus tbName1 und tbVorname übereinstimmen.
+ Markiert den besten Treffer farblich und scrollt diesen in den sichtbaren Bereich.
+ </summary>
+ <remarks>
+ 04.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Logikfehler korrigiert: Die zweite Schleife sucht nun basierend auf dem Treffer der ersten Schleife (Kurzname -> Vollname), statt die Suche komplett bei 0 zu wiederholen.
+ - Absturzsicherung: Prüfung auf '.Items.Count > 0' eingeführt, um Fehler bei leerer Tabelle zu verhindern.
+ - API-Modernisierung: Veraltete VB6-Funktion 'Mid' durch die native '.StartsWith()' Methode ersetzt (deutlich performanter und lesbarer).
+ - Performance: Mehrfache '.Refresh()'-Aufrufe entfernt, um die UI-Last zu minimieren.
+ </remarks>
+</member>
+<member name="M:Pension.frmReservierungDest.lvwAddItem(System.Windows.Forms.ListView,System.String[])">
+ <summary>
+ Fügt dem angegebenen ListView eine komplette Datenzeile basierend auf einer flexiblen Parameterliste hinzu.
+ </summary>
+ <param name="lvw">Das Ziel-ListView-Control.</param>
+ <param name="Text">Eine variable Liste (ParamArray) an String-Werten für die einzelnen Spaltenzellen.</param>
+ <remarks>
+ 03.10.2026 - Code-Optimierung:
+ - Robustheit erhöht: Null- und Längenprüfung für das 'Text'-Array integriert, um Laufzeitfehler zu vermeiden.
+ - Syntax bereinigt: Redundanten 'With'-Block entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLadeWerbung">
  <summary>
- Werbung in Combobox laden
+ Bindet die Werbedaten aus der globalen DataTable (dtWer) an die ComboBox (coWerbung) und setzt den Standardwert.
  </summary>
  <remarks>
- 04.02.2012 Create
+ 04.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: Die Eigenschaften 'ValueMember' und 'DisplayMember' werden nun VOR der 'DataSource' gesetzt. Das verhindert, dass .NET die Datenstruktur intern mehrfach berechnet und zeichnet.
+ - Robustheit erhöht: Prüfung integriert, ob 'dtWer' überhaupt Daten enthält, bevor die Bindung stattfindet.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLadeZimmerInList(System.String)">
  <summary>
- Belegte (tscoZim) und Freie (tscoFreiZim) Zimmer in Combobox laden
+ Lädt die belegten (tscoZim) und freien (tscoFreiZim) Zimmer für den Buchungszeitraum in die entsprechenden Auswahlboxen.
  </summary>
- <param name="sRBID">BuchungsID</param>
+ <param name="sRBID">Die eindeutige Buchungs-ID.</param>
  <remarks>
- 03.02.2012 Create
+ 03.02.2012 - Create
+ 03.10.2026 - Code-Optimization:
+ - Absturzsicherung: 'dt.Rows.Count > 0'-Prüfung vor dem Zugriff auf 'dt.Rows(0)' eingebaut, um Abstürze bei leeren Buchungen zu verhindern.
+ - Performance-Boost: 'ReDim Preserve' in der Schleife durch eine effiziente 'List(Of String)' ersetzt. 'BeginUpdate' für beide ComboBoxen integriert.
+ - Robustheit erhöht: Feste Array-Grenzen (z. B. Index 2 bis 20) durch dynamische Abfragen abgesichert ('arZ.GetLength(0)'), um 'IndexOutOfRangeException' zu vermeiden.
+ - Syntax bereinigt: Veraltetes 'Space(30)' durch die native '.PadRight()' Methode ersetzt. 'Nothing'-Vergleiche bei Strings auf 'String.IsNullOrEmpty' umgestellt.
+ </remarks>
+</member>
+<member name="M:Pension.frmReservierungDest.prLadeBuchung(System.String,System.String)">
+ <summary>
+ Lädt die kompletten Buchungsdaten aus der Datenbank, weist diese den UI-Elementen zu und initialisiert die länderspezifischen Steuersätze sowie Rechnungsstatus.
+ </summary>
+ <param name="sRID">Die eindeutige Buchungs-ID (BID).</param>
+ <param name="sIDRe">Die eindeutige Datensatz-ID.</param>
+ <remarks>
+ 03.10.2026 - Code-Optimierung:
+ - Absturzsicherung: 'Try-Catch'-Block nach oben verschoben, um den Datenbankaufruf 'fcReadDataTable' sicher einzuschließen.
+ - Performance-Boost: Lokale Zuweisung 'Dim row As DataRow = dt.Rows(0)' verhindert das permanente, rechenintensive Neuerstellen der Zeilenreferenz.
+ - Robustheit erhöht: Sichere Konvertierung über 'Convert.ToInt32'/'Double.TryParse' für 'Val' implementiert. System-DBNulls werden stabil abgefangen.
+ - Syntax bereinigt: Veraltete 'Call'-Befehle, 'Space(30)' und redundante Codezeilen entfernt.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.fcCheckNewResevierung(System.String,System.String)">
  <summary>
- Prüfen ob eine neue Reservierung vorliegt ("Unbekannt")
+ Prüft, ob es sich um eine neue Reservierung handelt (wenn die Kunden-ID "0" oder leer ist).
  </summary>
- <param name="sRID"></param>
- <param name="sZID"></param>
- <returns></returns>
+ <param name="sRID">Die eindeutige Buchungs-ID (BID).</param>
+ <param name="sZID">Die eindeutige Zimmer-ID (ZimID).</param>
+ <returns>True, wenn die Reservierung neu ("Unbekannt") ist, andernfalls False.</returns>
  <remarks>
- 26.02.2012 Create
+ 26.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Robustheit erhöht: Null-Prüfung für die 'DataTable' integriert, um Abstürze bei fehlgeschlagenen Datenbankabfragen zu verhindern.
+ - Syntax bereinigt: Die veraltete Zuweisung an den Funktionsnamen durch das native .NET-Schlüsselwort 'Return' ersetzt.
+ - Typsicherheit erhöht: Die Funktion ist nun standardmäßig auf 'False' initialisiert und fängt auch leere Kunden-IDs ab.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.fcIfZimmerInArray(System.String[],System.String)">
  <summary>
- Prüfung ob die Zimmer-ID im Array arF enthalten ist 
+ Prüft, ob die angegebene Zimmer-ID im Array der belegten Zimmer enthalten ist (ignoriert führende/nachfolgende Leerzeichen).
  </summary>
- <param name="arB">Belegte Zimmer</param>
- <param name="sID">Zimmer ID</param>
- <returns></returns>
+ <param name="arB">Das Array mit den IDs der belegten Zimmer.</param>
+ <param name="sID">Die zu suchende Zimmer-ID.</param>
+ <returns>True, wenn die Zimmer-ID im Array existiert, andernfalls False.</returns>
  <remarks>
- 03.02.2012 Create
+ 03.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: Manuelle For-Schleife durch die native, hochoptimierte Framework-Methode 'Array.Exists()' ersetzt.
+ - Robustheit erhöht: Null-Prüfung ('arB Is Nothing') integriert, um eine 'NullReferenceException' bei leeren Arrays zu verhindern.
+ - Syntax bereinigt: Veraltete VB6-Zuweisung an den Funktionsnamen durch das standardisierte 'Return' ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLoadPreiseInList(System.Data.DataTable,System.String)">
  <summary>
- Tabelle User mit daten aus der DataTabel "Preise" füllen
+ Befüllt das ListView (lvPreise) mit den Daten aus der DataTable "Preise" passend zur ausgewählten Kategorie (lbArt.Text).
  </summary>
- <param name="dtT"></param>
+ <param name="dtT">Die DataTable, welche die Preisstruktur enthält.</param>
+ <param name="sSaison">Der Filter für die aktuelle Saison (wird derzeit intern für die Anzeige aufbereitet).</param>
  <remarks>
- 01.02.2012 Create
- </remarks>
-</member>
-<member name="M:Pension.frmReservierungDest.prLadeAnAbReise(System.Data.DataTable)">
- <summary>
- An und Abreise daten laden und anzeigen
- </summary>
- <param name="dt"></param>
- <remarks>
- 03.02.2012 Create
+ 01.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: '.BeginUpdate()' und '.EndUpdate()' umschließen den Import, um UI-Flackern vollständig zu unterdrücken.
+ - Syntax bereinigt: Redundanten, innerhalb der Schleife platzierten 'With'-Block aufgelöst. 'Select Case' syntaktisch modernisiert (Klausel 'Is =' entfernt).
+ - Robustheit erhöht: Null-Prüfung für die 'DataTable' und sichere Typkonvertierung mit 'Double.TryParse' statt der veralteten 'Val'-Funktion integriert.
+ - Rechtschreibkorrektur: Interne Bezeichner im XML-Kommentar korrigiert (Sasion -> Saison, DataTabel -> DataTable).
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLadeZimmer(System.String)">
  <summary>
- Zimmerdaten laden und anzeigen
+ Lädt die Zimmerdetails sowie den zugehörigen Objektnamen aus der Datenbank und zeigt diese in den UI-Labels an.
  </summary>
- <param name="sRZID"></param>
+ <param name="sRZID">Die eindeutige Zimmer-ID (sRZID).</param>
  <remarks>
- 03.02.2012 Create
+ 03.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Absturzsicherung: 'dtZ IsNot Nothing'-Prüfung vorab integriert, um Abstürze bei fehlgeschlagenen Datenbankabfragen zu verhindern.
+ - Performance-Boost: Lokale Zuweisung 'Dim row As DataRow = dtZ.Rows(0)' verhindert das permanente, rechenintensive Neuerstellen der Zeilenreferenz.
+ - Syntax bereinigt: Die ungenutzte Variable 'sObj' entfernt und direkt als Parameter in 'fcGetObjektName' übergeben.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLaderPersonenUeberNachtung(System.Data.DataTable)">
  <summary>
- Anzahl der Personen und Übernachtungen
+ Lädt die Anzahl der Personen, Übernachtungspreise, Kategorien sowie die Preisgestaltungs-Variable aus der Buchungstabelle und befüllt die Benutzeroberfläche.
  </summary>
- <param name="dt"></param>
+ <param name="dt">Die DataTable mit den aktuellen Buchungsdaten.</param>
  <remarks>
- 03.02.2012 Create
+ 03.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Absturzsicherung: 'dt.Rows.Count > 0'-Prüfung vorab integriert, um eine 'IndexOutOfRangeException' bei leeren Datensätzen zu verhindern.
+ - Performance-Boost: Lokale Zuweisung 'Dim row As DataRow = dt.Rows(0)' verhindert das permanente, rechenintensive Neuerstellen der Zeilenreferenz.
+ - Robustheit erhöht: Sichere Konvertierung über 'Double.TryParse' für 'Val' implementiert, um Fehler bei fehlerhaften numerischen Datenbankwerten zu vermeiden.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.prLadeGastDaten(System.String)">
  <summary>
- Gastdaten laden und anzeigen
+ Lädt die Kundendaten anhand der Gast-ID aus der Datenbank und befüllt die Eingabemaske. 
+ Setzt Standardwerte für leere Felder und leert die Maske bei einer neuen Gast-ID ("0").
  </summary>
- <param name="sID"></param>
+ <param name="sID">Die eindeutige ID des Kunden/Gastes.</param>
  <remarks>
- 04.02.2012 Create
+ 04.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Absturzsicherung: 'dt IsNot Nothing'-Prüfung vorab integriert, um Abstürze bei fehlgeschlagenen Datenbankabfragen zu verhindern.
+ - Logikfehler behoben: Der fehleranfällige Vergleich 'sID = 0' wurde auf einen typsicheren String-Vergleich ('sID = "0"') umgestellt, um implizite Konvertierungsfehler zu vermeiden.
+ - Performance-Boost: Den alten 'With'-Block durch eine dedizierte 'DataRow'-Referenz ('row') ersetzt.
+ - Syntax bereinigt: Redundantes 'Call' entfernt und Zuweisungen über den modernen ternären 'If()'-Operator verkürzt.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.fcCollectDataInArray(System.String[])">
  <summary>
- Aktuelle Werte in ein Array sichern (Vergleich vorher / nacher) => Daten speichern
+ Sichert die aktuellen Formular- und Buchungswerte in ein String-Array, um einen späteren Vorher-Nachher-Vergleich für die Speicherung zu ermöglichen.
  </summary>
- <param name="arT"></param>
- <returns></returns>
+ <param name="arT">Das zu befüllende String-Array. Muss mindestens 25 Elemente (Indizes 0 bis 24) umfassen.</param>
+ <returns>Das befüllte String-Array mit den aktuellen UI-Daten.</returns>
  <remarks>
- 25.02.2012 Create
+ 25.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Typsicherheit geschärft: Rückgabetyp von der generischen 'Array'-Klasse auf ein explizites 'String()' Array umgestellt.
+ - Robustheit erhöht: Automatische Dimensionierungsprüfung integriert. Ist das übergebene Array zu klein oder 'Nothing', wird es automatisch im Speicher auf die korrekte Größe (25 Elemente) initialisiert, um eine 'IndexOutOfRangeException' zu verhindern.
+ - Syntax bereinigt: Die veraltete Zuweisung an den Funktionsnamen durch das standardisierte .NET-Schlüsselwort 'Return' ersetzt.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.coAnrede_SelectedIndexChanged(System.Object,System.EventArgs)">
  <summary>
- Steuerung des zweiten Namensfeldes in Abhängigkeit der Anrede
+ Steuert die Aktivierung und die Beschriftung der Namens- und Vornamesfelder in Abhängigkeit davon, ob eine "Firma" oder eine Person ausgewählt wurde.
  </summary>
- <param name="sender"></param>
- <param name="e"></param>
+ <param name="sender">Das auslösende Objekt (hier das coAnrede-Steuerelement).</param>
+ <param name="e">Die Ereignisdaten des SelectedIndexChanged-Events.</param>
  <remarks>
- 25.02.2012 Create
+ 25.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Code-Verschlankung: Die Bedingung wurde in eine boolesche Variable ('isFirma') ausgelagert. Dadurch werden redundante Zuweisungen eliminiert und die Logik lässt sich in der Hälfte der Zeilen abbilden.
+ - Stabilität erhöht: Absicherung durch '.ToString()' hinzugefügt, um mögliche Null-Werte beim Wechsel der Auswahl sauber abzufangen.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierungDest.tbAnzahlung_KeyPress(System.Object,System.Windows.Forms.KeyPressEventArgs)">
@@ -755,6 +1145,36 @@ Pension
  02.04.2012 Create
  </remarks>
 </member>
+<member name="T:Pension.frmSQLError">
+ <summary>
+ Formular zur Anzeige und Verwaltung von SQL-Fehlermeldungen und Web-Störungsprotokollen.
+ </summary>
+</member>
+<member name="M:Pension.frmSQLError.Form1_Load(System.Object,System.EventArgs)">
+ <summary>
+ Wird beim Laden des Fehlerformulars ausgelöst. Initialisiert die Textanzeige.
+ </summary>
+</member>
+<member name="M:Pension.frmSQLError.rbSQLError_CheckedChanged(System.Object,System.EventArgs)">
+ <summary>
+ Wechselt die Anzeige auf SQL-Fehlerprotokolle.
+ </summary>
+</member>
+<member name="M:Pension.frmSQLError.rbWebStoerung_CheckedChanged(System.Object,System.EventArgs)">
+ <summary>
+ Wechselt die Anzeige auf Web-Störungsprotokolle.
+ </summary>
+</member>
+<member name="M:Pension.frmSQLError.buDelete_Click(System.Object,System.EventArgs)">
+ <summary>
+ Löscht das ausgewählte Protokoll über eine PHP-Webanforderung und aktualisiert die Anzeige.
+ </summary>
+</member>
+<member name="M:Pension.frmSQLError.prSQLText">
+ <summary>
+ Ruft die Protokolldaten remote ab und befüllt das Textfeld performant über einen StringBuilder.
+ </summary>
+</member>
 <member name="M:Pension.frmAnzahlung.prLoadZimmer(System.String)">
  <summary>
  Zimmer der Buchung laden
@@ -871,12 +1291,18 @@ Pension
 </member>
 <member name="M:Pension.PHP.Update(System.String@,System.String@)">
  <summary>
- Update eines Datensatzes
+ Führt das Update eines Datensatzes über eine verschlüsselte HTTP-POST-Anfrage an ein Remote-PHP-Skript aus.
  </summary>
- <param name="sSQL  "></param>
- <param name="sIP "></param>
- <returns></returns>
- <remarks>03.02.2011 Create koh chang
+ <param name="sSQL">Das auszuführende SQL-Statement (wird per Referenz manipuliert und verschlüsselt).</param>
+ <param name="sIP">Die Ziel-IP-Adresse oder Domain (wird zur vollständigen URL erweitert).</param>
+ <returns>True, wenn das Update auf dem Server erfolgreich war (Rückgabe "True"), andernfalls False.</returns>
+ <remarks>
+ 03.02.2011 - Create (Koh Chang)
+ 03.10.2026 - Code-Optimierung:
+ - Robustheit erhöht: Index-Prüfung bei 'aZeile.Length > 1' verhindert eine 'IndexOutOfRangeException', falls das PHP-Skript eine fehlerhafte oder leere Antwort liefert.
+ - Speicher-Effizienz: Unnötige Variable 'sSql_Si' entfernt.
+ - API-Modernisierung: Veraltete VB6-Funktionen ('TimeOfDay', 'Mid', 'Split', 'MsgBox') durch moderne .NET-Äquivalente ersetzt.
+ - Typsicherheit: 'DateTime.Now.DayOfWeek' liefert einen typsicheren Index für das Passwort-Array.
  </remarks>
 </member>
 <member name="M:Pension.frmReservierung.frmReservierung_Load(System.Object,System.EventArgs)">
@@ -1623,12 +2049,81 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  13.01.2012 Create
  </remarks>
 </member>
+<member name="M:Pension.frmDatenControl.frmDatenControl_Load(System.Object,System.EventArgs)">
+ <summary>
+ Wird beim Laden des Formulars (frmDatenControl) ausgeführt.
+ Bereinigt fehlerhafte Buchungssätze in der lokalen Datenbank, ruft die aktuellen Kundendaten 
+ über den PHP-Webservice ab, erstellt die Tabellenstruktur und befüllt diese.
+ </summary>
+ <param name="sender">Die Quelle des Ereignisses.</param>
+ <param name="e">Die Ereignisdaten.</param>
+ <remarks>
+ 27.12.2011 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Unsicheren Datentyp 'Array' durch ein stark typisiertes String-Array ('String()') ersetzt.
+ - Veraltetes 'Call'-Schlüsselwort bei Prozeduraufrufen entfernt.
+ - 'Try-Catch'-Fehlerbehandlung hinzugefügt, um unvollständiges Laden der Maske bei Netzwerk-/Datenbankfehlern zu verhindern.
+ </remarks>
+</member>
 <member name="M:Pension.frmDatenControl.prCreateTable">
  <summary>
- Tabelle der zu sendenden EMails erstellen
+ Erstellt die Spaltenstruktur für die Tabelle der zu sendenden E-Mails im ListView (lvControll)
+ und berechnet die Spaltenbreiten dynamisch anhand der Control-Breite.
  </summary>
  <remarks>
- 17.02.2012 Create
+ 17.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Division-by-Zero-Schutz: Mindestbreite für die dynamische Berechnung erzwungen.
+ - Nutzung des Ganzzahl-Divisionsoperators (\) für präzisere Breitenberechnungen ohne implizite Typkonvertierung.
+ - Layout-Aktualisierung optimiert: '.BeginUpdate()' und '.EndUpdate()' hinzugefügt, um Bildschirmflackern beim Löschen und Neuerstellen der Spalten zu verhindern.
+ </remarks>
+</member>
+<member name="M:Pension.frmDatenControl.prFillTabelle(System.String[]@)">
+ <summary>
+ Befüllt das ListView (lvControll) mit den Kundendaten aus dem übergebenen Array.
+ Wertet Steuerzeichen (#) für die Nummerierung aus und splittet die Datensätze anhand von Semikolons.
+ Fügt zwischen den verschiedenen Nummernblöcken (z. B. zwischen Nummer 1 und 2) eine visuelle Leerzeile ein.
+ </summary>
+ <param name="arKunde">Das Array mit den Rohdaten der Kunden (getrennt durch Semikolons oder Steuerzeichen).</param>
+ <remarks>
+ 17.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: '.BeginUpdate()' und '.EndUpdate()' verhindern das permanente Neuzeichnen bei jedem Zeilenimport.
+ - Robustheit erhöht: Indexprüfung 'arKun.Length >= 8' verhindert Abstürze bei unvollständigen Datenzeilen.
+ - Veraltete 'Split'-Funktion durch native '.Split(";"c)' Methode des Frameworks ersetzt.
+ - Typisierung geschärft: 'arKunde' von generischem 'Array' auf ein konkretes 'String()' Array umgestellt.
+ - Logikfehler/Bereinigung: Leere Zeilen-Erzeugung bei '#' entfernt, da diese die Tabellenstruktur korrumpierte.
+ - Struktur-Feature: Fügt nun korrekt eine Leerzeile als Trenner ein, sobald ein neuer Nummernblock (1 -> 2, 2 -> 3) beginnt.
+ </remarks>
+</member>
+<member name="M:Pension.frmDatenControl.lvControll_SelectedIndexChanged(System.Object,System.EventArgs)">
+ <summary>
+ Reagiert auf die Auswahländerung im ListView (lvControll) und aktualisiert die globalen Variablen für die ausgewählte Nummer und die alte ID.
+ </summary>
+ <param name="sender">Das auslösende Objekt (hier das lvControll-Steuerelement).</param>
+ <param name="e">Die Ereignisdaten des SelectedIndexChanged-Events.</param>
+ <remarks>
+ 17.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Robustheit erhöht: Direkte Prüfung auf '.SelectedItems.Count > 0' statt Ungleichheitsprüfung, um Fehlzugriffe auf Indizes zu vermeiden.
+ - Defensiver Zugriff: Explizite Index-Prüfung bei 'SubItems' eingeführt, um Abstürze bei unvollständigen ListView-Zeilen zu verhindern.
+ - Syntax bereinigt: Den redundanten 'With'-Block entfernt, da dieser bei kurzen Abfragen keinen Mehrwert bietet und die Lesbarkeit mindert.
+ </remarks>
+</member>
+<member name="M:Pension.frmDatenControl.tbDel_Click(System.Object,System.EventArgs)">
+ <summary>
+ Löscht den aktuell ausgewählten Kunden, aktualisiert verknüpfte Buchungen mit einer neuen ID und lädt die Tabellenansicht neu.
+ </summary>
+ <param name="sender">Das auslösende Objekt (hier der Löschen-Button tbDel).</param>
+ <param name="e">Die Ereignisdaten des Click-Events.</param>
+ <remarks>
+ 17.02.2012 - Create
+ 03.10.2026 - Code-Optimierung:
+ - Performance-Boost: Suchschleife optimiert. 'lvControll.Items.Count' wird nicht mehr bei jedem Durchlauf abgefragt. Schleife bricht nach dem Finden ('Exit For') sofort ab.
+ - Robustheit erhöht: Typisierte 'Integer.TryParse' und 'Double.TryParse' verhindern Abstürze bei nicht-numerischen Werten in den Tabellenzellen.
+ - Index-Prüfung: Spaltenzugriffe (Index 8) werden vorab validiert, um 'ArgumentOutOfRangeException' zu vermeiden.
+ - Syntax bereinigt: Redundante 'With'- und 'Call'-Schlüsselwörter entfernt. Veraltete 'Split'-Funktion durch native String-Arrays ersetzt.
+ - UI-Flackern minimiert: 'lvControll.BeginUpdate()' und 'EndUpdate()' umschließen nun das Löschen und Neuaufbauen der Tabelle.
  </remarks>
 </member>
 <member name="M:Pension.frmErinnerung.prSetTable">
@@ -3038,14 +3533,14 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  <param name="sender">Die Quelle des Ereignisses (die Toolbar-Schaltfläche).</param>
  <param name="e">Die Ereignisdaten des Klick-Events.</param>
  <remarks>
- <para>Öffnet das Formular für die Zimmereinteilung. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
+ <para>Öffnet das Formular für SQLError. Ist das Formular bereits geöffnet, wird es in den Vordergrund fokussiert.</para>
  <para>
  <b>Historie:</b><br/>
  22.09.2026 – XML-Kommentare hinzugefügt und Fokus-Verhalten (<c>BringToFront</c>) optimiert.<br/>
  </para>
  </remarks>
 </member>
-<member name="M:Pension.frmMain.IDKundeToolStripMenuItem_Click(System.Object,System.EventArgs)">
+<member name="M:Pension.frmMain.IDKundeBuchung_Click(System.Object,System.EventArgs)">
  <summary>
  Verarbeitet das Klick-Ereignis SQL String KunToBuc.
  </summary>
@@ -7345,6 +7840,20 @@ Giebt X1 kordinate einer zelle Zurück( in mm)
  26.09.2026 - Code-Optimierung:
  - Den langen 'Select Case'-Block durch die native 'MonthName'-Funktion ersetzt.
  - Validierung für Werte außerhalb des Bereichs 1-12 hinzugefügt, um Laufzeitfehler zu verhindern.
+ </remarks>
+</member>
+<member name="M:Pension.moFunction.fcUmDatum(System.String)">
+ <summary>
+ Konvertiert Datumsstrings bidirektional: Wandelt das deutsche Format (dd.MM.yyyy) 
+ in das Datenbankformat (yyyyMMdd) um und umgekehrt.
+ </summary>
+ <param name="sDatum">Das zu konvertierende Datum als String.</param>
+ <returns>Das umgewandelte Datum oder ein Leerzeichen, falls die Konvertierung fehlschlägt.</returns>
+ <remarks>
+ 02.10.2026 - Code-Optimierung:
+ - Fehleranfälliges 'ParseExact' durch das robustere 'TryParse' ersetzt, um Abstürze bei angehängten Uhrzeiten zu verhindern.
+ - Veralteten 'ByVal'-Modifizierer entfernt.
+ - Unterstützung für Datumsangaben inklusive Uhrzeitkomponenten integriert.
  </remarks>
 </member>
 <member name="M:Pension.moFunction.fcUmDatumXR(System.String)">

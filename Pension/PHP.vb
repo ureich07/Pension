@@ -280,68 +280,6 @@ Public Class PHP
     End Function
 
 
-    'Public Shared Function DataTable(ByRef sSQL As String, ByRef sIP As String) As DataTable
-    '    Dim dt As New DataTable()
-
-    '    Dim sSumme As String = GetQuersumme(sSQL)
-    '    Dim sPW() As String = {"Gabriela", "Gewuenscht", "Karriere", "Elternzeit", "Truemmer", "Abstand", "Bodensee"}
-
-    '    ' WICHTIG: DayOfWeek ist ein Enum (0=Sunday, 1=Monday...). 
-    '    ' Array-Index-Sicherung gegen OutOfBounds, falls die Wochentage im Enum anders sortiert sind
-    '    Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek)
-    '    If dayIndex >= sPW.Length Then dayIndex = 0
-
-    '    Dim PW As String = DeCrypt(sPW(dayIndex), GetTimePW())
-    '    Dim sTime As String = TimeOfDay.ToString("HHmmss") ' Sichereres Zeitformat ohne ":"
-
-    '    ' SQL verschlüsseln und URL zusammenbauen
-    '    sSQL = "S=" & Mid(sTime, 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-    '    sIP = "http://" & sIP & "/SQLRead.php"
-
-    '    ' HTTP Request absetzen
-    '    Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-
-    '    ' 1. Prüfung: Hat der Server überhaupt geantwortet?
-    '    If String.IsNullOrEmpty(htmlcode) Then Return dt
-
-    '    ' Zeilen trennen (^ = Chr(94))
-    '    Dim aZeile() As String = Split(htmlcode, Chr(94))
-
-    '    ' 2. Prüfung: Enthält die Antwort genügend Zeilen (mindestens Header und eine Datenzeile)?
-    '    If aZeile.Length < 3 Then Return dt
-
-    '    ' Spaltenüberschriften erstellen (~ = Chr(126))
-    '    Dim aFeld() As String = Split(aZeile(1), Chr(126))
-    '    For i As Integer = 0 To aFeld.Length - 1
-    '        dt.Columns.Add(aFeld(i), GetType(String))
-    '    Next
-
-    '    ' Datenzeilen verarbeiten (Beginnt bei Index 2, da Index 1 der Header ist)
-    '    ' Ende bei aZeile.Length - 2 (da die letzte Zeile oft leer ist wegen des finalen Trennzeichens)
-    '    For i As Integer = 2 To aZeile.Length - 2
-    '        aFeld = Split(aZeile(i), Chr(126))
-
-    '        ' Spaltenanzahl der Zeile mit den definierten Columns abgleichen (Schutz vor Spalten-Mismatch)
-    '        Dim spaltenAnzahl As Integer = Math.Min(aFeld.Length, dt.Columns.Count)
-
-    '        ' Performance-Optimierung: Array vorab befüllen und als ganze Zeile hinzufügen
-    '        Dim rowValues(dt.Columns.Count - 1) As String
-
-    '        For j As Integer = 0 To spaltenAnzahl - 1
-    '            ' Wenn das Feld leer ist, wird ein Leerzeichen gesetzt (beibehalten laut Altem Code)
-    '            If String.IsNullOrEmpty(aFeld(j)) Then
-    '                rowValues(j) = " "
-    '            Else
-    '                rowValues(j) = aFeld(j)
-    '            End If
-    '        Next
-
-    '        ' Zeile effizient in einem Rutsch zur DataTable hinzufügen
-    '        dt.Rows.Add(rowValues)
-    '    Next
-
-    '    Return dt
-    'End Function
 
 
     ''' <summary>
@@ -399,37 +337,65 @@ Public Class PHP
         End If
 
     End Function
+
     ''' <summary>
-    ''' Update eines Datensatzes
+    ''' Führt das Update eines Datensatzes über eine verschlüsselte HTTP-POST-Anfrage an ein Remote-PHP-Skript aus.
     ''' </summary>
-    ''' <param name="sSQL  "></param>
-    ''' <param name="sIP "></param>
-    ''' <returns></returns>
-    ''' <remarks>03.02.2011 Create koh chang
+    ''' <param name="sSQL">Das auszuführende SQL-Statement (wird per Referenz manipuliert und verschlüsselt).</param>
+    ''' <param name="sIP">Die Ziel-IP-Adresse oder Domain (wird zur vollständigen URL erweitert).</param>
+    ''' <returns>True, wenn das Update auf dem Server erfolgreich war (Rückgabe "True"), andernfalls False.</returns>
+    ''' <remarks>
+    ''' 03.02.2011 - Create (Koh Chang)
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Robustheit erhöht: Index-Prüfung bei 'aZeile.Length > 1' verhindert eine 'IndexOutOfRangeException', falls das PHP-Skript eine fehlerhafte oder leere Antwort liefert.
+    ''' - Speicher-Effizienz: Unnötige Variable 'sSql_Si' entfernt.
+    ''' - API-Modernisierung: Veraltete VB6-Funktionen ('TimeOfDay', 'Mid', 'Split', 'MsgBox') durch moderne .NET-Äquivalente ersetzt.
+    ''' - Typsicherheit: 'DateTime.Now.DayOfWeek' liefert einen typsicheren Index für das Passwort-Array.
     ''' </remarks>
     Public Shared Function Update(ByRef sSQL As String, ByRef sIP As String) As Boolean
         prInfo("Update => " & sSQL)
-        Dim sSql_Si As String = sSQL
+        Dim isSuccess As Boolean = False
+
+        ' Passwort-Array über native .NET-Syntax initialisieren
+        Dim sPW() As String = {"Flipflop", "Begegnung", "neueLand", "sichimmer", "Zukunft", "zuSorgen", "sondern"}
+
+        ' DayOfWeek liefert 0 (Sunday) bis 6 (Saturday). Array-Reihenfolge muss darauf abgestimmt sein.
+        Dim currentDayIndex As Integer = CInt(DateTime.Now.DayOfWeek)
+        Dim passwordKey As String = DeCrypt(sPW(currentDayIndex), GetTimePW())
+
+        ' Aktuelle Uhrzeit ermitteln und Formatierung anpassen (.NET alternative zu TimeOfDay)
+        Dim currentTimeString As String = DateTime.Now.ToString("HH;mm;ss")
+
+        ' Die ersten 6 Zeichen der Zeitzeichenkette herausschneiden (.NET Substring statt Mid)
+        Dim timePart As String = currentTimeString.Substring(0, Math.Min(6, currentTimeString.Length))
         Dim sSumme As String = GetQuersumme(sSQL)
-        Update = False
 
-        Dim sPW() As String = Split("Flipflop;Begegnung;neueLand;sichimmer;Zukunft;zuSorgen;sondern", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-
+        ' String-Verschlüsselung aufbauen
+        sSQL = "S=" & timePart & sSumme & DeCryptASCII(sSQL, passwordKey)
         sIP = "http://" & sIP & "/SQLUpdate.php"
+
+        ' POST-Request an den Webserver senden
         Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-        Dim aZeile() As String = Split(htmlcode, Chr(94)) 'Zeilenende chr(94)
-        If aZeile(1) = "True" Then
-            Update = True
+
+        If Not String.IsNullOrEmpty(htmlcode) Then
+            ' Splitten am Trennzeichen ^ (Chr(94)) mit der nativen .NET-Methode
+            Dim aZeile() As String = htmlcode.Split("^"c)
+
+            ' WICHTIG: Prüfen, ob das Array mindestens zwei Elemente enthält, um Abstürze zu verhindern
+            If aZeile.Length > 1 AndAlso aZeile(1) = "True" Then
+                isSuccess = True
+            Else
+                Const sMsg As String = " PHP-Update Fehler beim Speichern"
+                MessageBox.Show(sMsg, "Fehler", MessageBoxButtons.OKCancel, MessageBoxIcon.Error)
+            End If
         Else
-            Dim sMsg As String = " PHP-Update Fehler beim Speichern"
-            MsgBox(sMsg, vbOKCancel, "OK")
+            MessageBox.Show("Keine Antwort vom Server erhalten.", "Verbindungsfehler", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
+
         prInfo("")
+        Return isSuccess
     End Function
+
     Public Shared Function SaveFtp(ByRef sIP As String) As Boolean
         Dim sSQL = fcGetTimeID(Date.Today)
         Dim sSumme As String = GetQuersumme(sSQL)

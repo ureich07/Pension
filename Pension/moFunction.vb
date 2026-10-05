@@ -1261,26 +1261,67 @@ Module moFunction
     End Function
 
 
-    ''' <summary>
-    ''' Datumsumwandlung, "01.09.2008 <> 20080901"
-    ''' </summary>
-    ''' <param name="sDatum"></param>
-    ''' <param name="sDatum">Das zu konvertierende Datum als String.</param>
-    ''' <returns>Das umgewandelte Datum oder ein Leerzeichen bei Fehlern/leeren Eingaben.</returns>
-    Function fcUmDatum(ByVal sDatum As String) As String
+    '''' <summary>
+    '''' Datumsumwandlung, "01.09.2008 ungleich 20080901"
+    '''' </summary>
+    '''' <param name="sDatum">Das zu konvertierende Datum als String.</param>
+    '''' <returns>Das umgewandelte Datum oder ein Leerzeichen bei Fehlern/leeren Eingaben.</returns>
+    'Function fcUmDatum(ByVal sDatum As String) As String
 
-        If String.IsNullOrEmpty(sDatum.Trim) Then Return " "
-            sDatum = sDatum.Trim()
-        ' Wenn ein Punkt enthalten ist: von "01.09.2008" zu "20080901"
-        If sDatum.Contains(".") Then
-            Dim datum As DateTime = DateTime.ParseExact(sDatum, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture)
-            Return datum.ToString("yyyyMMdd")
+    '    If String.IsNullOrEmpty(sDatum.Trim) Then Return " "
+    '    sDatum = sDatum.Trim()
+    '    ' Wenn ein Punkt enthalten ist: von "01.09.2008" zu "20080901"
+    '    If sDatum.Contains(".") Then
+    '        Dim datum As DateTime = DateTime.ParseExact(sDatum, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture)
+    '        Return datum.ToString("yyyyMMdd")
+    '    Else
+    '        Dim datum As DateTime = DateTime.ParseExact(sDatum, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture)
+    '        Return datum.ToString("dd.MM.yyyy")
+    '    End If
+
+    'End Function
+
+    ''' <summary>
+    ''' Konvertiert Datumsstrings bidirektional: Wandelt das deutsche Format (dd.MM.yyyy) 
+    ''' in das Datenbankformat (yyyyMMdd) um und umgekehrt.
+    ''' </summary>
+    ''' <param name="sDatum">Das zu konvertierende Datum als String.</param>
+    ''' <returns>Das umgewandelte Datum oder ein Leerzeichen, falls die Konvertierung fehlschlägt.</returns>
+    ''' <remarks>
+    ''' 02.10.2026 - Code-Optimierung:
+    ''' - Fehleranfälliges 'ParseExact' durch das robustere 'TryParse' ersetzt, um Abstürze bei angehängten Uhrzeiten zu verhindern.
+    ''' - Veralteten 'ByVal'-Modifizierer entfernt.
+    ''' - Unterstützung für Datumsangaben inklusive Uhrzeitkomponenten integriert.
+    ''' </remarks>
+    Function fcUmDatum(sDatum As String) As String
+        If String.IsNullOrEmpty(sDatum) Then Return " "
+
+        Dim getrimmtesDatum As String = sDatum.Trim()
+
+        ' Wenn ein Punkt enthalten ist: von "dd.MM.yyyy..." zu "yyyyMMdd"
+        If getrimmtesDatum.Contains(".") Then
+            ' Erlaubt auch Formate, bei denen eine Uhrzeit anhängt
+            Dim Formate() As String = {"dd.MM.yyyy", "d.M.yyyy", "dd.MM.yyyy HH:mm:ss", "d.M.yyyy H:mm:ss"}
+            Dim dResult As DateTime
+
+            If DateTime.TryParseExact(getrimmtesDatum, Formate, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dResult) Then
+                Return dResult.ToString("yyyyMMdd")
+            End If
         Else
-            Dim datum As DateTime = DateTime.ParseExact(sDatum, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture)
-            Return datum.ToString("dd.MM.yyyy")
+            ' Ohne Punkt: von "yyyyMMdd..." zu "dd.MM.yyyy"
+            Dim Formate() As String = {"yyyyMMdd", "yyyyMMdd HH:mm:ss"}
+            Dim dResult As DateTime
+
+            If DateTime.TryParseExact(getrimmtesDatum, Formate, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dResult) Then
+                Return dResult.ToString("dd.MM.yyyy")
+            End If
         End If
 
+        ' Rückfallwert bei nicht erkennbarem Format (analog zu Ihrer Original-Logik)
+        Return " "
     End Function
+
+
 
     ''' <summary>
     ''' Datumsumwandlung,  (20080901 > 2008-09-01)

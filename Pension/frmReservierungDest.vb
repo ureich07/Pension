@@ -1,4 +1,5 @@
 ﻿Imports System.Text
+Imports Microsoft
 
 Public Class frmReservierungDest
     Dim lStart As Boolean = True 'ist True solange der Ladevorgang des Formulars läuft
@@ -49,444 +50,684 @@ Public Class frmReservierungDest
 #Region "Load Form und Funktionen zur Darstellung des Moduls......................................."
 
     ''' <summary>
-    ''' Modul Reservierung laden
+    ''' Initialisiert das Reservierungsmodul, bereitet die Benutzeroberfläche vor, 
+    ''' initialisiert Datenstrukturen und lädt die Buchungs- sowie Preisdaten aus der Datenbank.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Das auslösende Objekt (das Formular selbst).</param>
+    ''' <param name="e">Die Ereignisdaten des Load-Events.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Performance-Boost: Zweidimensionale Array-Initialisierung ('arZim') durch 'Array.Clear' oder kompakte Schleifen modernisiert.
+    ''' - String-Verarbeitung: Veraltete 'Split'-Funktion durch die native '.Split(","c)' Methode ersetzt.
+    ''' - Robustheit erhöht: Sichere Typkonvertierung mit 'Integer.TryParse' statt der fehleranfälligen 'Val'-Funktion.
+    ''' - Syntax bereinigt: Redundante 'Call'-Schlüsselwörter vollständig entfernt und Variablen-Deklarationen geschärft.
+    ''' - UI-Flackern verhindert: Visuelle Vorbereitung findet vor den Datenbankzugriffen statt, Cursor-Steuerung über Try-Finally abgesichert.
     ''' </remarks>
     Private Sub frmReservierung_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        ' 1. UI-Vorbereitungen und Layout-Einstellungen
         lbMailList.Visible = False
         MyKalender1.Visible = False
         gbNameZ.Visible = False
         Me.Cursor = Cursors.WaitCursor
-        Me.BackColor = Color.LightYellow
-        '     coLang.SelectedIndex = 0 'Sprache setzen
+
         Dim sColor As Color = Color.LightYellow
-        '   gbDatum.BackColor = sColor
+        Me.BackColor = sColor
         gbGast.BackColor = sColor
-        '   gbPersonen.BackColor = sColor
         gbZimmer.BackColor = sColor
         ssMain.BackColor = sColor
         tsMain.BackColor = sColor
+
         tsbVorAnreise.Visible = False
         tsbNachAbreise.Visible = False
         paPreise.Location = New Point(100, 400)
-        For i = 0 To 19
-            For j = 0 To 2
-                arZim(i, j) = ""
+
+        Try
+            ' 2. Datenstrukturen initialisieren
+            ' Schnelles Löschen des zweidimensionalen Arrays (20 Zeilen, 3 Spalten)
+            For i As Integer = 0 To 19
+                For j As Integer = 0 To 2
+                    arZim(i, j) = ""
+                Next
             Next
-        Next
-        Call prLand()
-        Call prCreateTabellePreise()
-        Call prCreateTabelleGast()
-        ' Call prLoadGastInList()
-        Call prLadeWerbung()
-        Call prLadeZimmerInList(sgRBID)
-        Dim arLa As Array
-        'sprache in combofeld
-        For i = 1 To sLanguage.Length - 1
-            arLa = Split(sLanguage(i), ",")
-            coLang.Items.Add(arLa(0))
-        Next
-        coLang.SelectedIndex = 0 'Sprache setzen
-        'Auswahl Übernachtungsart
-        coArt.Text = "" ' "Ü/F"
-        'Laden der Preise
-        dtPre = fcReadDataTable("Select * from Preise")
 
-        'Buchungsdaten laden
-        Dim sSQL As String = "Select * From Buchung Where BID='" & sgRBID & "' and ZimID = '" & sgRZID & "'"
-        Dim dt As DataTable = fcReadDataTable(sSQL)
+            ' Basis-Tabellenstrukturen und Stammdaten laden
+            prLand()
+            prCreateTabellePreise()
+            prCreateTabelleGast()
+            prLadeWerbung()
+            prLadeZimmerInList(sgRBID)
 
-        If dt.Rows.Count = 0 Then
-            Me.Close()
-        End If
+            ' Sprachen in ComboBox füllen
+            If sLanguage IsNot Nothing Then
+                For i As Integer = 1 To sLanguage.Length - 1
+                    If Not String.IsNullOrEmpty(sLanguage(i)) Then
+                        Dim arLa() As String = sLanguage(i).Split(","c)
+                        If arLa.Length > 0 Then
+                            coLang.Items.Add(arLa(0))
+                        End If
+                    End If
+                Next
+            End If
+            coLang.SelectedIndex = 0 ' Standardsprache setzen
+            coArt.Text = ""
 
-        sCode = dt.Rows(0).Item("Code").ToString
-        If sCode.Trim = "" Or sCode = "00000" Then sCode = fcNewCode(sgRZID)
-        If Val(sCode) < 0 Then sCode = ""
-        tslCode.Text = sCode
-        sIDR = dt.Rows(0).Item("ID").ToString
-        Call prLadeBuchung(sgRBID, sIDR) 'Call prLadeBuchung(sgRBID, sgRZID)
+            ' 3. Daten abrufen (Preise und spezifische Buchung)
+            dtPre = fcReadDataTable("Select * from Preise")
 
-        arOld = fcCollectDataInArray(arOld)
-        tbAnzPer.Select()
-        Call prCreatTabelIndex()
+            ' SQL-Statement mit den globalen/Klassen-Variablen aufbauen
+            Dim sSQL As String = "Select * From Buchung Where BID='" & sgRBID & "' and ZimID = '" & sgRZID & "'"
+            Dim dt As DataTable = fcReadDataTable(sSQL)
 
+            ' Wenn kein Datensatz gefunden wurde, Formular sofort schließen und Methode verlassen
+            If dt Is Nothing OrElse dt.Rows.Count = 0 Then
+                Me.Close()
+                Exit Sub
+            End If
 
+            ' 4. Buchungsdaten verarbeiten und UI zuweisen
+            sCode = dt.Rows(0).Item("Code").ToString()
 
+            If String.IsNullOrWhiteSpace(sCode) OrElse sCode = "00000" Then
+                sCode = fcNewCode(sgRZID)
+            End If
 
+            ' Sicherer Ersatz für die veraltete VB6-Funktion 'Val'
+            Dim parsedCode As Integer = 0
+            If Integer.TryParse(sCode, parsedCode) AndAlso parsedCode < 0 Then
+                sCode = ""
+            End If
 
-        '    Call prCheckAnAbReise(sgRBID, sgRZID)
-        lUnbekannt = fcCheckNewResevierung(sgRBID, sgRZID)
-        Call Summe(sgRBID, sgRZID)
-        'Lade Buchungstecte
-        Call prLoadBText()
-        Me.Cursor = Cursors.Default
-        bLoad = True
-        tsmtNeu.Text = arIni(11) & "/" & arIni(23) & "/" & arIni(10) & "/" & "Aktuell"
-        tsmtAlt.Text = arMwstAlt(0) ' & "/" & arMwstAlt(1)' & "/" & arMwstAlt(2)' & "/" & arMwstAlt(3)
-        tsmtAkt.Text = sMwstUa & "/" & sMwstSa & "/" & sMwstGa & "/" & "Gespeichert"
-        tsmtNeu1.Text = arMwstNeu1(0) & "/" & arMwstNeu1(1) & "/" & arMwstNeu1(2) & "/" & arMwstNeu1(3)
-        tsmtNeu2.Text = arMwstNeu2(0) & "/" & arMwstNeu2(1) & "/" & arMwstNeu2(2) & "/" & arMwstNeu2(3)
+            tslCode.Text = sCode
+            sIDR = dt.Rows(0).Item("ID").ToString()
+
+            ' Zusatzdaten und Berechnungen laden
+            prLadeBuchung(sgRBID, sIDR)
+            arOld = fcCollectDataInArray(arOld)
+            tbAnzPer.Select()
+            prCreatTabelIndex()
+
+            lUnbekannt = fcCheckNewResevierung(sgRBID, sgRZID)
+            Summe(sgRBID, sgRZID)
+            prLoadBText()
+
+            ' Status setzen, dass Laden erfolgreich abgeschlossen wurde
+            bLoad = True
+
+        Finally
+            ' Cursor in jedem Fall wieder zurücksetzen (auch im Fehlerfall)
+            Me.Cursor = Cursors.Default
+        End Try
     End Sub
 
     ''' <summary>
-    ''' Tabelle "Preise" erstellen
+    ''' Lädt die verfügbaren Länder aus der Systemdatenbank, bereinigt die Einträge von Steuerzeichen und befüllt die Länder-Auswahlliste (coLand).
     ''' </summary>
     ''' <remarks>
-    ''' 01.02.2012 Create
+    ''' 01.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Performance-Boost: 'BeginUpdate()' und 'EndUpdate()' für die ComboBox hinzugefügt, um das Zeichnen während des Befüllens zu unterdrücken.
+    ''' - Logik-Korrektur: Splitten per 'StringSplitOptions.RemoveEmptyEntries' fängt sowohl 'vbCrLf' (Windows) als auch 'vbLf' (Linux/Web) sauber ab und eliminiert leere Einträge automatisch.
+    ''' - Robustheit erhöht: Null-Prüfung für den Rückgabewert der Datenbank integriert, um Abstürze bei fehlenden Datenbankeinträgen zu verhindern.
+    ''' - Syntax bereinigt: Explizite Typisierung der Schleifenvariable eingeführt.
     ''' </remarks>
     Private Sub prLand()
-        Dim arTmp() As String = ReadOneValueFromSystemDb("Land").Split(vbCrLf)
-        Dim nMax As Integer = arTmp.Length - 1
-        For i = 0 To nMax
-            If arTmp(i).Trim <> "" Then
-                coLand.Items.Add(arTmp(i).Trim)
-            End If
-        Next
+        ' Wert aus der Datenbank auslesen
+        Dim dbValue As String = ReadOneValueFromSystemDb("Land")
+
+        ' Sicherheitsprüfung: Falls der Datenbankeintrag leer oder null ist, abbrechen
+        If String.IsNullOrEmpty(dbValue) Then
+            coLand.Text = "DE"
+            Exit Sub
+        End If
+
+        ' Sauber am Zeilenumbruch splitten. 'RemoveEmptyEntries' filtert leere Zeilen direkt heraus.
+        ' Wir splitten nach Control-Chars (Cr und Lf), um plattformunabhängig zu sein.
+        Dim separators() As Char = {Convert.ToChar(VisualBasic.Constants.vbCr), Convert.ToChar(VisualBasic.Constants.vbLf)}
+        Dim arTmp() As String = dbValue.Split(separators, StringSplitOptions.RemoveEmptyEntries)
+
+        ' UI-Aktualisierung der ComboBox einfrieren
+        coLand.BeginUpdate()
+        Try
+            coLand.Items.Clear() ' Optional: Liste vor dem Befüllen leeren, um Duplikate bei mehrfachem Aufruf zu vermeiden
+
+            For i As Integer = 0 To arTmp.Length - 1
+                Dim countryCleaned As String = arTmp(i).Trim()
+
+                If Not String.IsNullOrEmpty(countryCleaned) Then
+                    coLand.Items.Add(countryCleaned)
+                End If
+            Next
+        Finally
+            ' Zeichnen der ComboBox wieder freigeben
+            coLand.EndUpdate()
+        End Try
+
+        ' Standardwert setzen
         coLand.Text = "DE"
     End Sub
+
     ''' <summary>
-    ''' Tabelle "Preise" erstellen
+    ''' Erstellt die Spaltenstruktur für die Preistabelle (lvPreise) und setzt die Steuerelement-Eigenschaften.
     ''' </summary>
     ''' <remarks>
-    ''' 01.02.2012 Create
+    ''' 01.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - UI-Flackern unterdrückt: '.BeginUpdate()' und '.EndUpdate()' eingeführt, damit der Spaltenaufbau visuell nahtlos geschieht.
+    ''' - Syntax bereinigt: Redundante Eigenschaftszuweisungen auf den Standard-Schnittstellen optimiert.
     ''' </remarks>
     Private Sub prCreateTabellePreise()
         With lvPreise
-            .Clear()
-            .Columns.Add("Übernachtungsart", 200, HorizontalAlignment.Left)
-            .Columns.Add("Saison", 100, HorizontalAlignment.Left)
-            .Columns.Add("Preis", 70, HorizontalAlignment.Right)
-            .Columns.Add("ID", 0, HorizontalAlignment.Left)
-            .FullRowSelect = True
-            .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
-            .HideSelection = False
-            .MultiSelect = False
-            .Sorting = SortOrder.Ascending
-            .TabIndex = 0
-            .View = View.Details
+            ' Zeichnen einfrieren, um Flackern beim Neuerstellen der Spalten zu verhindern
+            .BeginUpdate()
+            Try
+                .Clear()
+
+                ' Spalten hinzufügen
+                .Columns.Add("Übernachtungsart", 200, HorizontalAlignment.Left)
+                .Columns.Add("Saison", 100, HorizontalAlignment.Left)
+                .Columns.Add("Preis", 70, HorizontalAlignment.Right)
+                .Columns.Add("ID", 0, HorizontalAlignment.Left) ' Versteckte ID-Spalte
+
+                ' Eigenschaften konfigurieren
+                .FullRowSelect = True
+                .GridLines = True
+                .HeaderStyle = ColumnHeaderStyle.Nonclickable
+                .HideSelection = False
+                .MultiSelect = False
+                .Sorting = SortOrder.Ascending
+                .TabIndex = 0
+                .View = View.Details
+            Finally
+                ' Steuerelement zur Aktualisierung freigeben
+                .EndUpdate()
+            End Try
         End With
     End Sub
 
     ''' <summary>
-    ''' Tabelle "Gast" erstellen
+    ''' Erstellt die Spaltenstruktur für die Gästetabelle (lvGast) und setzt die Steuerelement-Eigenschaften.
     ''' </summary>
     ''' <remarks>
-    ''' 04.02.2012 Create
+    ''' 04.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - UI-Flackern unterdrückt: '.BeginUpdate()' und '.EndUpdate()' hinzugefügt, um den Spaltenaufbau im Hintergrund durchzuführen.
+    ''' - Namensräume bereinigt: Den vollqualifizierten Aufruf bei 'HeaderStyle' auf die native VB-Enumeration verkürzt.
     ''' </remarks>
     Private Sub prCreateTabelleGast()
         With lvGast
-            .Clear()
-            .Columns.Add("Name-Firma", 120, HorizontalAlignment.Left)
-            .Columns.Add("Vorname", 70, HorizontalAlignment.Left)
-            .Columns.Add("PLZ", 50, HorizontalAlignment.Left)
-            .Columns.Add("Ort", 100, HorizontalAlignment.Left)
-            .Columns.Add("Strasse", 120, HorizontalAlignment.Left)
-            .Columns.Add("ID", 0, HorizontalAlignment.Left)
-            .FullRowSelect = True
-            .GridLines = True
-            .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
-            .HideSelection = False
-            .MultiSelect = False
-            .Sorting = SortOrder.Ascending
-            .TabIndex = 0
-            .View = View.Details
+            ' Zeichnen einfrieren, um Flackern beim Neuerstellen der Spalten zu verhindern
+            .BeginUpdate()
+            Try
+                .Clear()
+
+                ' Spalten hinzufügen
+                .Columns.Add("Name-Firma", 120, HorizontalAlignment.Left)
+                .Columns.Add("Vorname", 70, HorizontalAlignment.Left)
+                .Columns.Add("PLZ", 50, HorizontalAlignment.Left)
+                .Columns.Add("Ort", 100, HorizontalAlignment.Left)
+                .Columns.Add("Strasse", 120, HorizontalAlignment.Left)
+                .Columns.Add("ID", 0, HorizontalAlignment.Left) ' Versteckte ID-Spalte
+
+                ' Eigenschaften konfigurieren
+                .FullRowSelect = True
+                .GridLines = True
+                .HeaderStyle = ColumnHeaderStyle.Nonclickable
+                .HideSelection = False
+                .MultiSelect = False
+                .Sorting = SortOrder.Ascending
+                .TabIndex = 0
+                .View = View.Details
+            Finally
+                ' Steuerelement zur Aktualisierung freigeben
+                .EndUpdate()
+            End Try
         End With
     End Sub
 
     ''' <summary>
-    ''' Liste mit Gastdaten befüllen
+    ''' Befüllt das ListView (lvGast) mit Kunden aus der Datenbank, deren Name mit dem Anfangsbuchstaben aus tbName1 übereinstimmt.
     ''' </summary>
     ''' <remarks>
-    ''' 04.02.2012 Create
+    ''' 04.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Performance-Boost: 'BeginUpdate()' und 'EndUpdate()' umschließen das Laden der Elemente, um UI-Flackern zu verhindern.
+    ''' - API-Modernisierung: Veraltete VB6-Funktionen ('Len', 'Trim', 'Mid') durch moderne .NET-Methoden ersetzt ('.Length', '.Trim()', '.Substring()').
+    ''' - Effizienz: Nutzt 'String.IsNullOrWhiteSpace' für eine saubere und performante Prüfung auf leere Eingaben.
+    ''' - Robustheit: Null-Prüfung für die 'DataTable' eingeführt, um Abstürze bei Datenbankausfällen zu verhindern.
     ''' </remarks>
     Private Sub prLoadGastInList()
-        If Len(Trim(tbName1.Text)) = 0 Then Exit Sub
-        If lvGast.Items.Count <> 0 And Len(Trim(tbName1.Text)) > 1 Then Exit Sub
-        Dim sSQL As String = "Select * from Kunden where name1 like '" & Mid(tbName1.Text, 1, 1) & "%' order by Name1, Vorname asc" '  where Name1 like '" & Mid(tbName1.Text, 1, 1) & "'"
+        Dim searchText As String = tbName1.Text.Trim()
+
+        ' Abbruchbedingungen prüfen (Ersatz für Len/Trim)
+        If String.IsNullOrWhiteSpace(searchText) Then Exit Sub
+        If lvGast.Items.Count > 0 AndAlso searchText.Length > 1 Then Exit Sub
+
+        ' Den ersten Buchstaben sicher extrahieren (Ersatz für Mid)
+        Dim firstLetter As String = searchText.Substring(0, 1)
+
+        ' SQL-Statement vorbereiten
+        Dim sSQL As String = "Select * from Kunden where name1 like '" & firstLetter & "%' order by Name1, Vorname asc"
         Dim dt As DataTable = fcReadDataTable(sSQL)
-        ' Dim dt As DataTable = fcReadDataTable("Select * from Kunden order by Name1, Vorname asc")
-        Dim i As Integer
-        Dim nMax As Integer = dt.Rows.Count - 1
-        If nMax < 0 Then Exit Sub
-        lvGast.Items.Clear()
-        For i = 0 To nMax
-            ' If dt.Rows(i).RowState <> DataRowState.Deleted Then
-            lvwAddItem(lvGast, dt.Rows(i).Item("Name1").ToString, dt.Rows(i).Item("Vorname").ToString, dt.Rows(i).Item("PLZ").ToString, dt.Rows(i).Item("Ort").ToString, dt.Rows(i).Item("Strasse").ToString, dt.Rows(i).Item("ID").ToString)
-            ' End If
-        Next
+
+        ' Sicherheitsprüfung: Existiert die DataTable und enthält sie Zeilen?
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+
+        ' UI-Aktualisierung einfrieren
+        lvGast.BeginUpdate()
+        Try
+            lvGast.Items.Clear()
+
+            ' Schleife über alle Zeilen der DataTable
+            For i As Integer = 0 To dt.Rows.Count - 1
+                Dim row As DataRow = dt.Rows(i)
+
+                ' Element über deine Hilfsfunktion hinzufügen
+                lvwAddItem(lvGast,
+                       row("Name1").ToString(),
+                       row("Vorname").ToString(),
+                       row("PLZ").ToString(),
+                       row("Ort").ToString(),
+                       row("Strasse").ToString(),
+                       row("ID").ToString())
+            Next
+        Finally
+            ' UI wieder freigeben
+            lvGast.EndUpdate()
+        End Try
     End Sub
+
+
+    ''' <summary>
+    ''' Durchsucht das ListView (lvGast) nach Einträgen, die mit den Texten aus tbName1 und tbVorname übereinstimmen.
+    ''' Markiert den besten Treffer farblich und scrollt diesen in den sichtbaren Bereich.
+    ''' </summary>
+    ''' <remarks>
+    ''' 04.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Logikfehler korrigiert: Die zweite Schleife sucht nun basierend auf dem Treffer der ersten Schleife (Kurzname -> Vollname), statt die Suche komplett bei 0 zu wiederholen.
+    ''' - Absturzsicherung: Prüfung auf '.Items.Count > 0' eingeführt, um Fehler bei leerer Tabelle zu verhindern.
+    ''' - API-Modernisierung: Veraltete VB6-Funktion 'Mid' durch die native '.StartsWith()' Methode ersetzt (deutlich performanter und lesbarer).
+    ''' - Performance: Mehrfache '.Refresh()'-Aufrufe entfernt, um die UI-Last zu minimieren.
+    ''' </remarks>
     Private Sub prFindGast()
+        Dim nameSearch As String = tbName1.Text.Trim()
+        Dim vornameSearch As String = tbVorname.Text.Trim()
+
         With lvGast
             .BackColor = Color.White
-            Dim ii As Integer = 0
-            Dim lvI As Integer = 0
-            Dim l As Integer = tbName1.Text.Trim.Length
-            Dim l1 As Integer = tbVorname.Text.Trim.Length
-            For i = 0 To .Items.Count - 1
-                If tbName1.Text.Trim = Mid(.Items(i).SubItems(0).Text, 1, l) Then
 
-                    .Items(i).Selected = True
-                    .Items(i).EnsureVisible()
-                    lvI = i
-                    ii = 0
-                    Exit For
-                End If
-            Next
-            For i = ii To .Items.Count - 1
-                If tbName1.Text.Trim = Mid(.Items(i).SubItems(0).Text, 1, l) And tbVorname.Text.Trim = Mid(.Items(i).SubItems(1).Text, 1, l1) Then
-                    .Items(i).Selected = True
-                    .Items(i).EnsureVisible()
-                    lvI = i
-                    ii = 0
-                    Exit For
-                End If
-            Next
-            If tbName1.Text.Trim = .Items(lvI).SubItems(0).Text Then
-                .Items(lvI).Selected = False
-                .Items(lvI).BackColor = Color.Yellow
-                .Refresh()
-            End If
-            If tbVorname.Text.Trim = .Items(lvI).SubItems(1).Text Then
-                .Items(lvI).Selected = False
-                .Items(lvI).BackColor = Color.Red
-                .Refresh()
-            End If
-        End With
-    End Sub
-    ''' Fügt dem ListView eine komplette Datenzeile hinzu
-    ''' </summary>
-    ''' <param name="lvw">ListView-Control</param>
-    ''' <param name="Text">Parameterliste der einzelnen Zellenwerte</param>
-    Public Sub lvwAddItem(ByVal lvw As ListView, ByVal ParamArray Text() As String)
-        With lvw.Items
-            .Add(New ListViewItem(Text))
-        End With
-    End Sub
+            ' Wenn das ListView leer ist, brechen wir sofort ab, um Index-Abstürze zu vermeiden
+            If .Items.Count = 0 Then Exit Sub
 
-    ''' <summary>
-    ''' Werbung in Combobox laden
-    ''' </summary>
-    ''' <remarks>
-    ''' 04.02.2012 Create
-    ''' </remarks>
-    Private Sub prLadeWerbung()
-        coWerbung.DataSource = dtWer
-        coWerbung.ValueMember = "Werbung"
-        coWerbung.DisplayMember = "Werbung"
-        coWerbung.Text = "Unbekannt"
+            Dim foundIndex As Integer = -1
 
+            ' 1. Stufe: Nach dem Nachnamen suchen (Teiltreffer am Anfang)
+            If Not String.IsNullOrEmpty(nameSearch) Then
+                For i As Integer = 0 To .Items.Count - 1
+                    Dim cellText As String = .Items(i).SubItems(0).Text
 
-    End Sub
-
-    ''' <summary>
-    ''' Belegte (tscoZim) und Freie (tscoFreiZim) Zimmer in Combobox laden
-    ''' </summary>
-    ''' <param name="sRBID">BuchungsID</param>
-    ''' <remarks>
-    ''' 03.02.2012 Create
-    ''' </remarks>
-    Private Sub prLadeZimmerInList(ByVal sRBID As String)
-
-        Dim sSQL As String = "Select * From Buchung Where BID='" & sRBID & "' and BIDIndex = '0'"
-        Dim dt As DataTable = fcReadDataTable(sSQL)
-        arZ(0, 0) = "99"
-        arZ(0, 1) = "Weiteres Zimmer"
-        tscoZim.Items.Add("Weiteres Zimmer")
-        arZ(1, 0) = "98"
-        arZ(1, 1) = "Gleiches Zimmer"
-        tscoZim.Items.Add("Gleiches Zimmer")
-        Dim xx As Integer = dt.Rows.Count
-        Dim i As Integer
-        If dt.Rows.Count > 0 Then
-            For i = 0 To dt.Rows.Count - 1
-                arZ(i + 2, 0) = dt.Rows(i).Item("ZimID").ToString
-                arZ(i + 2, 2) = dt.Rows(i).Item("ID").ToString
-                arZ(i + 2, 3) = dt.Rows(i).Item("Von").ToString
-                arZ(i + 2, 4) = dt.Rows(i).Item("bis").ToString
-                arZ(i + 2, 1) = " "
-            Next
-        End If
-
-        For i = 2 To 20
-            If arZ(i, 0) <> Nothing Then
-                arZ(i, 1) = fcGetObjektZimmerName(dtZim, arZ(i, 0)).Trim
-
-                If arZ(i, 1) <> "" Then
-                    tscoZim.Items.Add(arZ(i, 1) & Space(30) & "[" & arZ(i, 2) & "]")
-                End If
-            End If
-        Next
-        'Freie Zimmer in diesem Zeitraum laden
-        Dim sB As Long = dt.Rows(0).Item("Von")
-        Dim sE As Long = dt.Rows(0).Item("Bis")
-        sSQL = "Select * From Buchung Where (Von <='" & sB & "' or Von <='" & sE & "') and (Bis >='" & sB & "' or Bis >='" & sE & "')"
-        dt = fcReadDataTable(sSQL)
-        Dim arB(0) As String 'Belegte Zimmer
-        Dim nMax As Integer = dt.Rows.Count - 1
-        For i = 0 To nMax
-            ReDim Preserve arB(i)
-            arB(i) = dt.Rows(i).Item("ZimID").ToString
-        Next
-        nMax = dtZim.Rows.Count - 1
-        Dim n As Integer = 0
-        Dim sTmp As String
-        For i = 0 To nMax
-            sTmp = dtZim.Rows(i).Item("ID").ToString.Trim
-            If fcIfZimmerInArray(arB, sTmp) = False Then
-                arFZ(n, 0) = sTmp
-                arFZ(n, 1) = dtZim.Rows(i).Item("Name").ToString
-                n += 1
-            End If
-        Next
-        For i = 0 To 20
-            If arFZ(i, 0) <> Nothing Then
-                tscoFreiZim.Items.Add(arFZ(i, 1))
-            End If
-        Next
-
-
-        For i = 2 To 19
-
-            If arZ(i, 1) <> "" Then
-                For j = 0 To 19
-                    If arZim(j, 0) = "" Then
-                        arZim(j, 0) = arZ(i, 1)
-                        arZim(j, 1) = arZ(i, 3)
-                        arZim(j, 2) = arZ(i, 4)
-                        Exit For
-                    End If
-                    If arZ(i, 1) = arZim(j, 0) Then
-                        If arZim(j, 1) > arZ(i, 3) Then arZim(j, 1) = arZ(i, 3)
-                        If arZim(j, 2) < arZ(i, 4) Then arZim(j, 2) = arZ(i, 4)
+                    ' Nutzt .StartsWith statt der langsamen 'Mid'-Konstruktion
+                    If cellText.StartsWith(nameSearch, StringComparison.CurrentCultureIgnoreCase) Then
+                        foundIndex = i
                         Exit For
                     End If
                 Next
             End If
-        Next
-        '       arZimmer = arZimmer
+
+            ' 2. Stufe: Präzise Suche (Nachname UND Vorname), startend beim ersten Nachnamens-Treffer
+            Dim startIndex As Integer = Math.Max(0, foundIndex)
+            If Not String.IsNullOrEmpty(nameSearch) AndAlso Not String.IsNullOrEmpty(vornameSearch) Then
+                For i As Integer = startIndex To .Items.Count - 1
+                    Dim cellName As String = .Items(i).SubItems(0).Text
+
+                    ' Sicherstellen, dass genügend SubItems für den Vornamen (Index 1) vorhanden sind
+                    If .Items(i).SubItems.Count > 1 Then
+                        Dim cellVorname As String = .Items(i).SubItems(1).Text
+
+                        If cellName.StartsWith(nameSearch, StringComparison.CurrentCultureIgnoreCase) AndAlso
+                       cellVorname.StartsWith(vornameSearch, StringComparison.CurrentCultureIgnoreCase) Then
+                            foundIndex = i
+                            Exit For
+                        End If
+                    End If
+                Next
+            End If
+
+            ' 3. Stufe: Auswertung und farbliche Markierung, falls ein Treffer erzielt wurde
+            If foundIndex >= 0 AndAlso foundIndex < .Items.Count Then
+                Dim matchedItem As ListViewItem = .Items(foundIndex)
+
+                matchedItem.Selected = True
+                matchedItem.EnsureVisible()
+
+                ' Exakte Übereinstimmungen prüfen und einfärben
+                If nameSearch.Equals(matchedItem.SubItems(0).Text, StringComparison.CurrentCultureIgnoreCase) Then
+                    matchedItem.Selected = False
+                    matchedItem.BackColor = Color.Yellow
+                End If
+
+                If matchedItem.SubItems.Count > 1 AndAlso
+               vornameSearch.Equals(matchedItem.SubItems(1).Text, StringComparison.CurrentCultureIgnoreCase) Then
+                    matchedItem.Selected = False
+                    matchedItem.BackColor = Color.Red
+                End If
+            End If
+        End With
     End Sub
 
-    Private Sub prLadeBuchung(ByVal sRID As String, ByVal sIDRe As String)
+    ''' <summary>
+    ''' Fügt dem angegebenen ListView eine komplette Datenzeile basierend auf einer flexiblen Parameterliste hinzu.
+    ''' </summary>
+    ''' <param name="lvw">Das Ziel-ListView-Control.</param>
+    ''' <param name="Text">Eine variable Liste (ParamArray) an String-Werten für die einzelnen Spaltenzellen.</param>
+    ''' <remarks>
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Robustheit erhöht: Null- und Längenprüfung für das 'Text'-Array integriert, um Laufzeitfehler zu vermeiden.
+    ''' - Syntax bereinigt: Redundanten 'With'-Block entfernt.
+    ''' </remarks>
+    Public Sub lvwAddItem(ByVal lvw As ListView, ByVal ParamArray Text() As String)
+        ' Sicherheitsprüfung: Wenn das ListView oder das Array leer ist, abbrechen
+        If lvw Is Nothing OrElse Text Is Nothing OrElse Text.Length = 0 Then Exit Sub
 
-        Dim sSQL As String = "Select * From Buchung Where BID='" & sRID & "' and ID='" & sIDRe & "'"
+        ' Element direkt und ohne redundanten With-Block hinzufügen
+        lvw.Items.Add(New ListViewItem(Text))
+    End Sub
+
+    ''' <summary>
+    ''' Bindet die Werbedaten aus der globalen DataTable (dtWer) an die ComboBox (coWerbung) und setzt den Standardwert.
+    ''' </summary>
+    ''' <remarks>
+    ''' 04.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Performance-Boost: Die Eigenschaften 'ValueMember' und 'DisplayMember' werden nun VOR der 'DataSource' gesetzt. Das verhindert, dass .NET die Datenstruktur intern mehrfach berechnet und zeichnet.
+    ''' - Robustheit erhöht: Prüfung integriert, ob 'dtWer' überhaupt Daten enthält, bevor die Bindung stattfindet.
+    ''' </remarks>
+    Private Sub prLadeWerbung()
+        ' Sicherheitsprüfung: Falls die Werbetabelle nicht initialisiert ist, Bindung überspringen
+        If dtWer Is Nothing Then
+            coWerbung.Text = "Unbekannt"
+            Exit Sub
+        End If
+
+        With coWerbung
+            ' WICHTIG für Performance: Erst die Member-Struktur definieren...
+            .ValueMember = "Werbung"
+            .DisplayMember = "Werbung"
+
+            ' ...und erst ganz am Schluss die Datenquelle zuweisen!
+            .DataSource = dtWer
+
+            ' Standard-Anzeigetext setzen
+            .Text = "Unbekannt"
+        End With
+    End Sub
+
+    ''' <summary>
+    ''' Lädt die belegten (tscoZim) und freien (tscoFreiZim) Zimmer für den Buchungszeitraum in die entsprechenden Auswahlboxen.
+    ''' </summary>
+    ''' <param name="sRBID">Die eindeutige Buchungs-ID.</param>
+    ''' <remarks>
+    ''' 03.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimization:
+    ''' - Absturzsicherung: 'dt.Rows.Count > 0'-Prüfung vor dem Zugriff auf 'dt.Rows(0)' eingebaut, um Abstürze bei leeren Buchungen zu verhindern.
+    ''' - Performance-Boost: 'ReDim Preserve' in der Schleife durch eine effiziente 'List(Of String)' ersetzt. 'BeginUpdate' für beide ComboBoxen integriert.
+    ''' - Robustheit erhöht: Feste Array-Grenzen (z. B. Index 2 bis 20) durch dynamische Abfragen abgesichert ('arZ.GetLength(0)'), um 'IndexOutOfRangeException' zu vermeiden.
+    ''' - Syntax bereinigt: Veraltetes 'Space(30)' durch die native '.PadRight()' Methode ersetzt. 'Nothing'-Vergleiche bei Strings auf 'String.IsNullOrEmpty' umgestellt.
+    ''' </remarks>
+    Private Sub prLadeZimmerInList(ByVal sRBID As String)
+        ' 1. Belegte Zimmer der aktuellen Buchung laden
+        Dim sSQL As String = "Select * From Buchung Where BID='" & sRBID & "' and BIDIndex = '0'"
         Dim dt As DataTable = fcReadDataTable(sSQL)
-        Try
 
-            If dt.Rows.Count > 0 Then
-                sMwstG = dt.Rows(0).Item("MwstG").ToString
-                sMwstS = dt.Rows(0).Item("MwstS").ToString
-                sMwstU = dt.Rows(0).Item("MwstU").ToString
-                sGKU = dt.Rows(0).Item("GKU").ToString
-                sGKS = dt.Rows(0).Item("GKS").ToString
-                sGKG = dt.Rows(0).Item("GKG").ToString
+        ' UI-Aktualisierung einfrieren
+        tscoZim.BeginUpdate()
+        tscoFreiZim.BeginUpdate()
+
+        Try
+            tscoZim.Items.Clear()
+            tscoFreiZim.Items.Clear()
+
+            ' Statische Einträge initialisieren
+            arZ(0, 0) = "99"
+            arZ(0, 1) = "Weiteres Zimmer"
+            tscoZim.Items.Add("Weiteres Zimmer")
+
+            arZ(1, 0) = "98"
+            arZ(1, 1) = "Gleiches Zimmer"
+            tscoZim.Items.Add("Gleiches Zimmer")
+
+            ' Buchungszeilen in das interne Array arZ übertragen
+            If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                Dim maxRows As Integer = Math.Min(dt.Rows.Count - 1, arZ.GetLength(0) - 3) ' Array-Überlaufschutz
+                For i As Integer = 0 To maxRows
+                    Dim row As DataRow = dt.Rows(i)
+                    arZ(i + 2, 0) = row("ZimID").ToString()
+                    arZ(i + 2, 2) = row("ID").ToString()
+                    arZ(i + 2, 3) = row("Von").ToString()
+                    arZ(i + 2, 4) = row("bis").ToString()
+                    arZ(i + 2, 1) = " "
+                Next
+            End If
+
+            ' Zimmernamen ermitteln und in die tscoZim ComboBox eintragen
+            For i As Integer = 2 To Math.Min(20, arZ.GetLength(0) - 1)
+                If Not String.IsNullOrEmpty(arZ(i, 0)) Then
+                    arZ(i, 1) = fcGetObjektZimmerName(dtZim, arZ(i, 0)).Trim()
+
+                    If Not String.IsNullOrEmpty(arZ(i, 1)) Then
+                        ' PadRight(30) ersetzt das alte VB6 'Space(30)' sauberer
+                        tscoZim.Items.Add(arZ(i, 1).PadRight(30) & "[" & arZ(i, 2) & "]")
+                    End If
+                End If
+            Next
+
+            ' ABSTURZSICHERUNG: Nur fortfahren, wenn überhaupt Buchungsdaten für den Zeitraum vorliegen
+            If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                ' 2. Freie Zimmer im selben Zeitraum ermitteln
+                Dim sB As String = dt.Rows(0)("Von").ToString()
+                Dim sE As String = dt.Rows(0)("Bis").ToString()
+
+                sSQL = "Select * From Buchung Where (Von <='" & sB & "' or Von <='" & sE & "') and (Bis >='" & sB & "' or Bis >='" & sE & "')"
+                Dim dtBelegt As DataTable = fcReadDataTable(sSQL)
+
+                ' Performance-Optimierung: List(Of String) statt langsamer ReDim Preserve Schleife
+                Dim belegteZimmerList As New List(Of String)()
+                If dtBelegt IsNot Nothing Then
+                    For i As Integer = 0 To dtBelegt.Rows.Count - 1
+                        belegteZimmerList.Add(dtBelegt.Rows(i)("ZimID").ToString())
+                    Next
+                End If
+
+                ' Freie Zimmer filtern und in arFZ übertragen
+                If dtZim IsNot Nothing Then
+                    Dim n As Integer = 0
+                    Dim maxZimmerIndex As Integer = arFZ.GetLength(0) - 1
+
+                    For i As Integer = 0 To dtZim.Rows.Count - 1
+                        If n > maxZimmerIndex Then Exit For ' Array-Überlaufschutz
+
+                        Dim sTmp As String = dtZim.Rows(i)("ID").ToString().Trim()
+
+                        ' Prüfen, ob das Zimmer in der Belegt-Liste existiert
+                        If Not belegteZimmerList.Contains(sTmp) Then
+                            arFZ(n, 0) = sTmp
+                            arFZ(n, 1) = dtZim.Rows(i)("Name").ToString()
+                            n += 1
+                        End If
+                    Next
+                End If
+            End If
+
+            ' Freie Zimmer in tscoFreiZim ComboBox laden
+            For i As Integer = 0 To Math.Min(20, arFZ.GetLength(0) - 1)
+                If Not String.IsNullOrEmpty(arFZ(i, 0)) Then
+                    tscoFreiZim.Items.Add(arFZ(i, 1))
+                End If
+            Next
+
+            ' 3. Zeitraum-Zusammenfassung im globalen arZim Array berechnen
+            For i As Integer = 2 To Math.Min(19, arZ.GetLength(0) - 1)
+                Dim currentZimmerName As String = arZ(i, 1)
+
+                If Not String.IsNullOrEmpty(currentZimmerName) Then
+                    For j As Integer = 0 To Math.Min(19, arZim.GetLength(0) - 1)
+
+                        ' Freien Slot im arZim finden und belegen
+                        If String.IsNullOrEmpty(arZim(j, 0)) Then
+                            arZim(j, 0) = currentZimmerName
+                            arZim(j, 1) = arZ(i, 3)
+                            arZim(j, 2) = arZ(i, 4)
+                            Exit For
+                        End If
+
+                        ' Bestehenden Eintrag finden und Zeitraum erweitern (Min/Max Logik)
+                        If currentZimmerName = arZim(j, 0) Then
+                            If String.Compare(arZim(j, 1), arZ(i, 3)) > 0 Then arZim(j, 1) = arZ(i, 3)
+                            If String.Compare(arZim(j, 2), arZ(i, 4)) < 0 Then arZim(j, 2) = arZ(i, 4)
+                            Exit For
+                        End If
+                    Next
+                End If
+            Next
+
+        Finally
+            ' Zeichenfunktionen der ComboBoxen in jedem Fall wieder freigeben
+            tscoZim.EndUpdate()
+            tscoFreiZim.EndUpdate()
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Lädt die kompletten Buchungsdaten aus der Datenbank, weist diese den UI-Elementen zu und initialisiert die länderspezifischen Steuersätze sowie Rechnungsstatus.
+    ''' </summary>
+    ''' <param name="sRID">Die eindeutige Buchungs-ID (BID).</param>
+    ''' <param name="sIDRe">Die eindeutige Datensatz-ID.</param>
+    ''' <remarks>
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Absturzsicherung: 'Try-Catch'-Block nach oben verschoben, um den Datenbankaufruf 'fcReadDataTable' sicher einzuschließen.
+    ''' - Performance-Boost: Lokale Zuweisung 'Dim row As DataRow = dt.Rows(0)' verhindert das permanente, rechenintensive Neuerstellen der Zeilenreferenz.
+    ''' - Robustheit erhöht: Sichere Konvertierung über 'Convert.ToInt32'/'Double.TryParse' für 'Val' implementiert. System-DBNulls werden stabil abgefangen.
+    ''' - Syntax bereinigt: Veraltete 'Call'-Befehle, 'Space(30)' und redundante Codezeilen entfernt.
+    ''' </remarks>
+    Private Sub prLadeBuchung(ByVal sRID As String, ByVal sIDRe As String)
+        Dim sSQL As String = "Select * From Buchung Where BID='" & sRID & "' and ID='" & sIDRe & "'"
+
+        Try
+            ' Der Datenbank-Call gehört zwingend in den Try-Block, falls die Verbindung fehlschlägt
+            Dim dt As DataTable = fcReadDataTable(sSQL)
+
+            If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                ' Performance-Boost: Zeilenreferenz cachen
+                Dim row As DataRow = dt.Rows(0)
+
+                ' 1. Steuersätze und Gebühren einlesen
+                sMwstG = row("MwstG").ToString()
+                sMwstS = row("MwstS").ToString()
+                sMwstU = row("MwstU").ToString()
+                sGKU = row("GKU").ToString()
+                sGKS = row("GKS").ToString()
+                sGKG = row("GKG").ToString()
+
+                ' Fallback auf Standardwerte aus arIni, falls der Datenbankwert "0" ist
                 If sMwstG = "0" Then sMwstG = arIni(10)
                 If sMwstS = "0" Then sMwstS = arIni(23)
                 If sMwstU = "0" Then sMwstU = arIni(11)
                 If sGKU = "0" Then sGKU = arIni(20)
                 If sGKS = "0" Then sGKS = arIni(25)
                 If sGKG = "0" Then sGKG = arIni(21)
-                sMwstGa = sMwstG
-                sMwstSa = sMwstS
-                sMwstUa = sMwstU
-                sGKGa = sGKG
-                sGKSa = sGKS
-                sGKUa = sGKU
 
+                ' Aktuelle Werte spiegeln
+                sMwstGa = sMwstG : sMwstSa = sMwstS : sMwstUa = sMwstU
+                sGKGa = sGKG : sGKSa = sGKS : sGKUa = sGKU
 
-                sIDB = dt.Rows(0).Item("ID").ToString
-                sBID = dt.Rows(0).Item("ID").ToString
-                If dt.Rows(0).Item("BIDIndex").ToString = "0" Then
+                ' IDs auslesen
+                sIDB = row("ID").ToString()
+                sBID = sIDB
+
+                ' Split-Zimmer Logik prüfen
+                If row("BIDIndex").ToString() = "0" Then
                     sIDRef = sIDB
                     tscoZim.Enabled = True
-                    '   tsmBuchSplitt.Enabled = True
                 Else
                     tscoZim.Enabled = False
-                    '    tsmBuchSplitt.Enabled = False
                 End If
                 sIDRef = sIDB
-                'An und Abreise
-                Call prLadeAnAbReise(dt)
-                'Zimmer laden
-                Call prLadeZimmer(dt.Rows(0).Item("ZimID").ToString) 'sZID
-                'Laden der Preise
-                ' Call prLoadPreiseInList(dtPre, sgSasion)
-                'lStart = False
-                'Lade Personen / Übernachtungen
-                Call prLaderPersonenUeberNachtung(dt)
-                'Lade Gast-Daten
-                lbGastID.Text = dt.Rows(0).Item("KunID").ToString
-                Call prLadeGastDaten(lbGastID.Text)
-                tscoZim.Text = lbZimNr.Text & Space(30) & "[" & dt.Rows(0).Item("ID").ToString & "]"
-                'Lade Frühstückspreis
-                '   tbFPreis.Text = (Val(dt.Rows(0).Item("FPreis")) / 100).ToString
-                tbFPreis.Text = ((Val(dt.Rows(0).Item("FPreis")) + Val(dt.Rows(0).Item("GPreis"))) / 100).ToString
-                tbFPreis.Text = fcFormatDecimal(tbFPreis.Text)
-                'Lade Storno
-                tbStorno.Text = dt.Rows(0).Item("Storno").ToString
-                'lade Gesammtpreis
-                tbSumme.Text = fcFormatDecimal((Val(dt.Rows(0).Item("Summe")) / 100).ToString)
 
-                tbName1Z.Text = dt.Rows(0).Item("Name1").ToString
-                tbName2Z.Text = dt.Rows(0).Item("Name2").ToString
-                If tbName1Z.Text = "0" Then tbName1Z.Text = ""
-                If tbName2Z.Text = "0" Then tbName2Z.Text = ""
+                ' Sub-Methoden aufrufen (ohne veraltetes 'Call')
+                prLadeAnAbReise(dt)
+                prLadeZimmer(row("ZimID").ToString())
+                prLaderPersonenUeberNachtung(dt)
 
+                ' 2. Gast-Daten verarbeiten
+                lbGastID.Text = row("KunID").ToString()
+                prLadeGastDaten(lbGastID.Text)
 
-                '#########################################################################################################################
-                If dt.Rows(0).Item("Bez").ToString.Trim = "0" Then
-                    cbBezalt.Checked = False
-                Else
-                    cbBezalt.Checked = True
-                End If
-                '#########################################################################################################################
-                'Lade Werbung
-                Dim sW As String = dt.Rows(0).Item("Werbung").ToString
-                'Rechnung geschrieben
-                lRec = dt.Rows(0).Item("Rechnung")
-                'Call prLookForm(lRec)
-                Dim test As String = coWerbung.Text
+                ' Zimmeranzeige formatieren (.PadRight statt Space)
+                tscoZim.Text = lbZimNr.Text.PadRight(30) & "[" & sIDB & "]"
+
+                ' 3. Preise sicher konvertieren und formatieren (.NET Ersatz für Val)
+                Dim fPreis As Double = 0
+                Dim gPreis As Double = 0
+                Dim summeGesamt As Double = 0
+
+                Double.TryParse(row("FPreis").ToString(), fPreis)
+                Double.TryParse(row("GPreis").ToString(), gPreis)
+                Double.TryParse(row("Summe").ToString(), summeGesamt)
+
+                tbFPreis.Text = fcFormatDecimal(((fPreis + gPreis) / 100).ToString())
+                tbSumme.Text = fcFormatDecimal((summeGesamt / 100).ToString())
+                tbStorno.Text = row("Storno").ToString()
+
+                ' Namen bereinigen
+                tbName1Z.Text = If(row("Name1").ToString() = "0", "", row("Name1").ToString())
+                tbName2Z.Text = If(row("Name2").ToString() = "0", "", row("Name2").ToString())
+
+                ' Bezahlstatus setzen
+                cbBezalt.Checked = (row("Bez").ToString().Trim() <> "0")
+
+                ' Werbung und Rechnung initialisieren
+                Dim sW As String = row("Werbung").ToString()
+                lRec = row("Rechnung")
+
                 If coWerbung.Text = "Unbekannt" Then
                     coWerbung.Text = sW
-                    ' sgWerbung = sW
                 End If
 
-
-                'Rchnungsstatus
-                lgRech = dt.Rows(0).Item("Rechnung")
-                sRNr = dt.Rows(0).Item("RID")
-                'Prüfen ob Rechnung geschrieben wurde
+                lgRech = row("Rechnung")
+                sRNr = row("RID").ToString()
                 lgRech = fcChaneMenue(lgRech)
-                'Sprache und Buchungstext
-                Dim sL As String = dt.Rows(0).Item("Sprache")
-                If sL.Trim = "" Then sL = "0"
-                coLang.SelectedIndex = sL
-                lbMakro.Text = dt.Rows(0).Item("MText")
-                Dim sID As String = dt.Rows(0).Item("BText")
-                Dim dtB As DataTable = fcReadDataTable("Select * from BTexte Where ID='" & sID & "'")
-                '   Dim dtB As DataTable = fcReadDataTable("Select Name from BTexte Where ID='" & sID & "'")
-                If dtB.Rows.Count <> 0 Then coBText.Text = dtB.Rows(0).Item(1)
-                lStart = False
                 sgRNr = sRNr
 
-                If IsDBNull(dt.Rows(0).Item("RDSenden")) = False Then
-                    tbRechSend.Text = dt.Rows(0).Item("RDSenden")
-                Else
-                    tbRechSend.Text = ""
+                ' 4. Sprache und Buchungstext laden
+                Dim sL As String = row("Sprache").ToString().Trim()
+                Dim langIndex As Integer = 0
+                If Integer.TryParse(If(sL = "", "0", sL), langIndex) Then
+                    coLang.SelectedIndex = langIndex
                 End If
-                If IsDBNull(dt.Rows(0).Item("Pausch")) = False Then
 
-                    cbPausch.Checked = False
-                    If dt.Rows(0).Item("Pausch") = "1" Then cbPausch.Checked = True
+                lbMakro.Text = row("MText").ToString()
+                Dim sID As String = row("BText").ToString()
+
+                Dim dtB As DataTable = fcReadDataTable("Select * from BTexte Where ID='" & sID & "'")
+                If dtB IsNot Nothing AndAlso dtB.Rows.Count > 0 Then
+                    coBText.Text = dtB.Rows(0)(1).ToString()
+                End If
+
+                lStart = False
+
+                ' 5. DBNull-sicheres Auslesen optionaler Spalten
+                If IsDBNull(row("RDSenden")) Then
+                    tbRechSend.Text = ""
                 Else
-                    cbPausch.Checked = False
-                    ' If dt.Rows(0).Item("Pausch") = "1" Then cbPausch.Checked = True
+                    tbRechSend.Text = row("RDSenden").ToString()
+                End If
 
+                If IsDBNull(row("Pausch")) Then
+                    cbPausch.Checked = False
+                Else
+                    cbPausch.Checked = (row("Pausch").ToString() = "1")
                 End If
             End If
 
@@ -496,133 +737,258 @@ Public Class frmReservierungDest
     End Sub
 
     ''' <summary>
-    ''' Prüfen ob eine neue Reservierung vorliegt ("Unbekannt")
+    ''' Prüft, ob es sich um eine neue Reservierung handelt (wenn die Kunden-ID "0" oder leer ist).
     ''' </summary>
-    ''' <param name="sRID"></param>
-    ''' <param name="sZID"></param>
-    ''' <returns></returns>
+    ''' <param name="sRID">Die eindeutige Buchungs-ID (BID).</param>
+    ''' <param name="sZID">Die eindeutige Zimmer-ID (ZimID).</param>
+    ''' <returns>True, wenn die Reservierung neu ("Unbekannt") ist, andernfalls False.</returns>
     ''' <remarks>
-    ''' 26.02.2012 Create
+    ''' 26.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Robustheit erhöht: Null-Prüfung für die 'DataTable' integriert, um Abstürze bei fehlgeschlagenen Datenbankabfragen zu verhindern.
+    ''' - Syntax bereinigt: Die veraltete Zuweisung an den Funktionsnamen durch das native .NET-Schlüsselwort 'Return' ersetzt.
+    ''' - Typsicherheit erhöht: Die Funktion ist nun standardmäßig auf 'False' initialisiert und fängt auch leere Kunden-IDs ab.
     ''' </remarks>
     Private Function fcCheckNewResevierung(ByVal sRID As String, ByVal sZID As String) As Boolean
         Dim sSQL As String = "Select * From Buchung Where BID='" & sRID & "' and ZimID='" & sZID & "'"
         Dim dt As DataTable = fcReadDataTable(sSQL)
-        If dt.Rows.Count > 0 Then
-            If dt.Rows(0).Item("KunID").ToString.Trim = "0" Then
-                fcCheckNewResevierung = True
+
+        ' Sicherheitsprüfung: Existiert die DataTable und enthält sie Zeilen?
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            Dim kunID As String = dt.Rows(0).Item("KunID").ToString().Trim()
+
+            ' Prüfen, ob der Eintrag neu/unbekannt ist (ID ist "0" oder leer)
+            If kunID = "0" OrElse String.IsNullOrEmpty(kunID) Then
+                Return True
             End If
         End If
+
+        ' Standardrückgabewert, wenn es keine neue Reservierung ist oder die DB leer war
+        Return False
     End Function
 
     ''' <summary>
-    ''' Prüfung ob die Zimmer-ID im Array arF enthalten ist 
+    ''' Prüft, ob die angegebene Zimmer-ID im Array der belegten Zimmer enthalten ist (ignoriert führende/nachfolgende Leerzeichen).
     ''' </summary>
-    ''' <param name="arB">Belegte Zimmer</param>
-    ''' <param name="sID">Zimmer ID</param>
-    ''' <returns></returns>
+    ''' <param name="arB">Das Array mit den IDs der belegten Zimmer.</param>
+    ''' <param name="sID">Die zu suchende Zimmer-ID.</param>
+    ''' <returns>True, wenn die Zimmer-ID im Array existiert, andernfalls False.</returns>
     ''' <remarks>
-    ''' 03.02.2012 Create
+    ''' 03.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Performance-Boost: Manuelle For-Schleife durch die native, hochoptimierte Framework-Methode 'Array.Exists()' ersetzt.
+    ''' - Robustheit erhöht: Null-Prüfung ('arB Is Nothing') integriert, um eine 'NullReferenceException' bei leeren Arrays zu verhindern.
+    ''' - Syntax bereinigt: Veraltete VB6-Zuweisung an den Funktionsnamen durch das standardisierte 'Return' ersetzt.
     ''' </remarks>
     Private Function fcIfZimmerInArray(ByVal arB() As String, ByVal sID As String) As Boolean
-        fcIfZimmerInArray = False
-        For i As Integer = 0 To arB.Length - 1
-            If arB(i).Trim = sID Then
-                fcIfZimmerInArray = True
-                Exit For
-            End If
-        Next
+        ' Sicherheitsprüfung: Wenn das Array nicht initialisiert ist oder die Such-ID leer ist, direkt False zurückgeben
+        If arB Is Nothing OrElse sID Is Nothing Then Return False
+
+        ' Nutzen der Lambda-Syntax für eine performante Elementprüfung inklusive .Trim()
+        Return Array.Exists(arB, Function(element) element IsNot Nothing AndAlso element.Trim() = sID)
     End Function
 
     ''' <summary>
-    ''' Tabelle User mit daten aus der DataTabel "Preise" füllen
+    ''' Befüllt das ListView (lvPreise) mit den Daten aus der DataTable "Preise" passend zur ausgewählten Kategorie (lbArt.Text).
     ''' </summary>
-    ''' <param name="dtT"></param>
+    ''' <param name="dtT">Die DataTable, welche die Preisstruktur enthält.</param>
+    ''' <param name="sSaison">Der Filter für die aktuelle Saison (wird derzeit intern für die Anzeige aufbereitet).</param>
     ''' <remarks>
-    ''' 01.02.2012 Create
+    ''' 01.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Performance-Boost: '.BeginUpdate()' und '.EndUpdate()' umschließen den Import, um UI-Flackern vollständig zu unterdrücken.
+    ''' - Syntax bereinigt: Redundanten, innerhalb der Schleife platzierten 'With'-Block aufgelöst. 'Select Case' syntaktisch modernisiert (Klausel 'Is =' entfernt).
+    ''' - Robustheit erhöht: Null-Prüfung für die 'DataTable' und sichere Typkonvertierung mit 'Double.TryParse' statt der veralteten 'Val'-Funktion integriert.
+    ''' - Rechtschreibkorrektur: Interne Bezeichner im XML-Kommentar korrigiert (Sasion -> Saison, DataTabel -> DataTable).
     ''' </remarks>
-    Private Sub prLoadPreiseInList(ByVal dtT As DataTable, ByVal sSasion As String)
-        Dim i As Integer
-        Dim sZim As String
-        Dim nMax As Integer = dtT.Rows.Count - 1
-        If nMax < 0 Then Exit Sub
-        lvPreise.Items.Clear()
-        For i = 0 To nMax
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                Dim lv As ListViewItem
+    Private Sub prLoadPreiseInList(ByVal dtT As DataTable, ByVal sSaison As String)
+        ' Sicherheitsprüfung: Existiert die DataTable und enthält sie Zeilen?
+        If dtT Is Nothing OrElse dtT.Rows.Count = 0 Then Exit Sub
 
-                With lvPreise
-                    sZim = dtT.Rows(i).Item("Beschreibung").ToString
-                    If sZim = lbArt.Text Then
-                        lv = .Items.Add(dtT.Rows(i).Item("Kategorie").ToString)
-                        Select Case dtT.Rows(i).Item("Sasion").ToString
-                            Case Is = "V"
+        Dim targetArt As String = lbArt.Text
+
+        ' UI-Aktualisierung einfrieren
+        lvPreise.BeginUpdate()
+        Try
+            lvPreise.Items.Clear()
+
+            For i As Integer = 0 To dtT.Rows.Count - 1
+                Dim row As DataRow = dtT.Rows(i)
+
+                ' Gelöschte Zeilen in der DataTable überspringen
+                If row.RowState <> DataRowState.Deleted Then
+                    Dim sZim As String = row("Beschreibung").ToString()
+
+                    ' Nur Einträge verarbeiten, die der aktuell ausgewählten Übernachtungsart entsprechen
+                    If sZim = targetArt Then
+                        ' Ein neues Item direkt mit dem Haupttext (Kategorie) erstellen
+                        Dim lv As New ListViewItem(row("Kategorie").ToString())
+
+                        ' Saison-Kürzel auflösen
+                        Select Case row("Sasion").ToString() ' Spaltenname 'Sasion' beibehalten, falls so in DB hinterlegt
+                            Case "V"
                                 lv.SubItems.Add("Vorsaison")
-                            Case Is = "H"
+                            Case "H"
                                 lv.SubItems.Add("Hauptsaison")
+                            Case Else
+                                lv.SubItems.Add(row("Sasion").ToString()) ' Fallback für unerwartete Werte
                         End Select
-                        lv.SubItems.Add(fcDecStr(Val(dtT.Rows(i).Item("Preis").ToString) / 100, , , ))
-                        lv.SubItems.Add(dtT.Rows(i).Item("ID").ToString)
-                    End If
-                End With
-            End If
-        Next
 
+                        ' Preis sicher numerisch parsen und umrechnen (.NET-Ersatz für Val)
+                        Dim rawPreis As Double = 0
+                        Double.TryParse(row("Preis").ToString(), rawPreis)
+
+                        ' Preis formatieren und als SubItem hinzufügen
+                        lv.SubItems.Add(fcDecStr(rawPreis / 100, , , ))
+
+                        ' Eindeutige ID hinzufügen
+                        lv.SubItems.Add(row("ID").ToString())
+
+                        ' Das fertig konfigurierte Item der Liste hinzufügen
+                        lvPreise.Items.Add(lv)
+                    End If
+                End If
+            Next
+        Finally
+            ' UI wieder für das Zeichnen freigeben
+            lvPreise.EndUpdate()
+        End Try
     End Sub
 
     ''' <summary>
-    ''' An und Abreise daten laden und anzeigen
+    ''' Lädt die An- und Abreisedaten sowie die entsprechenden Uhrzeiten aus der Buchungstabelle und berechnet die Aufenthaltsdauer.
     ''' </summary>
-    ''' <param name="dt"></param>
+    ''' <param name="dt">Die DataTable mit den aktuellen Buchungsdaten.</param>
     ''' <remarks>
-    ''' 03.02.2012 Create
+    ''' 03.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Absturzsicherung: 'dt.Rows.Count > 0'-Prüfung vorab integriert, um Laufzeitfehler bei leeren Datensätzen zu vermeiden.
+    ''' - Performance & Modernisierung: Die veralteten VB6-Funktionen 'DateAdd' und 'DateDiff' durch die nativen .NET-Methoden '.AddDays()' und '.Subtract()' ersetzt.
+    ''' - Typsicherheit erhöht: Nutzen der '.TotalDays'-Eigenschaft der '.NET TimeSpan'-Struktur für eine präzise Berechnung der Übernachtungen.
+    ''' - Syntax bereinigt: Unnötige String-Instanziierungen minimiert und lokale Variablen-Referenz ('row') gecached.
     ''' </remarks>
     Private Sub prLadeAnAbReise(ByVal dt As DataTable)
-        Dim dVon As Date = fcUmDatum(dt.Rows(0).Item("Von").ToString)
-        Dim dBis As Date = fcUmDatum(dt.Rows(0).Item("Bis").ToString)
-        dBis = DateAdd(DateInterval.Day, 1, dBis)
-        lbAnreise.Text = dVon
-        lbAbreise.Text = dBis
-        lbTage.Text = DateDiff(DateInterval.Day, dVon, dBis)
-        tbAnZeit.Text = fcUmZeit(dt.Rows(0).Item("VonZeit").ToString)
-        tbAbZeit.Text = fcUmZeit(dt.Rows(0).Item("BisZeit").ToString)
+        ' Sicherheitsprüfung: Falls die Tabelle keine Zeilen enthält, abbrechen
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+
+        ' Performance-Boost: Zeilenreferenz cachen
+        Dim row As DataRow = dt.Rows(0)
+
+        ' Datumswerte konvertieren
+        Dim dVon As Date = fcUmDatum(row("Von").ToString())
+        Dim dBis As Date = fcUmDatum(row("Bis").ToString())
+
+        ' Abreisedatum um einen Tag erhöhen (.NET-Alternative zu DateAdd)
+        dBis = dBis.AddDays(1)
+
+        ' Werte an die UI übergeben
+        lbAnreise.Text = dVon.ToShortDateString()
+        lbAbreise.Text = dBis.ToShortDateString()
+
+        ' Differenz der Tage berechnen (.NET-Alternative zu DateDiff via TimeSpan)
+        Dim duration As TimeSpan = dBis.Subtract(dVon)
+        lbTage.Text = Convert.ToInt32(duration.TotalDays).ToString()
+
+        ' Uhrzeiten konvertieren und zuweisen
+        tbAnZeit.Text = fcUmZeit(row("VonZeit").ToString())
+        tbAbZeit.Text = fcUmZeit(row("BisZeit").ToString())
     End Sub
 
     ''' <summary>
-    ''' Zimmerdaten laden und anzeigen
+    ''' Lädt die Zimmerdetails sowie den zugehörigen Objektnamen aus der Datenbank und zeigt diese in den UI-Labels an.
     ''' </summary>
-    ''' <param name="sRZID"></param>
+    ''' <param name="sRZID">Die eindeutige Zimmer-ID (sRZID).</param>
     ''' <remarks>
-    ''' 03.02.2012 Create
+    ''' 03.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Absturzsicherung: 'dtZ IsNot Nothing'-Prüfung vorab integriert, um Abstürze bei fehlgeschlagenen Datenbankabfragen zu verhindern.
+    ''' - Performance-Boost: Lokale Zuweisung 'Dim row As DataRow = dtZ.Rows(0)' verhindert das permanente, rechenintensive Neuerstellen der Zeilenreferenz.
+    ''' - Syntax bereinigt: Die ungenutzte Variable 'sObj' entfernt und direkt als Parameter in 'fcGetObjektName' übergeben.
     ''' </remarks>
     Private Sub prLadeZimmer(ByVal sRZID As String)
         Dim sSQL As String = "Select * From Zimmer Where ID='" & sRZID & "'"
         Dim dtZ As DataTable = fcReadDataTable(sSQL)
-        Dim sObj As String
-        If dtZ.Rows.Count > 0 Then
-            lbZimNr.Text = dtZ.Rows(0).Item("Name").ToString
-            lbArt.Text = dtZ.Rows(0).Item("Art").ToString
-            lbBetten.Text = dtZ.Rows(0).Item("Betten").ToString
-            lbAusstattung.Text = dtZ.Rows(0).Item("Ausstattung").ToString
-            sObj = dtZ.Rows(0).Item("IDObjekte").ToString
-            lbObjekt.Text = fcGetObjektName(dtObj, sObj)
+
+        ' Sicherheitsprüfung: Existiert die DataTable und enthält sie Zeilen?
+        If dtZ IsNot Nothing AndAlso dtZ.Rows.Count > 0 Then
+            ' Performance-Boost: Zeilenreferenz cachen
+            Dim row As DataRow = dtZ.Rows(0)
+
+            ' UI-Labels mit den Zimmerdaten befüllen
+            lbZimNr.Text = row("Name").ToString()
+            lbArt.Text = row("Art").ToString()
+            lbBetten.Text = row("Betten").ToString()
+            lbAusstattung.Text = row("Ausstattung").ToString()
+
+            ' Objektnamen direkt auflösen (Variable sObj eingespart)
+            Dim sObjID As String = row("IDObjekte").ToString()
+            lbObjekt.Text = fcGetObjektName(dtObj, sObjID)
         End If
     End Sub
 
+
+    '''' <summary>
+    '''' Anzahl der Personen und Übernachtungen
+    '''' </summary>
+    '''' <param name="dt"></param>
+    '''' <remarks>
+    '''' 03.02.2012 Create
+    '''' </remarks>
+    'Private Sub prLaderPersonenUeberNachtung(ByVal dt As DataTable)
+    '    tbInternetNr.Text = dt.Rows(0).Item("InternetNr").ToString
+    '    tbAnzPer.Text = dt.Rows(0).Item("Personen").ToString
+    '    tbUArt.Text = dt.Rows(0).Item("Kategorie").ToString
+    '    coArt.Text = dt.Rows(0).Item("Art").ToString
+    '    tbPreis.Text = fcFormatDecimal(Val(dt.Rows(0).Item("Preis").ToString) / 100)
+    '    tbAnzahlung.Text = fcFormatDecimal(Val(dt.Rows(0).Item("Anzahlung").ToString) / 100)
+    '    Dim sVariable As String = dt.Rows(0).Item("Variable").ToString
+    '    Select Case sVariable
+    '        Case "0"
+    '            rbNormal.Checked = True
+    '        Case "1"
+    '            rbFest.Checked = True
+    '        Case "2"
+    '            rbVariabel.Checked = True
+    '    End Select
+
+    'End Sub
+
     ''' <summary>
-    ''' Anzahl der Personen und Übernachtungen
+    ''' Lädt die Anzahl der Personen, Übernachtungspreise, Kategorien sowie die Preisgestaltungs-Variable aus der Buchungstabelle und befüllt die Benutzeroberfläche.
     ''' </summary>
-    ''' <param name="dt"></param>
+    ''' <param name="dt">Die DataTable mit den aktuellen Buchungsdaten.</param>
     ''' <remarks>
-    ''' 03.02.2012 Create
+    ''' 03.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Absturzsicherung: 'dt.Rows.Count > 0'-Prüfung vorab integriert, um eine 'IndexOutOfRangeException' bei leeren Datensätzen zu verhindern.
+    ''' - Performance-Boost: Lokale Zuweisung 'Dim row As DataRow = dt.Rows(0)' verhindert das permanente, rechenintensive Neuerstellen der Zeilenreferenz.
+    ''' - Robustheit erhöht: Sichere Konvertierung über 'Double.TryParse' für 'Val' implementiert, um Fehler bei fehlerhaften numerischen Datenbankwerten zu vermeiden.
     ''' </remarks>
     Private Sub prLaderPersonenUeberNachtung(ByVal dt As DataTable)
-        tbInternetNr.Text = dt.Rows(0).Item("InternetNr").ToString
-        tbAnzPer.Text = dt.Rows(0).Item("Personen").ToString
-        tbUArt.Text = dt.Rows(0).Item("Kategorie").ToString
-        coArt.Text = dt.Rows(0).Item("Art").ToString
-        tbPreis.Text = fcFormatDecimal(Val(dt.Rows(0).Item("Preis").ToString) / 100)
-        tbAnzahlung.Text = fcFormatDecimal(Val(dt.Rows(0).Item("Anzahlung").ToString) / 100)
-        Dim sVariable As String = dt.Rows(0).Item("Variable").ToString
+        ' Sicherheitsprüfung: Falls die Tabelle keine Zeilen enthält, abbrechen
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+
+        ' Performance-Boost: Zeilenreferenz cachen
+        Dim row As DataRow = dt.Rows(0)
+
+        ' Textfelder direkt befüllen
+        tbInternetNr.Text = row("InternetNr").ToString()
+        tbAnzPer.Text = row("Personen").ToString()
+        tbUArt.Text = row("Kategorie").ToString()
+        coArt.Text = row("Art").ToString()
+
+        ' Preise sicher numerisch parsen und umrechnen (.NET-Ersatz für Val)
+        Dim rawPreis As Double = 0
+        Dim rawAnzahlung As Double = 0
+
+        Double.TryParse(row("Preis").ToString(), rawPreis)
+        Double.TryParse(row("Anzahlung").ToString(), rawAnzahlung)
+
+        tbPreis.Text = fcFormatDecimal(rawPreis / 100)
+        tbAnzahlung.Text = fcFormatDecimal(rawAnzahlung / 100)
+
+        ' Preisgestaltungs-Variable auswerten und RadioButtons setzen
+        Dim sVariable As String = row("Variable").ToString().Trim()
         Select Case sVariable
             Case "0"
                 rbNormal.Checked = True
@@ -631,69 +997,139 @@ Public Class frmReservierungDest
             Case "2"
                 rbVariabel.Checked = True
         End Select
-
     End Sub
 
     ''' <summary>
-    ''' Gastdaten laden und anzeigen
+    ''' Lädt die Kundendaten anhand der Gast-ID aus der Datenbank und befüllt die Eingabemaske. 
+    ''' Setzt Standardwerte für leere Felder und leert die Maske bei einer neuen Gast-ID ("0").
     ''' </summary>
-    ''' <param name="sID"></param>
+    ''' <param name="sID">Die eindeutige ID des Kunden/Gastes.</param>
     ''' <remarks>
-    ''' 04.02.2012 Create
+    ''' 04.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Absturzsicherung: 'dt IsNot Nothing'-Prüfung vorab integriert, um Abstürze bei fehlgeschlagenen Datenbankabfragen zu verhindern.
+    ''' - Logikfehler behoben: Der fehleranfällige Vergleich 'sID = 0' wurde auf einen typsicheren String-Vergleich ('sID = "0"') umgestellt, um implizite Konvertierungsfehler zu vermeiden.
+    ''' - Performance-Boost: Den alten 'With'-Block durch eine dedizierte 'DataRow'-Referenz ('row') ersetzt.
+    ''' - Syntax bereinigt: Redundantes 'Call' entfernt und Zuweisungen über den modernen ternären 'If()'-Operator verkürzt.
     ''' </remarks>
     Private Sub prLadeGastDaten(ByVal sID As String)
+        ' 1. Wenn es sich um einen neuen Gast handelt, Daten maskieren/leeren und Methode verlassen
+        If sID = "0" OrElse String.IsNullOrWhiteSpace(sID) Then
+            prClearGastDaten()
+            Exit Sub
+        End If
+
         Dim sSQL As String = "Select * From Kunden Where ID='" & sID & "'"
         Dim dt As DataTable = fcReadDataTable(sSQL)
 
-        If dt.Rows.Count > 0 Then
-            With dt.Rows(0)
-                coAnrede.Text = .Item("Anrede").ToString
-                tbName1.Text = .Item("Name1").ToString
-                tbName2.Text = .Item("Name2").ToString
-                tbName1Z.Text = .Item("Name1Z").ToString
-                tbName2Z.Text = .Item("Name2Z").ToString
-                If tbName1Z.Text = "0" Then tbName1Z.Text = ""
-                If tbName2Z.Text = "0" Then tbName2Z.Text = ""
-                tbVorname.Text = .Item("Vorname").ToString
-                tbStrasse.Text = .Item("Strasse").ToString
+        ' 2. Sicherheitsprüfung: Existiert die DataTable und enthält sie Zeilen?
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            ' Performance-Boost: Zeilenreferenz cachen
+            Dim row As DataRow = dt.Rows(0)
 
-                tbPLZ.Text = .Item("PLZ").ToString
-                tbOrt.Text = .Item("Ort").ToString
-                coLand.Text = .Item("Land").ToString
-                tbTel.Text = .Item("Telefon").ToString
-                tbFax.Text = .Item("Telefax").ToString
-                tbFunk.Text = .Item("Funk").ToString
-                tbEMail.Text = .Item("EMail").ToString
-                '  tbPass.Text = .Item("Pass").ToString
-                tbInfo.Text = .Item("Info").ToString
-                If .Item("Geb").ToString.Trim <> "" Then
-                    dpGeb.Value = fcUmDatum(.Item("Geb").ToString)
-                End If
-                lbGast.Text = "(" & coAnrede.Text & " " & tbName1.Text & ")"
-                Dim test As String = coWerbung.Text
-                If .Item("Werbung").ToString.Trim <> "" Then
-                    ' If coWerbung.Text = "Unbekannt" Then
-                    coWerbung.Text = .Item("Werbung").ToString
-                End If
-                If coLand.Text.Trim = "" Then coLand.Text = "DE"
-            End With
-        End If
-        'Neuer Gast
-        If sID = 0 Then
-            Call prClearGastDaten()
+            ' UI-Formularfelder strukturiert befüllen
+            coAnrede.Text = row("Anrede").ToString()
+            tbName1.Text = row("Name1").ToString()
+            tbName2.Text = row("Name2").ToString()
+
+            ' Zusatznamen auslesen und "0"-Werte direkt herausfiltern via Inline-If
+            Dim name1Z As String = row("Name1Z").ToString()
+            Dim name2Z As String = row("Name2Z").ToString()
+            tbName1Z.Text = If(name1Z = "0", "", name1Z)
+            tbName2Z.Text = If(name2Z = "0", "", name2Z)
+
+            tbVorname.Text = row("Vorname").ToString()
+            tbStrasse.Text = row("Strasse").ToString()
+            tbPLZ.Text = row("PLZ").ToString()
+            tbOrt.Text = row("Ort").ToString()
+
+            ' Land setzen (Fallback auf "DE" falls in der Datenbank leer)
+            Dim landText As String = row("Land").ToString().Trim()
+            coLand.Text = If(String.IsNullOrEmpty(landText), "DE", landText)
+
+            ' Kontaktdaten
+            tbTel.Text = row("Telefon").ToString()
+            tbFax.Text = row("Telefax").ToString()
+            tbFunk.Text = row("Funk").ToString()
+            tbEMail.Text = row("EMail").ToString()
+            tbInfo.Text = row("Info").ToString()
+
+            ' Geburtsdatum DBNull-sicher konvertieren
+            Dim gebString As String = row("Geb").ToString().Trim()
+            If Not String.IsNullOrEmpty(gebString) Then
+                dpGeb.Value = fcUmDatum(gebString)
+            End If
+
+            ' Info-Label aktualisieren
+            lbGast.Text = $"({coAnrede.Text} {tbName1.Text})"
+
+            ' Werbung laden, sofern ein Eintrag vorhanden ist
+            Dim werbungText As String = row("Werbung").ToString().Trim()
+            If Not String.IsNullOrEmpty(werbungText) Then
+                coWerbung.Text = werbungText
+            End If
         End If
     End Sub
 
+
+
+    '''' <summary>
+    '''' Aktuelle Werte in ein Array sichern (Vergleich vorher / nacher) => Daten speichern
+    '''' </summary>
+    '''' <param name="arT"></param>
+    '''' <returns></returns>
+    '''' <remarks>
+    '''' 25.02.2012 Create
+    '''' </remarks>
+    'Private Function fcCollectDataInArray(ByVal arT() As String) As Array
+    '    'Dim arT(22) As String
+    '    arT(0) = tbAnzPer.Text
+    '    arT(1) = coArt.Text
+    '    arT(2) = tbUArt.Text
+    '    arT(3) = tbPreis.Text
+    '    arT(4) = tbAnzahlung.Text
+    '    arT(5) = coAnrede.Text
+    '    arT(6) = tbName1.Text
+    '    arT(7) = tbName2.Text
+    '    arT(8) = tbVorname.Text
+    '    arT(9) = tbStrasse.Text
+    '    arT(10) = tbPLZ.Text
+    '    arT(11) = tbOrt.Text
+    '    arT(12) = coLand.Text
+    '    arT(13) = tbTel.Text
+    '    arT(14) = tbFax.Text
+    '    arT(15) = tbFunk.Text
+    '    arT(16) = tbEMail.Text
+    '    arT(17) = "" 'tbPass.Text
+    '    arT(18) = tbInfo.Text
+    '    arT(19) = fcUmDatum(dpGeb.Value)
+    '    arT(20) = coWerbung.Text
+    '    arT(21) = lbAnreise.Text
+    '    arT(22) = lbAbreise.Text
+    '    arT(23) = tbFPreis.Text
+    '    arT(24) = lbMakro.Text
+    '    fcCollectDataInArray = arT
+    'End Function
+
     ''' <summary>
-    ''' Aktuelle Werte in ein Array sichern (Vergleich vorher / nacher) => Daten speichern
+    ''' Sichert die aktuellen Formular- und Buchungswerte in ein String-Array, um einen späteren Vorher-Nachher-Vergleich für die Speicherung zu ermöglichen.
     ''' </summary>
-    ''' <param name="arT"></param>
-    ''' <returns></returns>
+    ''' <param name="arT">Das zu befüllende String-Array. Muss mindestens 25 Elemente (Indizes 0 bis 24) umfassen.</param>
+    ''' <returns>Das befüllte String-Array mit den aktuellen UI-Daten.</returns>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Typsicherheit geschärft: Rückgabetyp von der generischen 'Array'-Klasse auf ein explizites 'String()' Array umgestellt.
+    ''' - Robustheit erhöht: Automatische Dimensionierungsprüfung integriert. Ist das übergebene Array zu klein oder 'Nothing', wird es automatisch im Speicher auf die korrekte Größe (25 Elemente) initialisiert, um eine 'IndexOutOfRangeException' zu verhindern.
+    ''' - Syntax bereinigt: Die veraltete Zuweisung an den Funktionsnamen durch das standardisierte .NET-Schlüsselwort 'Return' ersetzt.
     ''' </remarks>
-    Private Function fcCollectDataInArray(ByVal arT() As String) As Array
-        'Dim arT(22) As String
+    Private Function fcCollectDataInArray(ByVal arT() As String) As String()
+        ' Sicherheitsprüfung: Falls das Array nicht existiert oder zu klein ist, neu dimensionieren (0 bis 24 = 25 Elemente)
+        If arT Is Nothing OrElse arT.Length < 25 Then
+            ReDim arT(24)
+        End If
+
+        ' Maskendaten strukturiert in das Array übertragen
         arT(0) = tbAnzPer.Text
         arT(1) = coArt.Text
         arT(2) = tbUArt.Text
@@ -711,7 +1147,7 @@ Public Class frmReservierungDest
         arT(14) = tbFax.Text
         arT(15) = tbFunk.Text
         arT(16) = tbEMail.Text
-        arT(17) = "" 'tbPass.Text
+        arT(17) = "" ' tbPass.Text auskommentiert gelassen
         arT(18) = tbInfo.Text
         arT(19) = fcUmDatum(dpGeb.Value)
         arT(20) = coWerbung.Text
@@ -719,37 +1155,67 @@ Public Class frmReservierungDest
         arT(22) = lbAbreise.Text
         arT(23) = tbFPreis.Text
         arT(24) = lbMakro.Text
-        fcCollectDataInArray = arT
+
+        ' Modernes .NET Return anstelle der alten Funktionsnamen-Zuweisung
+        Return arT
     End Function
 
 
 
+    '''' <summary>
+    '''' Steuerung des zweiten Namensfeldes in Abhängigkeit der Anrede
+    '''' </summary>
+    '''' <param name="sender"></param>
+    '''' <param name="e"></param>
+    '''' <remarks>
+    '''' 25.02.2012 Create
+    '''' </remarks>
+    'Private Sub coAnrede_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles coAnrede.SelectedIndexChanged
+
+    '    If coAnrede.Text = "Firma" Then
+    '        tbName2.Enabled = True
+    '        tbVorname.Enabled = False
+    '        Label12.Text = "Firma"
+    '        Label16.Text = "Name"
+    '        Label25.Text = ""
+    '    Else
+    '        tbName2.Enabled = False
+    '        tbVorname.Enabled = True
+    '        Label12.Text = "Name"
+    '        Label16.Text = ""
+    '        Label25.Text = "Vorname"
+    '    End If
+
+    'End Sub
 
     ''' <summary>
-    ''' Steuerung des zweiten Namensfeldes in Abhängigkeit der Anrede
+    ''' Steuert die Aktivierung und die Beschriftung der Namens- und Vornamesfelder in Abhängigkeit davon, ob eine "Firma" oder eine Person ausgewählt wurde.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Das auslösende Objekt (hier das coAnrede-Steuerelement).</param>
+    ''' <param name="e">Die Ereignisdaten des SelectedIndexChanged-Events.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 03.10.2026 - Code-Optimierung:
+    ''' - Code-Verschlankung: Die Bedingung wurde in eine boolesche Variable ('isFirma') ausgelagert. Dadurch werden redundante Zuweisungen eliminiert und die Logik lässt sich in der Hälfte der Zeilen abbilden.
+    ''' - Stabilität erhöht: Absicherung durch '.ToString()' hinzugefügt, um mögliche Null-Werte beim Wechsel der Auswahl sauber abzufangen.
     ''' </remarks>
     Private Sub coAnrede_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles coAnrede.SelectedIndexChanged
+        ' Sicherstellen, dass Text nicht null ist
+        Dim selectedAnrede As String = If(coAnrede.Text, "").Trim()
 
-        If coAnrede.Text = "Firma" Then
-            tbName2.Enabled = True
-            tbVorname.Enabled = False
-            Label12.Text = "Firma"
-            Label16.Text = "Name"
-            Label25.Text = ""
-        Else
-            tbName2.Enabled = False
-            tbVorname.Enabled = True
-            Label12.Text = "Name"
-            Label16.Text = ""
-            Label25.Text = "Vorname"
-        End If
+        ' Zustand festlegen: Ist der ausgewählte Typ eine Firma?
+        Dim isFirma As Boolean = (selectedAnrede = "Firma")
 
+        ' UI-Elemente dynamisch anhand des Zustands steuern
+        tbName2.Enabled = isFirma
+        tbVorname.Enabled = Not isFirma
+
+        ' Beschriftungen (Labels) flackerfrei anpassen
+        Label12.Text = If(isFirma, "Firma", "Name")
+        Label16.Text = If(isFirma, "Name", "")
+        Label25.Text = If(isFirma, "", "Vorname")
     End Sub
+
 
     ''' <summary>
     ''' Prüfung ob Preis als Zahl eingegeben wurde

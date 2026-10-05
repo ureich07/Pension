@@ -163,16 +163,16 @@
     <Compile Include="frmCheckin.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmWasser.Designer.vb">
-      <DependentUpon>frmWasser.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmWasser.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmReadRFID.Designer.vb">
       <DependentUpon>frmReadRFID.vb</DependentUpon>
     </Compile>
     <Compile Include="frmReadRFID.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmWasser.Designer.vb">
+      <DependentUpon>frmWasser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmWasser.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmRFID.Designer.vb">
@@ -342,14 +342,14 @@
     <EmbeddedResource Include="frmCheckin.resx">
       <DependentUpon>frmCheckin.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmReadRFID.resx">
+      <DependentUpon>frmReadRFID.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmWasser.resx">
       <DependentUpon>frmWasser.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmCorona.resx">
       <DependentUpon>frmCorona.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmReadRFID.resx">
-      <DependentUpon>frmReadRFID.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmRFID.resx">
       <DependentUpon>frmRFID.vb</DependentUpon>
