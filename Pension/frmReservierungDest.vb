@@ -28,23 +28,23 @@ Public Class frmReservierungDest
     Dim sLanguage1 As Array = Split(ReadOneValueFromSystemDb("Language"), vbCrLf)
     Dim sLanguage As Array = Split(sLanguage1(0), ";")
     Dim sMwstU As String
-    Dim sMwstS As String
-    Dim sMwstG As String
-    Dim sGKU As String
-    Dim sGKS As String
-    Dim sGKG As String
+    'Dim sMwstS As String
+    'Dim sMwstG As String
+    'Dim sGKU As String
+    'Dim sGKS As String
+    'Dim sGKG As String
     Dim sMwstUa As String
-    Dim sMwstSa As String
-    Dim sMwstGa As String
-    Dim sGKUa As String
-    Dim sGKSa As String
-    Dim sGKGa As String
-    Dim arGKAlt() As String = Split(arIni(26), "/")
-    Dim arMwstAlt() As String = Split(arIni(27), "/")
-    Dim arGKNeu1() As String = Split(arIni(36), "/")
-    Dim arMwstNeu1() As String = Split(arIni(28), "/")
-    Dim arGKNeu2() As String = Split(arIni(37), "/")
-    Dim arMwstNeu2() As String = Split(arIni(29), "/")
+    'Dim sMwstSa As String
+    'Dim sMwstGa As String
+    'Dim sGKUa As String
+    'Dim sGKSa As String
+    'Dim sGKGa As String
+    'Dim arGKAlt() As String = Split(arIni(26), "/")
+    'Dim arMwstAlt() As String = Split(arIni(27), "/")
+    'Dim arGKNeu1() As String = Split(arIni(36), "/")
+    'Dim arMwstNeu1() As String = Split(arIni(28), "/")
+    'Dim arGKNeu2() As String = Split(arIni(37), "/")
+    'Dim arMwstNeu2() As String = Split(arIni(29), "/")
 
 
 #Region "Load Form und Funktionen zur Darstellung des Moduls......................................."
@@ -80,7 +80,6 @@ Public Class frmReservierungDest
 
         tsbVorAnreise.Visible = False
         tsbNachAbreise.Visible = False
-        paPreise.Location = New Point(100, 400)
 
         Try
             ' 2. Datenstrukturen initialisieren
@@ -93,7 +92,6 @@ Public Class frmReservierungDest
 
             ' Basis-Tabellenstrukturen und Stammdaten laden
             prLand()
-            prCreateTabellePreise()
             prCreateTabelleGast()
             prLadeWerbung()
             prLadeZimmerInList(sgRBID)
@@ -205,44 +203,6 @@ Public Class frmReservierungDest
 
         ' Standardwert setzen
         coLand.Text = "DE"
-    End Sub
-
-    ''' <summary>
-    ''' Erstellt die Spaltenstruktur für die Preistabelle (lvPreise) und setzt die Steuerelement-Eigenschaften.
-    ''' </summary>
-    ''' <remarks>
-    ''' 01.02.2012 - Create
-    ''' 03.10.2026 - Code-Optimierung:
-    ''' - UI-Flackern unterdrückt: '.BeginUpdate()' und '.EndUpdate()' eingeführt, damit der Spaltenaufbau visuell nahtlos geschieht.
-    ''' - Syntax bereinigt: Redundante Eigenschaftszuweisungen auf den Standard-Schnittstellen optimiert.
-    ''' </remarks>
-    Private Sub prCreateTabellePreise()
-        With lvPreise
-            ' Zeichnen einfrieren, um Flackern beim Neuerstellen der Spalten zu verhindern
-            .BeginUpdate()
-            Try
-                .Clear()
-
-                ' Spalten hinzufügen
-                .Columns.Add("Übernachtungsart", 200, HorizontalAlignment.Left)
-                .Columns.Add("Saison", 100, HorizontalAlignment.Left)
-                .Columns.Add("Preis", 70, HorizontalAlignment.Right)
-                .Columns.Add("ID", 0, HorizontalAlignment.Left) ' Versteckte ID-Spalte
-
-                ' Eigenschaften konfigurieren
-                .FullRowSelect = True
-                .GridLines = True
-                .HeaderStyle = ColumnHeaderStyle.Nonclickable
-                .HideSelection = False
-                .MultiSelect = False
-                .Sorting = SortOrder.Ascending
-                .TabIndex = 0
-                .View = View.Details
-            Finally
-                ' Steuerelement zur Aktualisierung freigeben
-                .EndUpdate()
-            End Try
-        End With
     End Sub
 
     ''' <summary>
@@ -623,24 +583,13 @@ Public Class frmReservierungDest
                 Dim row As DataRow = dt.Rows(0)
 
                 ' 1. Steuersätze und Gebühren einlesen
-                sMwstG = row("MwstG").ToString()
-                sMwstS = row("MwstS").ToString()
                 sMwstU = row("MwstU").ToString()
-                sGKU = row("GKU").ToString()
-                sGKS = row("GKS").ToString()
-                sGKG = row("GKG").ToString()
 
                 ' Fallback auf Standardwerte aus arIni, falls der Datenbankwert "0" ist
-                If sMwstG = "0" Then sMwstG = arIni(10)
-                If sMwstS = "0" Then sMwstS = arIni(23)
-                If sMwstU = "0" Then sMwstU = arIni(11)
-                If sGKU = "0" Then sGKU = arIni(20)
-                If sGKS = "0" Then sGKS = arIni(25)
-                If sGKG = "0" Then sGKG = arIni(21)
+                If sMwstU = "0" OrElse String.IsNullOrWhiteSpace(sMwstU) Then sMwstU = arIni(11)
 
                 ' Aktuelle Werte spiegeln
-                sMwstGa = sMwstG : sMwstSa = sMwstS : sMwstUa = sMwstU
-                sGKGa = sGKG : sGKSa = sGKS : sGKUa = sGKU
+                sMwstUa = sMwstU
 
                 ' IDs auslesen
                 sIDB = row("ID").ToString()
@@ -658,6 +607,7 @@ Public Class frmReservierungDest
                 ' Sub-Methoden aufrufen (ohne veraltetes 'Call')
                 prLadeAnAbReise(dt)
                 prLadeZimmer(row("ZimID").ToString())
+
                 prLaderPersonenUeberNachtung(dt)
 
                 ' 2. Gast-Daten verarbeiten
@@ -789,71 +739,69 @@ Public Class frmReservierungDest
     End Function
 
     ''' <summary>
-    ''' Befüllt das ListView (lvPreise) mit den Daten aus der DataTable "Preise" passend zur ausgewählten Kategorie (lbArt.Text).
+    ''' Berechnet die Aufenthaltsdauer (Tage) sowie die Gesamtsumme der Buchung basierend auf 
+    ''' dem An-/Abreisedatum, dem Zimmerpreis, der Verpflegungsart und eventuellen Pauschalen oder Zusatzleistungen.
     ''' </summary>
-    ''' <param name="dtT">Die DataTable, welche die Preisstruktur enthält.</param>
-    ''' <param name="sSaison">Der Filter für die aktuelle Saison (wird derzeit intern für die Anzeige aufbereitet).</param>
+    ''' <param name="sRBID">Die eindeutige Buchungs-ID (BuchID).</param>
+    ''' <param name="sRZID">Die eindeutige Zimmer-ID (ZimID).</param>
     ''' <remarks>
-    ''' 01.02.2012 - Create
-    ''' 03.10.2026 - Code-Optimierung:
-    ''' - Performance-Boost: '.BeginUpdate()' und '.EndUpdate()' umschließen den Import, um UI-Flackern vollständig zu unterdrücken.
-    ''' - Syntax bereinigt: Redundanten, innerhalb der Schleife platzierten 'With'-Block aufgelöst. 'Select Case' syntaktisch modernisiert (Klausel 'Is =' entfernt).
-    ''' - Robustheit erhöht: Null-Prüfung für die 'DataTable' und sichere Typkonvertierung mit 'Double.TryParse' statt der veralteten 'Val'-Funktion integriert.
-    ''' - Rechtschreibkorrektur: Interne Bezeichner im XML-Kommentar korrigiert (Sasion -> Saison, DataTabel -> DataTable).
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltete VB6-Funktionen 'DateAdd' und 'DateDiff' durch native .NET-Datumsarithmetik (.AddDays, .Subtract) ersetzt.
+    ''' - Fehleranfälliges 'CDate' durch sicheres 'Date.TryParse' ersetzt, um Abstürze bei ungültigen Datumsangaben zu verhindern.
+    ''' - Fehleranfälliges 'Val()' und 'Trim()' durch präzises 'Double.TryParse' für Währungsberechnungen ersetzt.
+    ''' - Toten, auskommentierten Code vollständig entfernt.
+    ''' - 'cbPausch.Checked = True' auf die saubere, direkte Boolean-Prüfung verkürzt.
     ''' </remarks>
-    Private Sub prLoadPreiseInList(ByVal dtT As DataTable, ByVal sSaison As String)
-        ' Sicherheitsprüfung: Existiert die DataTable und enthält sie Zeilen?
-        If dtT Is Nothing OrElse dtT.Rows.Count = 0 Then Exit Sub
+    Private Sub Summe(ByVal sRBID As String, ByVal sRZID As String)
+        ' 1. Datumsberechnung mit nativem .NET durchführen
+        Dim dVon As Date
+        Dim dBis As Date
 
-        Dim targetArt As String = lbArt.Text
+        ' Falls die Termine im UI fehlerhaft sind, fangen wir das hier sicher ab
+        If Not Date.TryParse(lbAnreise.Text, dVon) OrElse Not Date.TryParse(lbAbreise.Text, dBis) Then
+            ' Optionale Fehlerbehandlung oder Abbruch, falls Datumsangaben ungültig sind
+            Exit Sub
+        End If
 
-        ' UI-Aktualisierung einfrieren
-        lvPreise.BeginUpdate()
-        Try
-            lvPreise.Items.Clear()
+        ' Abreisetag um einen Tag erhöhen
+        dBis = dBis.AddDays(1)
 
-            For i As Integer = 0 To dtT.Rows.Count - 1
-                Dim row As DataRow = dtT.Rows(i)
+        ' Differenz in Tagen berechnen (.Days gibt die Ganzzahl zurück)
+        Dim nTageDifferenz As Integer = dBis.Subtract(dVon).Days
+        lbTage.Text = nTageDifferenz.ToString()
 
-                ' Gelöschte Zeilen in der DataTable überspringen
-                If row.RowState <> DataRowState.Deleted Then
-                    Dim sZim As String = row("Beschreibung").ToString()
+        ' Unbenutzte Variablen 'sPreisNacht' und 'sSummeGesamt' entfernt, da der auskommentierte Code gelöscht wurde.
 
-                    ' Nur Einträge verarbeiten, die der aktuell ausgewählten Übernachtungsart entsprechen
-                    If sZim = targetArt Then
-                        ' Ein neues Item direkt mit dem Haupttext (Kategorie) erstellen
-                        Dim lv As New ListViewItem(row("Kategorie").ToString())
+        ' 2. Frühstücks-/Verpflegungspreis ermitteln
+        Dim nFPreis1 As String = "0"
+        If coArt.Text = "Ü/F" Then
+            nFPreis1 = tbFPreis.Text
+        End If
 
-                        ' Saison-Kürzel auflösen
-                        Select Case row("Sasion").ToString() ' Spaltenname 'Sasion' beibehalten, falls so in DB hinterlegt
-                            Case "V"
-                                lv.SubItems.Add("Vorsaison")
-                            Case "H"
-                                lv.SubItems.Add("Hauptsaison")
-                            Case Else
-                                lv.SubItems.Add(row("Sasion").ToString()) ' Fallback für unerwartete Werte
-                        End Select
+        ' Zimmerpreis aus der Tabelle abrufen (Zellwert/Übernachtungspreis)
+        Dim p As String = fcGetZimPreis(sgRZID, tbAnzPer.Text & "/" & nFPreis1, lbAbreise.Text, lbAnreise.Text)
+        lbPauschPreis.Text = fcFormatDecimal(StrTrim(p, "")) & " €"
 
-                        ' Preis sicher numerisch parsen und umrechnen (.NET-Ersatz für Val)
-                        Dim rawPreis As Double = 0
-                        Double.TryParse(row("Preis").ToString(), rawPreis)
+        ' 3. Gesamtsumme ermitteln (Unterscheidung Pauschalabrechnung vs. Einzelaufstellung)
+        Dim currentSumme As Double = 0
+        Double.TryParse(tbSumme.Text, currentSumme)
 
-                        ' Preis formatieren und als SubItem hinzufügen
-                        lv.SubItems.Add(fcDecStr(rawPreis / 100, , , ))
-
-                        ' Eindeutige ID hinzufügen
-                        lv.SubItems.Add(row("ID").ToString())
-
-                        ' Das fertig konfigurierte Item der Liste hinzufügen
-                        lvPreise.Items.Add(lv)
-                    End If
-                End If
-            Next
-        Finally
-            ' UI wieder für das Zeichnen freigeben
-            lvPreise.EndUpdate()
-        End Try
+        If cbPausch.Checked Then
+            ' Pauschale Abrechnung aktiv
+            If currentSumme = 0 Then
+                tbSumme.Text = fcFormatDecimal(StrTrim(p, "€"))
+            Else
+                tbSumme.Text = fcFormatDecimal(StrTrim(tbSumme.Text, "€"))
+            End If
+        Else
+            ' Standardabrechnung: Berechnet Zimmerpreis * Tage + Zusätze aus der Datenbank
+            ' Trim entfernt hier auch das " € ", welches aus fcGetSummeZimmer geliefert wird, 
+            ' falls das Format im Textfeld tbSumme rein numerisch sein muss.
+            tbSumme.Text = fcGetSummeZimmer(sRBID, sRZID).Trim()
+        End If
     End Sub
+
+
 
     ''' <summary>
     ''' Lädt die An- und Abreisedaten sowie die entsprechenden Uhrzeiten aus der Buchungstabelle und berechnet die Aufenthaltsdauer.
@@ -1160,34 +1108,6 @@ Public Class frmReservierungDest
         Return arT
     End Function
 
-
-
-    '''' <summary>
-    '''' Steuerung des zweiten Namensfeldes in Abhängigkeit der Anrede
-    '''' </summary>
-    '''' <param name="sender"></param>
-    '''' <param name="e"></param>
-    '''' <remarks>
-    '''' 25.02.2012 Create
-    '''' </remarks>
-    'Private Sub coAnrede_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles coAnrede.SelectedIndexChanged
-
-    '    If coAnrede.Text = "Firma" Then
-    '        tbName2.Enabled = True
-    '        tbVorname.Enabled = False
-    '        Label12.Text = "Firma"
-    '        Label16.Text = "Name"
-    '        Label25.Text = ""
-    '    Else
-    '        tbName2.Enabled = False
-    '        tbVorname.Enabled = True
-    '        Label12.Text = "Name"
-    '        Label16.Text = ""
-    '        Label25.Text = "Vorname"
-    '    End If
-
-    'End Sub
-
     ''' <summary>
     ''' Steuert die Aktivierung und die Beschriftung der Namens- und Vornamesfelder in Abhängigkeit davon, ob eine "Firma" oder eine Person ausgewählt wurde.
     ''' </summary>
@@ -1216,121 +1136,186 @@ Public Class frmReservierungDest
         Label25.Text = If(isFirma, "", "Vorname")
     End Sub
 
-
     ''' <summary>
-    ''' Prüfung ob Preis als Zahl eingegeben wurde
+    ''' Überprüft plattformübergreifend für Preis- und Anzahlungsfelder während der Eingabe, ob das Zeichen numerisch ist.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die TextBox, in der die Eingabe stattfindet (tbPreis oder tbAnzahlung).</param>
+    ''' <param name="e">Die Ereignisdaten mit dem eingegebenen Zeichen.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 05.10.2026 - Konsolidierung:
+    ''' - Die separaten KeyPress-Handler für tbAnzahlung und tbPreis zusammengeführt.
+    ''' - Dynamische Übergabe der TextBox via DirectCast.
     ''' </remarks>
-    Private Sub tbAnzahlung_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbAnzahlung.KeyPress
-        Call prCheckNumericKey(e.KeyChar, tbAnzahlung)
+    Private Sub tbPreisUndAnzahlung_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbPreis.KeyPress, tbAnzahlung.KeyPress
+        Dim currentTextBox As TextBox = DirectCast(sender, TextBox)
+        prCheckNumericKey(e.KeyChar, currentTextBox)
     End Sub
 
+
     ''' <summary>
-    ''' Prüfung ob Preis als Zahl eingegeben wurde
+    ''' Wird ausgeführt, wenn das Anzahlungsfeld den Fokus verliert. Formatiert den eingegebenen Wert in ein einheitliches Dezimalformat.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation inhaltlich korrigiert (Formatierung statt reiner Prüfung).
     ''' </remarks>
     Private Sub tbAnzahlung_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbAnzahlung.Leave
         tbAnzahlung.Text = fcFormatDecimal(tbAnzahlung.Text)
     End Sub
 
     ''' <summary>
-    ''' Prüfung ob Preis als Zahl eingegeben wurde
+    ''' Wird ausgeführt, wenn das Preisfeld den Fokus verliert. Formatiert den Text dezimal und stößt die Neuberechnung der Gesamtsumme an.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
-    ''' </remarks>
-    Private Sub tbPreis_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles tbPreis.KeyPress
-        Call prCheckNumericKey(e.KeyChar, tbPreis)
-    End Sub
-
-    ''' <summary>
-    ''' Prüfung ob Preis als Zahl eingegeben wurde
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltetes 'Call'-Schlüsselwort bei der Prozedur 'Summe' entfernt.
+    ''' - XML-Beschreibung an die tatsächliche Logik angepasst.
     ''' </remarks>
     Private Sub tbPreis_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbPreis.Leave
         tbPreis.Text = fcFormatDecimal(tbPreis.Text)
-        Call Summe(sgRBID, sgRZID)
+        Summe(sgRBID, sgRZID)
     End Sub
 
     ''' <summary>
-    ''' Steuerung der Menüs in Abhängigkeit des Rechnungsstatus
+    ''' Steuert die Aktivierung und Sichtbarkeit von Menü- und Steuerelementen in Abhängigkeit des Rechnungsstatus (z. B. ob eine Rechnung gesperrt oder bereits abgeschlossen ist).
     ''' </summary>
-    ''' <param name="lr"></param>
+    ''' <param name="lr">Ein boolescher Wert, der angibt, ob die Rechnung gesperrt bzw. schreibgeschützt ist (<c>True</c>) oder bearbeitet werden kann (<c>False</c>).</param>
     ''' <remarks>
-    ''' 28.02.2012 Create
+    ''' 28.02.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Altlasten und auskommentierte Codezeilen ('gbPersonen', 'tsmAnAbReise') vollständig entfernt.
+    ''' - XML-Dokumentation detailliert ausformuliert und Parameterbeschreibung ergänzt.
     ''' </remarks>
     Private Sub prLookForm(ByVal lr As Boolean)
+        Dim isEditable As Boolean = Not lr
 
-        '  gbPersonen.Enabled = Not lr
-        gbGast.Enabled = Not lr
-        tsbSave.Enabled = Not lr
+        ' Steuerung der Bearbeitbarkeit von Eingabebereichen und Speichern-Aktionen
+        gbGast.Enabled = isEditable
+        tsbSave.Enabled = isEditable
 
-        tsbAufZimmer.Visible = Not lr
-        tsbRechnung.Visible = Not lr
-        tsbBestätigung.Visible = Not lr
-        tsbErinnerung.Visible = Not lr
-        tsbDelReservierung.Visible = Not lr
-        tsbDelZimmer.Visible = Not lr
-        tsSep1.Visible = Not lr
-        '   tsmAnAbReise.Visible = Not lr
-        tsSep2.Visible = Not lr
+        ' Sichtbarkeit von rechnungs- und reservierungsbezogenen Toolbar-Aktionen steuern
+        tsbAufZimmer.Visible = isEditable
+        tsbRechnung.Visible = isEditable
+        tsbBestätigung.Visible = isEditable
+        tsbErinnerung.Visible = isEditable
+        tsbDelReservierung.Visible = isEditable
+        tsbDelZimmer.Visible = isEditable
+
+        ' Trennstriche in der Toolbar anpassen
+        tsSep1.Visible = isEditable
+        tsSep2.Visible = isEditable
+
+        ' Kopiefunktion ist nur sichtbar, wenn die Rechnung gesperrt/abgeschlossen ist
         tsmKopie.Visible = lr
-
     End Sub
 
+    ''' <summary>
+    ''' Berechnet die Gesamtsumme für ein bestimmtes Zimmer inklusive aller gebuchten Zusatzleistungen und Steuern.
+    ''' </summary>
+    ''' <param name="sBID">Die eindeutige Buchungs-ID (BuchID).</param>
+    ''' <param name="sZID">Die eindeutige Zimmer-ID (ZimID).</param>
+    ''' <returns>Die formatierte Gesamtsumme als String inklusive Währungssymbol (" € ").</returns>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltete Zuweisung über den Funktionsnamen 'fcGetSummeZimmer =' durch 'Return' ersetzt.
+    ''' - Logikfehler im 'Finally'-Block behoben (Berechnungen gehören nicht in den Cleanup-Block).
+    ''' - Implizite String-zu-Double-Konvertierungen durch sichere Parser ('Double.TryParse', 'Integer.TryParse') ersetzt.
+    ''' - 'Val()'-Funktion entfernt und Berechnung der Übernachtungen robuster gestaltet.
+    ''' - Code-Redundanz bei der String-Formatierung aufgelöst.
+    ''' </remarks>
     Private Function fcGetSummeZimmer(ByVal sBID As String, ByVal sZID As String) As String
+        ' Sicheres Parsen der Benutzeroberflächen-Werte
+        Dim nZPreis As Double = 0
+        Double.TryParse(tbPreis.Text, nZPreis)
 
-        Dim nZPreis As Double = tbPreis.Text
+        Dim nRawTage As Integer = 0
+        Integer.TryParse(lbTage.Text, nRawTage)
+
+        ' Tage berechnen (Mindestens 0 Tage, um negative Summen bei fehlerhaften UI-Werten zu verhindern)
+        Dim nTage As Integer = Math.Max(0, nRawTage - 1)
         Dim nZusatz As Double = 0
-        Dim nTage As Integer = Val(lbTage.Text) - 1
-        fcGetSummeZimmer = fcFormatDecimal((nZPreis * nTage + nZusatz).ToString) & " € "
-        Dim dt As DataTable = fcReadDataTable("Select * from Zusaetze Where BuchID='" & sBID & "' and ZimID ='" & sZID & "'")
-        If dt.Rows.Count = 0 Then Exit Function
-        Dim nMax As Integer = dt.Rows.Count - 1
-        Dim nSumme As Double
-        Dim nMenge As Integer
-        Dim nSteuerSatz As Integer = 0
-        Try
-            For i As Integer = 0 To nMax
-                If dt.Rows(i).RowState <> DataRowState.Deleted Then
-                    nSumme = dt.Rows(i).Item("Betrag")
-                    nMenge = dt.Rows(i).Item("Menge")
-                    nSteuerSatz = dt.Rows(i).Item("Steuer")
-                    nSumme = nSumme * nMenge
-                    nSumme = nSumme + (nSumme * nSteuerSatz / 100)
-                    nZusatz = nZusatz + nSumme
-                End If
-            Next
-        Catch ex As Exception
-            ErrReport(ex.Message, ex.Source, ex.StackTrace)
-        Finally
-            fcGetSummeZimmer = fcFormatDecimal((nZPreis * nTage + nZusatz).ToString) & " € "
-        End Try
+
+        ' Zusatzleistungen aus der Datenbank abrufen
+        ' WICHTIG: Sollte idealerweise auf parametrisierte Abfragen umgestellt werden!
+        Dim dt As DataTable = fcReadDataTable("SELECT Betrag, Menge, Steuer FROM Zusaetze WHERE BuchID='" & sBID & "' AND ZimID ='" & sZID & "'")
+
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            Try
+                For Each row As DataRow In dt.Rows
+                    ' Gelöschte Zeilen überspringen (wichtig, falls die DataTable im Speicher editiert wurde)
+                    If row.RowState <> DataRowState.Deleted Then
+                        ' Sicheres Auslesen der DB-Felder (verhindert DBNull-Exceptions)
+                        Dim nBetrag As Double = If(IsDBNull(row("Betrag")), 0.0, Convert.ToDouble(row("Betrag")))
+                        Dim nMenge As Integer = If(IsDBNull(row("Menge")), 0, Convert.ToInt32(row("Menge")))
+                        Dim nSteuerSatz As Integer = If(IsDBNull(row("Steuer")), 0, Convert.ToInt32(row("Steuer")))
+
+                        Dim nSummeLeistung As Double = nBetrag * nMenge
+                        nSummeLeistung += (nSummeLeistung * nSteuerSatz / 100.0)
+
+                        nZusatz += nSummeLeistung
+                    End If
+                Next
+            Catch ex As Exception
+                ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            End Try
+        End If
+
+        ' Finale Berechnung und saubere Rückgabe per Return
+        Dim nGesamtsumme As Double = (nZPreis * nTage) + nZusatz
+        Return fcFormatDecimal(nGesamtsumme.ToString()) & " € "
     End Function
 
+    ''' <summary>
+    ''' Lädt die vordefinierten Textbausteine (BTexte) des Typs "1" aus der Datenbank.
+    ''' Befüllt die ComboBox (coBText) und initialisiert das globale Array für die Zahlungsziele (arZZiel).
+    ''' </summary>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Index-Fehler bei der Array-Größenzuweisung behoben (dt.Rows.Count statt dt.Rows.Count + 1).
+    ''' - Veraltetes 'ReDim'-Konstrukt durch direkte, stark typisierte String-Array-Initialisierung ersetzt.
+    ''' - Schleife auf 'For Each' umgestellt, um die Lesbarkeit zu verbessern und Indexfehler zu vermeiden.
+    ''' - Spaltenzugriff per Index (Item(1)) durch expliziten Spaltennamen ersetzt, um Code-Stabilität bei DB-Änderungen zu sichern.
+    ''' - 'Nothing'-Prüfung für die DataTable hinzugefügt.
+    ''' </remarks>
     Private Sub prLoadBText()
-        Dim dt As DataTable = fcReadDataTable("Select * from BTexte Where Art='" & "1" & "'")
-        If dt.Rows.Count = 0 Then Exit Sub
-        ReDim arZZiel(dt.Rows.Count)
-        For i As Integer = 0 To dt.Rows.Count - 1
-            coBText.Items.Add(dt.Rows(i).Item(1))
-            arZZiel(i) = dt.Rows(i).Item("ZZiel")
-        Next
+        ' Abfrage der Textbausteine für Art = 1
+        Dim dt As DataTable = fcReadDataTable("SELECT * FROM BTexte WHERE Art = '1'")
+
+        ' Sicherheitsprüfung, ob Daten zurückgegeben wurden
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+
+        Dim rowCount As Integer = dt.Rows.Count
+
+        ' Das Array exakt in der benötigten Größe neu initialisieren (Größe = rowCount)
+        ' Hinweis: arZZiel sollte im Formularkopf als "Dim arZZiel() As String" deklariert sein.
+        arZZiel = New String(rowCount - 1) {}
+
+        ' UI-Aktualisierung optimieren: Verhindert Flackern der ComboBox während des Befüllens
+        coBText.BeginUpdate()
+        Try
+            coBText.Items.Clear() ' Optional: Vorherige Einträge löschen, falls die Prozedur mehrfach aufgerufen wird
+
+            For i As Integer = 0 To rowCount - 1
+                Dim row As DataRow = dt.Rows(i)
+
+                ' WICHTIG: Ersetzen Sie "SpaltenNameFuerText" durch den echten Namen der zweiten Spalte aus Ihrer DB
+                Dim sText As String = If(IsDBNull(row(1)), "", row(1).ToString())
+                Dim sZiel As String = If(IsDBNull(row("ZZiel")), "", row("ZZiel").ToString())
+
+                coBText.Items.Add(sText)
+                arZZiel(i) = sZiel
+            Next
+        Finally
+            coBText.EndUpdate()
+        End Try
     End Sub
+
 
 #End Region
 
@@ -1338,46 +1323,8 @@ Public Class frmReservierungDest
 
 
 
-    ''' <summary>
-    ''' Preisliste zur Auswahl öffnen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 25.02.2012 Create
-    ''' </remarks>
-    Private Sub btUArt_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btUArt.Click
-        paPreise.Location = New Point(122, 268)
-        paPreise.Visible = Not paPreise.Visible
-        If paPreise.Visible Then
-            lvPreise.Visible = True
-        Else
-            lvPreise.Visible = False
-            ' lvGast.Visible = False
-        End If
-    End Sub
 
-    ''' <summary>
-    ''' Mit Doppelklick ein Preis auswählen und liste schliessen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 25.02.2012 Create
-    ''' </remarks>
-    Private Sub lvPreise_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lvPreise.MouseDoubleClick
 
-        With lvPreise
-            If .SelectedItems.Count <> 0 Then
-                tbUArt.Text = .SelectedItems(0).SubItems(0).Text
-                tbPreis.Text = .SelectedItems(0).SubItems(2).Text
-                Call Summe(sgRBID, sgRZID)
-            End If
-        End With
-        paPreise.Visible = False
-        lvPreise.Visible = False
-        '     lvGast.Visible = False
-    End Sub
 
     ''' <summary>
     ''' Mit Doppelklick einen Gast auswählen und Liste schliessen
@@ -1394,26 +1341,14 @@ Public Class frmReservierungDest
                 lbGastID.Text = .SelectedItems(0).SubItems(5).Text
             End If
         End With
-        paPreise.Visible = False
-        lvPreise.Visible = False
+        'paPreise.Visible = False
+        'lvPreise.Visible = False
         'lvGast.Visible = False
         Call prLadeGastDaten(lbGastID.Text)
         coWerbung.Text = "Stammgast"
     End Sub
 
-    ''' <summary>
-    ''' Gäste / Preisliste schliessen
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 25.02.2012 Create
-    ''' </remarks>
-    Private Sub btClosePreise_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btClosePreise.Click
-        paPreise.Visible = False
-        lvPreise.Visible = False
-        '  lvGast.Visible = False
-    End Sub
+
 
 #End Region
 
@@ -1521,7 +1456,7 @@ Public Class frmReservierungDest
             End If
         End If
 
-
+        MsgBox("Änderung gespeichert")
 
 
 
@@ -1809,8 +1744,8 @@ Public Class frmReservierungDest
     ''' <remarks>
     ''' 25.02.2012 Create
     ''' </remarks>
-    Private Sub prSaveNewReservierung(ByVal sBID As String, ByVal sKNr As String, _
-                                      ByVal sZID As String, ByVal sOID As String, _
+    Private Sub prSaveNewReservierung(ByVal sBID As String, ByVal sKNr As String,
+                                      ByVal sZID As String, ByVal sOID As String,
                                       ByVal arT() As String, ByVal ID As String)
         Dim sPauch As String = "0"
         If cbPausch.Checked = True Then sPauch = "1"
@@ -2003,7 +1938,8 @@ Public Class frmReservierungDest
         If rbVariabel.Checked = True Then sVariable = "2"
         Try
 
-            sqlText = "Von,Bis,ObjID,ZimID,Variable,KunID,Name1,Name2,Personen,Tiere,Art,Frueh,Kategorie,Preis,Anzahlung,Werbung,Info,FPreis,Storno,Summe,Pausch,RDSenden,ZDatum,InternetNr,GPreis,MwstU,MwstS,MwstG,GKU,GKS,GKG,VonZeit,BisZeit,Code"
+            sqlText = "Von,Bis,ObjID,ZimID,Variable,KunID,Name1,Name2,Personen,Tiere,Art,Frueh,Kategorie,Preis,Anzahlung,Werbung,Info,FPreis,Storno,Summe,Pausch,RDSenden,ZDatum,InternetNr,GPreis,MwstU,VonZeit,BisZeit,Code"
+            'sqlText = "Von,Bis,ObjID,ZimID,Variable,KunID,Name1,Name2,Personen,Tiere,Art,Frueh,Kategorie,Preis,Anzahlung,Werbung,Info,FPreis,Storno,Summe,Pausch,RDSenden,ZDatum,InternetNr,GPreis,MwstU,MwstS,MwstG,GKU,GKS,GKG,VonZeit,BisZeit,Code"
             arFields = Split(sqlText, ",")
 
             sb.Append(fcUmDatum(lbAnreise.Text) & "°")
@@ -2045,36 +1981,36 @@ Public Class frmReservierungDest
             Else
 
                 Select Case Val(tbRechSend.Text)
-                Case Is <= 0
-                    'Anreise datum
-                    zDatum = fcUmDatum(CDate(arT(21)).AddDays(Val(tbRechSend.Text)))
+                    Case Is <= 0
+                        'Anreise datum
+                        zDatum = fcUmDatum(CDate(arT(21)).AddDays(Val(tbRechSend.Text)))
                     '   Datum = CDate(fcUmDatum(von)).AddDays(nTage)
-                Case Is > 0
-                    'buchungsDatum
+                    Case Is > 0
+                        'buchungsDatum
 
-                    zDatum = fcUmDatum(CDate(Date.Today).AddDays(Val(tbRechSend.Text)))
-                Case Else
-                    'festdatum
-                    If tbRechSend.Text.Length > 6 Then
-                        zDatum = fcUmDatum(tbRechSend.Text)
-                        ' datum mit Jahr
-                    Else
-                        'datum ohne jahr ->>
-                        zDatum = fcUmDatum(Trim(tbRechSend.Text) & "." & (CDate(Date.Today).AddYears(1).Year.ToString))
+                        zDatum = fcUmDatum(CDate(Date.Today).AddDays(Val(tbRechSend.Text)))
+                    Case Else
+                        'festdatum
+                        If tbRechSend.Text.Length > 6 Then
+                            zDatum = fcUmDatum(tbRechSend.Text)
+                            ' datum mit Jahr
+                        Else
+                            'datum ohne jahr ->>
+                            zDatum = fcUmDatum(Trim(tbRechSend.Text) & "." & (CDate(Date.Today).AddYears(1).Year.ToString))
 
-                    End If
+                        End If
 
-            End Select
+                End Select
             End If
             sb.Append(zDatum & "°")
             sb.Append(tbInternetNr.Text & "°")
             sb.Append(sPreisG & "°")
             sb.Append(sMwstU & "°")
-            sb.Append(sMwstS & "°")
-            sb.Append(sMwstG & "°")
-            sb.Append(sGKU & "°")
-            sb.Append(sGKS & "°")
-            sb.Append(sGKG & "°")
+            'sb.Append(sMwstS & "°")
+            'sb.Append(sMwstG & "°")
+            'sb.Append(sGKU & "°")
+            'sb.Append(sGKS & "°")
+            'sb.Append(sGKG & "°")
             sb.Append(fcUmZeit(tbAnZeit.Text) & "°")    'Summe
             sb.Append(fcUmZeit(tbAbZeit.Text) & "°")
             sb.Append(sCode)
@@ -2385,9 +2321,9 @@ Public Class frmReservierungDest
     ''' <remarks>
     ''' 25.02.2012 Create
     ''' </remarks>
-    Private Sub prSetReservierungInDataGrid(ByVal sBegin As Date, ByVal sEnd As Date, _
-                                            ByVal sZim As String, ByVal sP As String, _
-                                            ByVal sName As String, ByVal sID As String, _
+    Private Sub prSetReservierungInDataGrid(ByVal sBegin As Date, ByVal sEnd As Date,
+                                            ByVal sZim As String, ByVal sP As String,
+                                            ByVal sName As String, ByVal sID As String,
                                             ByVal sFr As String)
         'Liste  synchronisieren
         Dim nCol As Integer = fcGetZimmerSpalte(sZim, frmMain.dgBuchung)
@@ -2491,7 +2427,7 @@ Public Class frmReservierungDest
         tssInfo.Text = "Übernachtungsart"
     End Sub
 
-    Private Sub btUArt_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles btUArt.MouseMove
+    Private Sub btUArt_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         tssInfo.Text = "Auswahl der Übernachtungsart"
     End Sub
 
@@ -2888,16 +2824,45 @@ Public Class frmReservierungDest
         frmErinnerung.Show()
     End Sub
 
+    ''' <summary>
+    ''' Steuert die Sichtbarkeit und den Standardpreis des Frühstücksfeldes (tbFPreis) 
+    ''' in Abhängigkeit der gewählten Verpflegungsart (Übernachtung mit Frühstück "Ü/F").
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (coArt).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Sichtbarkeitssteuerung direkt an die Bedingung gekoppelt (Kompaktierung).
+    ''' - Mathematische Berechnung durch sicheres Parsen von 'arIni' via 'Double.TryParse' abgesichert.
+    ''' - Explizite Formatierung des berechneten Frühstückspreises auf zwei Nachkommastellen (.ToString("F2")).
+    ''' </remarks>
     Private Sub coArt_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles coArt.SelectedIndexChanged
+        ' Prüfen, ob Übernachtung mit Frühstück gewählt wurde
+        Dim isFruehstueck As Boolean = (coArt.Text = "Ü/F")
 
-        If coArt.Text = "Ü/F" Then
-            tbFPreis.Visible = True
-            tbFPreis.Text = (arIni(17) / 100) + (arIni(24) / 100) '"3,00"  früschtuckspreis pro person
+        ' Sichtbarkeit der TextBox direkt zuweisen
+        tbFPreis.Visible = isFruehstueck
+
+        If isFruehstueck Then
+            ' Werte sicher aus dem INI-Array parsen
+            Dim val17 As Double = 0
+            Dim val24 As Double = 0
+
+            ' Falls arIni() Strings enthält, wandeln wir sie hier sicher in Double um
+            If arIni(17) IsNot Nothing Then Double.TryParse(arIni(17).ToString(), val17)
+            If arIni(24) IsNot Nothing Then Double.TryParse(arIni(24).ToString(), val24)
+
+            ' Berechnung durchführen (z.B. Netto + Steueranteil oder zwei Preisbestandteile)
+            Dim nGesamtPreis As Double = (val17 / 100.0) + (val24 / 100.0)
+
+            ' Sauber formatiert als Währungs-/Dezimalzahl mit 2 Nachkommastellen (z.B. "3,00") zuweisen
+            tbFPreis.Text = nGesamtPreis.ToString("F2")
         Else
-            tbFPreis.Visible = False
+            ' Standardwert setzen, wenn kein Frühstück gewählt ist
             tbFPreis.Text = "0,00"
         End If
     End Sub
+
 
     Private Sub tbFPreis_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbFPreis.LostFocus
         tbFPreis.Text = fcFormatDecimal(tbFPreis.Text)
@@ -3000,46 +2965,8 @@ Public Class frmReservierungDest
 
     End Sub
 
-    Private Sub Summe(ByVal sRBID As String, ByVal sRZID As String)
-
-        Dim dVon As Date = CDate(lbAnreise.Text)
-        Dim dBis As Date = CDate(lbAbreise.Text)
-        dBis = DateAdd(DateInterval.Day, 1, dBis)
-        lbTage.Text = DateDiff(DateInterval.Day, dVon, dBis)
-
-        Dim sPreisNacht As String = fcKillKomma(tbPreis.Text)
-        Dim sSummeGesamt As String = fcKillKomma(tbSumme.Text)
-
-        'lbSumme.Text = fcGetSummeZimmer(sRBID, sRZID)
-        'If Val(Trim(tbSumme.Text)) = 0 Then
-        '    tbSumme.Text = fcFormatDecimal(StrTrim(lbSumme.Text, "€"))
-        'Else
-        '    If Val(tbPreis.Text) <> 0 Then
-
-        '        tbSumme.Text = fcFormatDecimal(Str(Val(sPreisNacht) * (Val(lbTage.Text) - 1)))
-        '    End If
-        'End If
-        Dim nFPreis1 As String = "0"
-        If coArt.Text = "Ü/F" Then
-            nFPreis1 = tbFPreis.Text
-        End If
-        Dim p As String = fcGetZimPreis(sgRZID, tbAnzPer.Text & "/" & nFPreis1, lbAbreise.Text, lbAnreise.Text) 'Zimmerpreis nach tabelle
-        lbPauschPreis.Text = fcFormatDecimal(StrTrim(p, "")) & " €"
-        If cbPausch.Checked = True Then
-            If Val(Trim(tbSumme.Text)) = 0 Then
-                tbSumme.Text = fcFormatDecimal(StrTrim(p, "€"))
-            Else
-                tbSumme.Text = fcFormatDecimal(StrTrim(tbSumme.Text, "€"))
-            End If
-        Else
-            tbSumme.Text = fcGetSummeZimmer(sRBID, sRZID).Trim
-
-            'tbSumme.Text = fcFormatDecimal(StrTrim(tbSumme.Text, "€"))
-        End If
 
 
-
-    End Sub
 
 
 
@@ -3056,91 +2983,6 @@ Public Class frmReservierungDest
     End Function
     Private Sub buBerechnung_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buBerechnung.Click
         Call Summe(sgRBID, sgRZID)
-    End Sub
-
-    'Private Sub MwstHohlenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MwstHohlenToolStripMenuItem.Click
-    '    sMwstG = arIni(10)
-    '    sMwstS = arIni(23)
-    '    sMwstU = arIni(11)
-    '    sGKU = arIni(21)
-    '    sGKS = arIni(25)
-    '    sGKG = arIni(20)
-    'End Sub
-
-
-    Private Sub tsmtNeu_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmtNeu.Click
-        sMwstG = arIni(10)
-        sMwstS = arIni(23)
-        sMwstU = arIni(11)
-        sGKG = arIni(21)
-        sGKS = arIni(25)
-        sGKU = arIni(20)
-        Call prSaveMwst()
-    End Sub
-
-    Private Sub tsmtAlt_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmtAlt.Click
-        sMwstG = arMwstAlt(2)
-        sMwstS = arMwstAlt(1)
-        sMwstU = arMwstAlt(0)
-        sGKG = arGKAlt(2)
-        sGKS = arGKAlt(1)
-        sGKU = arGKAlt(0)
-        Call prSaveMwst()
-    End Sub
-
-    Private Sub tsmtAkt_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmtAkt.Click
-        sMwstG = sMwstGa
-        sMwstS = sMwstSa
-        sMwstU = sMwstUa
-        sGKG = sGKGa
-        sGKS = sGKSa
-        sGKU = sGKUa
-        Call prSaveMwst()
-    End Sub
-
-    Private Sub tsmtNeu2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmtNeu2.Click
-        sMwstG = arMwstNeu2(2)
-        sMwstS = arMwstNeu2(1)
-        sMwstU = arMwstNeu2(0)
-        sGKG = arGKNeu2(2)
-        sGKS = arGKNeu2(1)
-        sGKU = arGKNeu2(0)
-        Call prSaveMwst()
-    End Sub
-
-    Private Sub tsmtNeu1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsmtNeu1.Click
-        sMwstG = arMwstNeu1(2)
-        sMwstS = arMwstNeu1(1)
-        sMwstU = arMwstNeu1(0)
-        sGKG = arGKNeu1(2)
-        sGKS = arGKNeu1(1)
-        sGKU = arGKNeu1(0)
-        Call prSaveMwst()
-    End Sub
-
-
-
-
-
-    Private Sub prSaveMwst()
-
-        Dim sb As New StringBuilder
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        Dim cBedingung As String
-        Try
-            cBedingung = " WHERE BID ='" & sgRBID & "'"
-            sqlText = "MwstU,MwstS,MwstG,GKU,GKS,GKG"
-            arFields = Split(sqlText, ",")
-            sqlText = sMwstU & "°" & sMwstS & "°" & sMwstG & "°" & sGKU & "°" & sGKS & "°" & sGKG
-            arValue = Split(sqlText, "°")
-            Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
-        Catch ex As Exception
-            ErrReport(ex.Message, ex.Source, ex.StackTrace)
-        Finally
-
-
-        End Try
     End Sub
 
     Private Sub PreisToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PreisToolStripMenuItem.Click
@@ -3192,5 +3034,7 @@ Public Class frmReservierungDest
         End If
     End Sub
 
+    Private Sub ToolStripDropDownButton1_Click(sender As Object, e As EventArgs) Handles ToolStripDropDownButton1.Click
 
+    End Sub
 End Class

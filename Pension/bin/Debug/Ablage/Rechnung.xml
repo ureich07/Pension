@@ -10,11 +10,11 @@
 		</ram:GuidelineSpecifiedDocumentContextParameter>
 	</rsm:ExchangedDocumentContext>
 	<rsm:ExchangedDocument>
-		<ram:ID>2026-204</ram:ID>
+		<ram:ID>2026-350</ram:ID>
 		<ram:TypeCode>380</ram:TypeCode>
 		<ram:IssueDateTime>
 			<!-- Format YYYYMMDD -->
-			<udt:DateTimeString format="102">20260821</udt:DateTimeString>
+			<udt:DateTimeString format="102">20261005</udt:DateTimeString>
 		</ram:IssueDateTime>
 	</rsm:ExchangedDocument>
 	<rsm:SupplyChainTradeTransaction>
@@ -24,11 +24,11 @@
 				<ram:LineID> 1</ram:LineID>
 			</ram:AssociatedDocumentLineDocument>
 			<ram:SpecifiedTradeProduct>
-				<ram:Name>Fewo "Weinberg"</ram:Name>
+				<ram:Name>2-Bettzimmer</ram:Name>
 			</ram:SpecifiedTradeProduct>
 			<ram:SpecifiedLineTradeAgreement>
 				<ram:NetPriceProductTradePrice>
-					<ram:ChargeAmount>1295.33</ram:ChargeAmount>
+					<ram:ChargeAmount>392.52</ram:ChargeAmount>
 					 <!-- ?BT-149 -->
 					<ram:BasisQuantity unitCode="DAY">1</ram:BasisQuantity>
 				</ram:NetPriceProductTradePrice>
@@ -43,7 +43,7 @@
 					<ram:RateApplicablePercent>7.00</ram:RateApplicablePercent>
 				</ram:ApplicableTradeTax>
 				<ram:SpecifiedTradeSettlementLineMonetarySummation>
-					<ram:LineTotalAmount>1295.33</ram:LineTotalAmount>
+					<ram:LineTotalAmount>392.52</ram:LineTotalAmount>
 				</ram:SpecifiedTradeSettlementLineMonetarySummation>
 			</ram:SpecifiedLineTradeSettlement>
 		</ram:IncludedSupplyChainTradeLineItem>
@@ -70,15 +70,15 @@
 				</ram:SpecifiedTaxRegistration>
 			</ram:SellerTradeParty>
 			<ram:BuyerTradeParty>
-				<ram:Name>Firma Hölig MetallbauGmbH & Co. KG  </ram:Name>
+				<ram:Name>Herr Reich Uwe</ram:Name>
 				<ram:PostalTradeAddress>
-					<ram:PostcodeCode>01665</ram:PostcodeCode>
-					<ram:LineOne>Riesaer Straße 1a</ram:LineOne>
-					<ram:CityName>Diera-Zehren</ram:CityName>
+					<ram:PostcodeCode>17498</ram:PostcodeCode>
+					<ram:LineOne>Grüner Weg 34</ram:LineOne>
+					<ram:CityName>Neuenkirchen</ram:CityName>
 					<ram:CountryID>DE</ram:CountryID>
 				</ram:PostalTradeAddress>
 				<ram:URIUniversalCommunication>
-					<ram:URIID schemeID="EM">t.hoelig@metallbau-hoelig.de</ram:URIID>
+					<ram:URIID schemeID="EM">ue.reich@t-online.de</ram:URIID>
 				</ram:URIUniversalCommunication>
 			</ram:BuyerTradeParty>
 		</ram:ApplicableHeaderTradeAgreement>
@@ -88,13 +88,13 @@
 
 			<ram:ActualDeliverySupplyChainEvent>
 				<ram:OccurrenceDateTime>
-					<udt:DateTimeString format="102">20260824</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261012</udt:DateTimeString>
 				</ram:OccurrenceDateTime>
 			</ram:ActualDeliverySupplyChainEvent>
 		</ram:ApplicableHeaderTradeDelivery>
 		
 		<ram:ApplicableHeaderTradeSettlement>
-			<ram:PaymentReference>R.Nr.:2026-204/24.08.2026 - 04.09.2026</ram:PaymentReference>
+			<ram:PaymentReference>R.Nr.:2026-350/12.10.2026 - 13.10.2026</ram:PaymentReference>
 			<ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
 			<ram:SpecifiedTradeSettlementPaymentMeans>
 				<ram:TypeCode>58</ram:TypeCode>
@@ -108,32 +108,32 @@
 				</ram:PayeeSpecifiedCreditorFinancialInstitution>
 			</ram:SpecifiedTradeSettlementPaymentMeans>
 			<ram:ApplicableTradeTax>
-				<ram:CalculatedAmount> 90.67</ram:CalculatedAmount>
+				<ram:CalculatedAmount> 27.48</ram:CalculatedAmount>
 				<ram:TypeCode>VAT</ram:TypeCode>
-				<ram:BasisAmount>1295.33</ram:BasisAmount>
+				<ram:BasisAmount>392.52</ram:BasisAmount>
 				<ram:CategoryCode>S</ram:CategoryCode>
 				<ram:RateApplicablePercent>7.00</ram:RateApplicablePercent>
 			</ram:ApplicableTradeTax>
 			<ram:BillingSpecifiedPeriod>
 				<ram:StartDateTime>
-					<udt:DateTimeString format="102">20260824</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261012</udt:DateTimeString>
 				</ram:StartDateTime>
 				<ram:EndDateTime>
-					<udt:DateTimeString format="102">20260904</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261013</udt:DateTimeString>
 				</ram:EndDateTime>
 			</ram:BillingSpecifiedPeriod>
 			<ram:SpecifiedTradePaymentTerms>
 				<!-- <ram:Description></ram:Description> -->
 				<ram:DueDateDateTime>
-					<udt:DateTimeString format="102">20260819</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261019</udt:DateTimeString>
 				</ram:DueDateDateTime>
 			</ram:SpecifiedTradePaymentTerms>
 			<ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-				<ram:LineTotalAmount>1295.33</ram:LineTotalAmount>
-				<ram:TaxBasisTotalAmount>1295.33</ram:TaxBasisTotalAmount>
-				<ram:TaxTotalAmount currencyID="EUR"> 90.67</ram:TaxTotalAmount>
-				<ram:GrandTotalAmount>1386.00</ram:GrandTotalAmount>
-				<ram:DuePayableAmount>1386.00</ram:DuePayableAmount>
+				<ram:LineTotalAmount>392.52</ram:LineTotalAmount>
+				<ram:TaxBasisTotalAmount>392.52</ram:TaxBasisTotalAmount>
+				<ram:TaxTotalAmount currencyID="EUR"> 27.48</ram:TaxTotalAmount>
+				<ram:GrandTotalAmount>420.00</ram:GrandTotalAmount>
+				<ram:DuePayableAmount>420.00</ram:DuePayableAmount>
 			</ram:SpecifiedTradeSettlementHeaderMonetarySummation>
 		</ram:ApplicableHeaderTradeSettlement>
 	</rsm:SupplyChainTradeTransaction>

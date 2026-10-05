@@ -248,9 +248,11 @@
 
         Dim cBedingung As String = " WHERE KunID='" & sOldID & "'"
 
-        ' DB-Updates ausführen
+
+        ' KundenID bei allen Buchungen des "alten" Kunden mit der neuen KundenID überschreiben
         fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
-        'UpdateTable("DELETE FROM Kunden WHERE ID ='" & sOldID & "'")
+        ' "alten Kunden aus der Datenbank Kunden löschen
+        UpdateTable("DELETE FROM Kunden WHERE ID ='" & sOldID & "'")
 
         ' 3. UI einfrieren, bereinigen und neu befüllen (Verhindert Flackern)
         lvControll.BeginUpdate()

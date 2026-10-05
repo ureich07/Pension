@@ -30,17 +30,20 @@ Partial Class frmDatenControl
         '
         'lvControll
         '
-        Me.lvControll.Location = New System.Drawing.Point(12, 74)
+        Me.lvControll.HideSelection = False
+        Me.lvControll.Location = New System.Drawing.Point(18, 114)
+        Me.lvControll.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.lvControll.Name = "lvControll"
-        Me.lvControll.Size = New System.Drawing.Size(1198, 439)
+        Me.lvControll.Size = New System.Drawing.Size(1795, 673)
         Me.lvControll.TabIndex = 0
         Me.lvControll.UseCompatibleStateImageBehavior = False
         '
         'tbDel
         '
-        Me.tbDel.Location = New System.Drawing.Point(898, 45)
+        Me.tbDel.Location = New System.Drawing.Point(1645, 64)
+        Me.tbDel.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.tbDel.Name = "tbDel"
-        Me.tbDel.Size = New System.Drawing.Size(112, 23)
+        Me.tbDel.Size = New System.Drawing.Size(168, 35)
         Me.tbDel.TabIndex = 3
         Me.tbDel.Text = "Del."
         Me.tbDel.UseVisualStyleBackColor = True
@@ -49,9 +52,10 @@ Partial Class frmDatenControl
         '
         Me.RadioButton1.AutoSize = True
         Me.RadioButton1.Checked = True
-        Me.RadioButton1.Location = New System.Drawing.Point(31, 45)
+        Me.RadioButton1.Location = New System.Drawing.Point(46, 69)
+        Me.RadioButton1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(61, 17)
+        Me.RadioButton1.Size = New System.Drawing.Size(88, 24)
         Me.RadioButton1.TabIndex = 4
         Me.RadioButton1.TabStop = True
         Me.RadioButton1.Text = "Einfach"
@@ -60,22 +64,24 @@ Partial Class frmDatenControl
         'RadioButton2
         '
         Me.RadioButton2.AutoSize = True
-        Me.RadioButton2.Location = New System.Drawing.Point(129, 45)
+        Me.RadioButton2.Location = New System.Drawing.Point(194, 69)
+        Me.RadioButton2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.RadioButton2.Name = "RadioButton2"
-        Me.RadioButton2.Size = New System.Drawing.Size(66, 17)
+        Me.RadioButton2.Size = New System.Drawing.Size(97, 24)
         Me.RadioButton2.TabIndex = 5
         Me.RadioButton2.Text = "Erweitert"
         Me.RadioButton2.UseVisualStyleBackColor = True
         '
         'frmDatenControl
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1232, 525)
+        Me.ClientSize = New System.Drawing.Size(1848, 808)
         Me.Controls.Add(Me.RadioButton2)
         Me.Controls.Add(Me.RadioButton1)
         Me.Controls.Add(Me.tbDel)
         Me.Controls.Add(Me.lvControll)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmDatenControl"
         Me.Text = "DatenControlle"
         Me.ResumeLayout(False)

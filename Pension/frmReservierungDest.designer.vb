@@ -44,7 +44,6 @@ Partial Class frmReservierungDest
         Me.tbStorno = New System.Windows.Forms.TextBox()
         Me.tbFPreis = New System.Windows.Forms.TextBox()
         Me.Label22 = New System.Windows.Forms.Label()
-        Me.btUArt = New System.Windows.Forms.Button()
         Me.tbAnzahlung = New System.Windows.Forms.TextBox()
         Me.coArt = New System.Windows.Forms.ComboBox()
         Me.Label15 = New System.Windows.Forms.Label()
@@ -105,9 +104,6 @@ Partial Class frmReservierungDest
         Me.Label16 = New System.Windows.Forms.Label()
         Me.Label12 = New System.Windows.Forms.Label()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.paPreise = New System.Windows.Forms.Panel()
-        Me.lvPreise = New System.Windows.Forms.ListView()
-        Me.btClosePreise = New System.Windows.Forms.Button()
         Me.lvGast = New System.Windows.Forms.ListView()
         Me.tsMain = New System.Windows.Forms.ToolStrip()
         Me.tsbClose = New System.Windows.Forms.ToolStripButton()
@@ -148,12 +144,6 @@ Partial Class frmReservierungDest
         Me.tsbKey = New System.Windows.Forms.ToolStripButton()
         Me.ssMain = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel4 = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.ToolStripDropDownButton2 = New System.Windows.Forms.ToolStripDropDownButton()
-        Me.tsmtNeu = New System.Windows.Forms.ToolStripMenuItem()
-        Me.tsmtAlt = New System.Windows.Forms.ToolStripMenuItem()
-        Me.tsmtNeu1 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.tsmtNeu2 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.tsmtAkt = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tssInfo = New System.Windows.Forms.ToolStripStatusLabel()
         Me.grBText = New System.Windows.Forms.GroupBox()
@@ -165,13 +155,12 @@ Partial Class frmReservierungDest
         Me.btBText = New System.Windows.Forms.Button()
         Me.coLang = New System.Windows.Forms.ComboBox()
         Me.Label24 = New System.Windows.Forms.Label()
-        Me.MyKalender1 = New Pension.myKalender()
         Me.gbNameZ = New System.Windows.Forms.GroupBox()
         Me.tbName2Z = New System.Windows.Forms.TextBox()
         Me.tbName1Z = New System.Windows.Forms.TextBox()
+        Me.MyKalender1 = New Pension.myKalender()
         Me.gbZimmer.SuspendLayout()
         Me.gbGast.SuspendLayout()
-        Me.paPreise.SuspendLayout()
         Me.tsMain.SuspendLayout()
         Me.ssMain.SuspendLayout()
         Me.grBText.SuspendLayout()
@@ -285,7 +274,6 @@ Partial Class frmReservierungDest
         Me.gbZimmer.Controls.Add(Me.tbStorno)
         Me.gbZimmer.Controls.Add(Me.tbFPreis)
         Me.gbZimmer.Controls.Add(Me.Label22)
-        Me.gbZimmer.Controls.Add(Me.btUArt)
         Me.gbZimmer.Controls.Add(Me.tbAnzahlung)
         Me.gbZimmer.Controls.Add(Me.coArt)
         Me.gbZimmer.Controls.Add(Me.Label15)
@@ -453,17 +441,6 @@ Partial Class frmReservierungDest
         Me.Label22.TabIndex = 24
         Me.Label22.Text = "Storno in %"
         '
-        'btUArt
-        '
-        Me.btUArt.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btUArt.Image = CType(resources.GetObject("btUArt.Image"), System.Drawing.Image)
-        Me.btUArt.Location = New System.Drawing.Point(458, 231)
-        Me.btUArt.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btUArt.Name = "btUArt"
-        Me.btUArt.Size = New System.Drawing.Size(24, 31)
-        Me.btUArt.TabIndex = 21
-        Me.btUArt.UseVisualStyleBackColor = True
-        '
         'tbAnzahlung
         '
         Me.tbAnzahlung.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
@@ -505,7 +482,7 @@ Partial Class frmReservierungDest
         Me.tbUArt.Location = New System.Drawing.Point(165, 231)
         Me.tbUArt.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.tbUArt.Name = "tbUArt"
-        Me.tbUArt.Size = New System.Drawing.Size(292, 26)
+        Me.tbUArt.Size = New System.Drawing.Size(274, 26)
         Me.tbUArt.TabIndex = 22
         '
         'Label17
@@ -1167,40 +1144,6 @@ Partial Class frmReservierungDest
         Me.Label8.Text = "Anrede"
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'paPreise
-        '
-        Me.paPreise.BackColor = System.Drawing.SystemColors.GradientInactiveCaption
-        Me.paPreise.Controls.Add(Me.lvPreise)
-        Me.paPreise.Controls.Add(Me.btClosePreise)
-        Me.paPreise.Location = New System.Drawing.Point(898, 108)
-        Me.paPreise.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.paPreise.Name = "paPreise"
-        Me.paPreise.Size = New System.Drawing.Size(996, 383)
-        Me.paPreise.TabIndex = 0
-        Me.paPreise.Visible = False
-        '
-        'lvPreise
-        '
-        Me.lvPreise.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lvPreise.HideSelection = False
-        Me.lvPreise.Location = New System.Drawing.Point(24, 20)
-        Me.lvPreise.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.lvPreise.Name = "lvPreise"
-        Me.lvPreise.Size = New System.Drawing.Size(946, 302)
-        Me.lvPreise.TabIndex = 0
-        Me.lvPreise.UseCompatibleStateImageBehavior = False
-        Me.lvPreise.Visible = False
-        '
-        'btClosePreise
-        '
-        Me.btClosePreise.Location = New System.Drawing.Point(532, 334)
-        Me.btClosePreise.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btClosePreise.Name = "btClosePreise"
-        Me.btClosePreise.Size = New System.Drawing.Size(117, 35)
-        Me.btClosePreise.TabIndex = 1
-        Me.btClosePreise.Text = "Schliessen"
-        Me.btClosePreise.UseVisualStyleBackColor = True
-        '
         'lvGast
         '
         Me.lvGast.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -1467,7 +1410,7 @@ Partial Class frmReservierungDest
         'ssMain
         '
         Me.ssMain.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.ssMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel4, Me.ToolStripDropDownButton2, Me.ToolStripStatusLabel1, Me.tssInfo})
+        Me.ssMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel4, Me.ToolStripStatusLabel1, Me.tssInfo})
         Me.ssMain.Location = New System.Drawing.Point(0, 973)
         Me.ssMain.Name = "ssMain"
         Me.ssMain.Padding = New System.Windows.Forms.Padding(2, 0, 21, 0)
@@ -1480,46 +1423,6 @@ Partial Class frmReservierungDest
         Me.ToolStripStatusLabel4.Name = "ToolStripStatusLabel4"
         Me.ToolStripStatusLabel4.Size = New System.Drawing.Size(42, 32)
         Me.ToolStripStatusLabel4.Text = "    "
-        '
-        'ToolStripDropDownButton2
-        '
-        Me.ToolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripDropDownButton2.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmtNeu, Me.tsmtAlt, Me.tsmtNeu1, Me.tsmtNeu2, Me.tsmtAkt})
-        Me.ToolStripDropDownButton2.Image = CType(resources.GetObject("ToolStripDropDownButton2.Image"), System.Drawing.Image)
-        Me.ToolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripDropDownButton2.Name = "ToolStripDropDownButton2"
-        Me.ToolStripDropDownButton2.Size = New System.Drawing.Size(38, 36)
-        Me.ToolStripDropDownButton2.Text = "ToolStripDropDownButton2"
-        '
-        'tsmtNeu
-        '
-        Me.tsmtNeu.Name = "tsmtNeu"
-        Me.tsmtNeu.Size = New System.Drawing.Size(188, 40)
-        Me.tsmtNeu.Text = "5/5/16"
-        '
-        'tsmtAlt
-        '
-        Me.tsmtAlt.Name = "tsmtAlt"
-        Me.tsmtAlt.Size = New System.Drawing.Size(188, 40)
-        Me.tsmtAlt.Text = "7/7/19"
-        '
-        'tsmtNeu1
-        '
-        Me.tsmtNeu1.Name = "tsmtNeu1"
-        Me.tsmtNeu1.Size = New System.Drawing.Size(188, 40)
-        Me.tsmtNeu1.Text = "a/b/c"
-        '
-        'tsmtNeu2
-        '
-        Me.tsmtNeu2.Name = "tsmtNeu2"
-        Me.tsmtNeu2.Size = New System.Drawing.Size(188, 40)
-        Me.tsmtNeu2.Text = "d/e/f"
-        '
-        'tsmtAkt
-        '
-        Me.tsmtAkt.Name = "tsmtAkt"
-        Me.tsmtAkt.Size = New System.Drawing.Size(188, 40)
-        Me.tsmtAkt.Text = "x/y/z"
         '
         'ToolStripStatusLabel1
         '
@@ -1559,7 +1462,7 @@ Partial Class frmReservierungDest
         Me.tbRechSend.Location = New System.Drawing.Point(165, 22)
         Me.tbRechSend.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.tbRechSend.Name = "tbRechSend"
-        Me.tbRechSend.Size = New System.Drawing.Size(134, 26)
+        Me.tbRechSend.Size = New System.Drawing.Size(144, 26)
         Me.tbRechSend.TabIndex = 13
         '
         'Label18
@@ -1636,20 +1539,6 @@ Partial Class frmReservierungDest
         Me.Label24.Text = "Sprache"
         Me.Label24.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'MyKalender1
-        '
-        Me.MyKalender1.Abreise = "20150414"
-        Me.MyKalender1.Anreise = "20150605"
-        Me.MyKalender1.AnreiseAbreise = False
-        Me.MyKalender1.Buchung = "20150525-20150530"
-        Me.MyKalender1.Datum = Nothing
-        Me.MyKalender1.Location = New System.Drawing.Point(898, 497)
-        Me.MyKalender1.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
-        Me.MyKalender1.Name = "MyKalender1"
-        Me.MyKalender1.Size = New System.Drawing.Size(1012, 466)
-        Me.MyKalender1.Sperr = "20150625-20150630"
-        Me.MyKalender1.TabIndex = 7
-        '
         'gbNameZ
         '
         Me.gbNameZ.Controls.Add(Me.tbName2Z)
@@ -1679,6 +1568,20 @@ Partial Class frmReservierungDest
         Me.tbName1Z.Size = New System.Drawing.Size(936, 26)
         Me.tbName1Z.TabIndex = 0
         '
+        'MyKalender1
+        '
+        Me.MyKalender1.Abreise = "20150329"
+        Me.MyKalender1.Anreise = "20150605"
+        Me.MyKalender1.AnreiseAbreise = False
+        Me.MyKalender1.Buchung = "20150525-20150530"
+        Me.MyKalender1.Datum = Nothing
+        Me.MyKalender1.Location = New System.Drawing.Point(898, 497)
+        Me.MyKalender1.Margin = New System.Windows.Forms.Padding(6)
+        Me.MyKalender1.Name = "MyKalender1"
+        Me.MyKalender1.Size = New System.Drawing.Size(1012, 466)
+        Me.MyKalender1.Sperr = "20150625-20150630"
+        Me.MyKalender1.TabIndex = 7
+        '
         'frmReservierungDest
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -1687,7 +1590,6 @@ Partial Class frmReservierungDest
         Me.ClientSize = New System.Drawing.Size(1924, 1012)
         Me.Controls.Add(Me.gbNameZ)
         Me.Controls.Add(Me.MyKalender1)
-        Me.Controls.Add(Me.paPreise)
         Me.Controls.Add(Me.lvGast)
         Me.Controls.Add(Me.ssMain)
         Me.Controls.Add(Me.tsMain)
@@ -1704,7 +1606,6 @@ Partial Class frmReservierungDest
         Me.gbZimmer.PerformLayout()
         Me.gbGast.ResumeLayout(False)
         Me.gbGast.PerformLayout()
-        Me.paPreise.ResumeLayout(False)
         Me.tsMain.ResumeLayout(False)
         Me.tsMain.PerformLayout()
         Me.ssMain.ResumeLayout(False)
@@ -1756,10 +1657,6 @@ Partial Class frmReservierungDest
     Friend WithEvents tbAnzahlung As System.Windows.Forms.TextBox
     Friend WithEvents tbPreis As System.Windows.Forms.TextBox
     Friend WithEvents coArt As System.Windows.Forms.ComboBox
-    Friend WithEvents btUArt As System.Windows.Forms.Button
-    Friend WithEvents paPreise As System.Windows.Forms.Panel
-    Friend WithEvents btClosePreise As System.Windows.Forms.Button
-    Friend WithEvents lvPreise As System.Windows.Forms.ListView
     Friend WithEvents tbUArt As System.Windows.Forms.TextBox
     Friend WithEvents ToolStripLabel1 As System.Windows.Forms.ToolStripLabel
     Friend WithEvents tscoZim As System.Windows.Forms.ToolStripComboBox
@@ -1844,13 +1741,7 @@ Partial Class frmReservierungDest
     Friend WithEvents Label28 As System.Windows.Forms.Label
     Friend WithEvents tbInternetNr As System.Windows.Forms.TextBox
     Friend WithEvents MyKalender1 As Pension.myKalender
-    Friend WithEvents ToolStripDropDownButton2 As System.Windows.Forms.ToolStripDropDownButton
-    Friend WithEvents tsmtNeu As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents tsmtAlt As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripStatusLabel4 As System.Windows.Forms.ToolStripStatusLabel
-    Friend WithEvents tsmtAkt As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents tsmtNeu1 As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents tsmtNeu2 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents tbAbZeit As System.Windows.Forms.TextBox
     Friend WithEvents tbAnZeit As System.Windows.Forms.TextBox
     Friend WithEvents PreisToolStripMenuItem As ToolStripMenuItem

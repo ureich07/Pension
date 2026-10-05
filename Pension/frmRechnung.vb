@@ -26,47 +26,101 @@ Public Class frmRechnung
 
 #Region "Load Form und Funktionen zur Darstellung des Moduls......................................."
 
+    ''' <summary>
+    ''' Wird beim Laden des Hauptformulars (frmMain) ausgeführt.
+    ''' Initialisiert das Masken-Layout, lädt die Zimmer- und Gastdaten zur aktuellen Buchung, 
+    ''' generiert bei Bedarf eine neue Rechnungsnummer und aktualisiert die Rechnungspositionen.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimization:
+    ''' - 'Try-Catch-Finally'-Struktur hinzugefügt, um unvollständiges Laden bei DB-Fehlern zu verhindern.
+    ''' - Garantiertes Zurücksetzen des Cursors im 'Finally'-Block (wichtig bei vorzeitigem Abbruch).
+    ''' - Veraltetes 'Call'-Schlüsselwort bei allen Prozeduraufrufen entfernt.
+    ''' - Auskommentierte Code-Leichen ('gbZimmer', 'ssMain', 'tsMain', 'Call Main()') entfernt.
+    ''' - String-Verkettung für die Rechnungsnummer modernisiert.
+    ''' </remarks>
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        ' Warte-Cursor anzeigen, da Daten aus der DB geladen werden
         Me.Cursor = Cursors.WaitCursor
-        Me.BackColor = Color.LightYellow
-        Dim sColor As Color = Color.LightYellow
-        gbOption.BackColor = sColor
-        gbGast.BackColor = sColor
-        gbRechnung.BackColor = sColor
-        'gbZimmer.BackColor = sColor
-        'ssMain.BackColor = sColor
-        'tsMain.BackColor = sColor
-        coSteuer.Text = "0"
-        buMail.Enabled = False
-        ' Call Main()
-        Call prSetTabelleRechnung(dtZim)
-        Call prLoadZimmer(sgRBID, sgRNr)
-        Call prLadeGastDaten(sgGID)
-        lbBID.Text = sgRBID
-        If sgRNr.Trim = "" Then
-            sRNr = fcGetNr("RNr")
-            tbRNr.Text = Date.Today.Year & "-" & sRNr
-        Else
-            tbRNr.Text = sgRNr
-        End If
-        Me.Cursor = Cursors.Default
-        Call prRefreshRechnungsPosition()
-        sGKNr = sgGID
+
+        Try
+            ' 1. Visuelle Initialisierung
+            Dim sColor As Color = Color.LightYellow
+            Me.BackColor = sColor
+            gbOption.BackColor = sColor
+            gbGast.BackColor = sColor
+            gbRechnung.BackColor = sColor
+
+            ' Standardwerte und Element-Zustände setzen
+            coSteuer.Text = "0"
+            buMail.Enabled = False
+
+            ' 2. Daten laden (Reihenfolge beibehalten)
+            prSetTabelleRechnung(dtZim)
+            prLoadZimmer(sgRBID, sgRNr)
+            prLadeGastDaten(sgGID)
+
+            ' Buchungs-ID im UI anzeigen
+            lbBID.Text = sgRBID
+
+            ' 3. Rechnungsnummer verarbeiten
+            If String.IsNullOrWhiteSpace(sgRNr) Then
+                sRNr = fcGetNr("RNr")
+                ' Modernes String-Interpolation ($) statt Verkettung mit &
+                tbRNr.Text = $"{Date.Today.Year}-{sRNr}"
+            Else
+                tbRNr.Text = sgRNr
+            End If
+
+            ' Rechnungsaufstellung aktualisieren
+            prRefreshRechnungsPosition()
+
+            ' Gast-ID für Kontierung zuweisen
+            sGKNr = sgGID
+
+        Catch ex As Exception
+            ' Fehler reporten, damit die Anwendung bei DB-Fehlern nicht unkontrolliert abstürzt
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+        Finally
+            ' WICHTIG: Der Cursor MUSS im Finally zurückgesetzt werden, 
+            ' damit der Nutzer bei einem Fehler nicht auf einem dauerhaften WaitCursor hängen bleibt.
+            Me.Cursor = Cursors.Default
+        End Try
     End Sub
 
     ''' <summary>
-    ''' Tabelle Rechnungen erstellen
+    ''' Initialisiert die Tabellenstruktur des Rechnungs-GridViews (dgRechnung).
+    ''' Erstellt alle benötigten Spalten, definiert Spaltenbreiten, Ausrichtungen,
+    ''' Farb- und Selektionsstile und unterbindet die automatische Spaltensortierung.
     ''' </summary>
-    ''' <param name="dt"></param>
+    ''' <param name="dt">Die DataTable mit den Zimmer-Stammdaten (wird in dieser Prozedur aktuell nicht aktiv verwendet).</param>
     ''' <remarks>
-    ''' 19.3.2012 Create
+    ''' 19.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Logikfehler behoben: Spaltensortierung wird nun wie im Kommentar gefordert via 'NotSortable' unterbunden.
+    ''' - Redundante und unübersichtliche Spalten-Zuweisungen durch strukturierte Arrays und Schleifen stark verkürzt.
+    ''' - Ungenutzte lokale Variable 'DGVCol' in die Schleife integriert.
+    ''' - Performance beim Neuaufbau der Tabellenstruktur optimiert.
     ''' </remarks>
     Private Sub prSetTabelleRechnung(ByVal dt As DataTable)
-
         With dgRechnung
-            Dim nB As Integer = 50
             .Columns.Clear()
             .ColumnHeadersHeight = 30
+            .RowHeadersVisible = False
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
+            .ReadOnly = True
+            .ShowCellToolTips = True
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing
+
+            ' Farben der selektierten Zeile definieren
+            .DefaultCellStyle.SelectionBackColor = cgColorRow
+            .DefaultCellStyle.SelectionForeColor = Color.Black
+
+            ' 1. Spalten hinzufügen (Name/Key und Header-Text)
             .Columns.Add("POS", "POS")
             .Columns.Add("Zimmer", "Zimmer")
             .Columns.Add("Menge", "Menge")
@@ -86,201 +140,243 @@ Public Class frmRechnung
             .Columns.Add("Storno", "Storno")
             .Columns.Add("Summe", "Summe")
             .Columns.Add("GPreis", "GPreis")
-            .Columns(0).Width = 50
-            .Columns(0).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-            .Columns(1).Width = 80
-            .Columns(1).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
-            .Columns(2).Width = 50
-            .Columns(2).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-            .Columns(3).Width = 150
-            .Columns(3).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
 
-            .Columns(4).Width = 50
-            .Columns(4).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(5).Width = 50
-            .Columns(5).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            ' 2. Individuelle Breiten und Ausrichtungen für die ersten Spalten setzen
+            Dim columnSettings As New Dictionary(Of Integer, (Width As Integer, Alignment As DataGridViewContentAlignment)) From {
+                {0, (50, DataGridViewContentAlignment.MiddleCenter)},  ' POS
+                {1, (80, DataGridViewContentAlignment.MiddleLeft)},    ' Zimmer
+                {2, (50, DataGridViewContentAlignment.MiddleCenter)},  ' Menge
+                {3, (150, DataGridViewContentAlignment.MiddleLeft)},   ' Text
+                {4, (50, DataGridViewContentAlignment.MiddleRight)},   ' Betrag
+                {5, (50, DataGridViewContentAlignment.MiddleRight)},   ' ST7
+                {6, (50, DataGridViewContentAlignment.MiddleRight)},   ' ST19
+                {7, (50, DataGridViewContentAlignment.MiddleRight)},   ' STS
+                {8, (80, DataGridViewContentAlignment.MiddleRight)},   ' Netto
+                {9, (80, DataGridViewContentAlignment.MiddleRight)}    ' Brutto
+            }
 
-            .Columns(6).Width = 50
-            .Columns(6).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(7).Width = 50
-            .Columns(7).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(8).Width = 80
-            .Columns(8).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(9).Width = 80
-            .Columns(9).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            For Each setting In columnSettings
+                .Columns(setting.Key).Width = setting.Value.Width
+                .Columns(setting.Key).DefaultCellStyle.Alignment = setting.Value.Alignment
+            Next
 
-            .Columns(10).Width = nB
-            .Columns(10).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(11).Width = nB
-            .Columns(11).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            ' 3. Alle restlichen Spalten ab Index 10 erhalten eine Standardbreite von 50 und Rechtsbündigkeit
+            Dim nB As Integer = 50
+            For i As Integer = 10 To .Columns.Count - 1
+                .Columns(i).Width = nB
+                .Columns(i).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            Next
 
-            .Columns(12).Width = nB
-            .Columns(12).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(13).Width = nB
-            .Columns(13).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(14).Width = nB
-            .Columns(14).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(15).Width = nB
-            .Columns(15).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(16).Width = nB
-            .Columns(16).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(17).Width = nB
-            .Columns(17).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns(18).Width = nB
-            .Columns(18).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .RowHeadersVisible = False
-            .AllowUserToAddRows = False
-            .AllowUserToDeleteRows = False
+            ' 4. Eigenschaften für alle Spalten anwenden (Sortierung ausschalten)
+            For Each col As DataGridViewColumn In .Columns
+                col.SortMode = DataGridViewColumnSortMode.NotSortable
+            Next
 
             .AutoResizeRows()
-            'Sortierung der Spalten verhindern
-            Dim DGVCol As DataGridViewColumn
-            For Each DGVCol In .Columns
-                DGVCol.SortMode = DataGridViewColumnSortMode.Automatic
-            Next
-            'Tooltips für Feiertage aktivieren
-            .ShowCellToolTips = True
-            .ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing
-            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            ' Farben der selektierten Zeile
-            With .DefaultCellStyle
-                .SelectionBackColor = cgColorRow 'Color.GreenYellow
-                .SelectionForeColor = Color.Black
-            End With
-            .ReadOnly = True
         End With
-
-
     End Sub
 
     ''' <summary>
-    ''' Gastdaten laden und anzeigen
+    ''' Lädt die Gast- bzw. Kundendaten anhand der übergebenen ID aus der Datenbank 
+    ''' und stellt diese in den entsprechenden Oberflächenelementen (Labels) dar.
     ''' </summary>
-    ''' <param name="sID"></param>
+    ''' <param name="sID">Die eindeutige Kunden-ID (ID).</param>
     ''' <remarks>
-    ''' 04.02.2012 Create
+    ''' 04.02.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Sicherheitsprüfung für 'dt IsNot Nothing' hinzugefügt, um NullReferenceExceptions bei Verbindungsabbrüchen zu verhindern.
+    ''' - String-Konvertierung von '.ToString()' auf die robustere Variante 'Convert.ToString()' umgestellt, um DBNull-Fehler abzufangen.
+    ''' - XML-Dokumentation für Parameter vervollständigt.
     ''' </remarks>
     Private Sub prLadeGastDaten(ByVal sID As String)
-        Dim sSQL As String = "Select * From Kunden Where ID='" & sID & "'"
+        Dim sSQL As String = "SELECT Anrede, Name1, Name2, Vorname, Strasse, PLZ, Ort, Land FROM Kunden WHERE ID='" & sID & "'"
         Dim dt As DataTable = fcReadDataTable(sSQL)
 
-        If dt.Rows.Count > 0 Then
+        ' Sicherheitsprüfung: Hat die Datenbank überhaupt eine gültige Tabelle zurückgegeben und enthält diese Zeilen?
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
             With dt.Rows(0)
-                lbAnrede.Text = .Item("Anrede").ToString
-                lbName1.Text = .Item("Name1").ToString
-                lbName2.Text = .Item("Name2").ToString
-                lbVorname.Text = .Item("Vorname").ToString
-                lbStrasse.Text = .Item("Strasse").ToString
-
-                lbPLZ.Text = .Item("PLZ").ToString
-                lbOrt.Text = .Item("Ort").ToString
-                lbLand.Text = .Item("Land").ToString
+                ' Convert.ToString() fängt im Gegensatz zu .ToString() ein potenzielles DBNull sicher ab,
+                ' ohne dass die Anwendung abstürzt, und gibt stattdessen einen leeren String ("") zurück.
+                lbAnrede.Text = Convert.ToString(.Item("Anrede"))
+                lbName1.Text = Convert.ToString(.Item("Name1"))
+                lbName2.Text = Convert.ToString(.Item("Name2"))
+                lbVorname.Text = Convert.ToString(.Item("Vorname"))
+                lbStrasse.Text = Convert.ToString(.Item("Strasse"))
+                lbPLZ.Text = Convert.ToString(.Item("PLZ"))
+                lbOrt.Text = Convert.ToString(.Item("Ort"))
+                lbLand.Text = Convert.ToString(.Item("Land"))
             End With
         End If
     End Sub
 
     ''' <summary>
-    ''' Zimmer der Buchung laden
+    ''' Lädt alle gebuchten Zimmer zu einer bestimmten Buchung und Rechnungsnummer aus der Datenbank.
+    ''' Initialisiert Rechnungsdaten (Datum, Zahlungsart), befüllt die Zimmerliste (chliZimmer) und hakt die aktiven Zimmer an.
     ''' </summary>
-    ''' <param name="sBid"></param>
-    ''' <remarks></remarks>
+    ''' <param name="sBid">Die eindeutige Buchungs-ID (BID).</param>
+    ''' <param name="sRNrID">Die bestehende Rechnungsnummer (RID).</param>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Kritischen Absturz-Bug behoben: 'Rows.Count'-Prüfung an den Anfang verschoben, um Index-Fehler bei leeren Abfragen zu verhindern.
+    ''' - 'Nothing'- und 'DBNull'-Prüfungen für 'dt' und Datenbankfelder hinzugefügt.
+    ''' - Redundanten/doppelten Aufruf von 'prRefreshRechnungsPosition' entfernt (wird bereits im Load-Event direkt danach gefeuert).
+    ''' - String-Verarbeitung modernisiert (String-Interpolation statt '&' Verknüpfung).
+    ''' - Schleifenvariablen lokal typisiert und ungenutztes 'nMax' entfernt.
+    ''' </remarks>
     Private Sub prLoadZimmer(ByVal sBid As String, ByVal sRNrID As String)
-        Dim sSQL As String = "Select * from Buchung Where BID='" & sBid & "' and RID='" & sRNrID & "'"
+        Dim sSQL As String = "SELECT RDatum, RDSenden, Pausch, ZimID, ID FROM Buchung WHERE BID='" & sBid & "' AND RID='" & sRNrID & "'"
         Dim dt As DataTable = fcReadDataTable(sSQL)
-        Dim nMax As Integer = dt.Rows.Count - 1
-        sRdatum = dt.Rows(0).Item("RDatum") 'rechnungsdatum
-        sRDSenden = dt.Rows(0).Item("RDSenden").ToString.Trim
-        sPausch = dt.Rows(0).Item("Pausch").ToString.Trim
+
+        ' CRITICAL BUGFIX: Sofort abbrechen, wenn keine Daten gefunden wurden (verhindert Absturz bei dt.Rows(0))
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+
+        Dim firstRow As DataRow = dt.Rows(0)
+
+        ' 1. Stammdaten der Rechnung auslesen
+        sRdatum = Convert.ToString(firstRow("RDatum")).Trim()
+        sRDSenden = Convert.ToString(firstRow("RDSenden")).Trim()
+        sPausch = Convert.ToString(firstRow("Pausch")).Trim()
+
+        ' Pauschalierungsstatus prüfen
         If sPausch = "1" Then
             rbPausch.Checked = True
             nReArt = 4
         End If
 
-        If sRDSenden.Trim = "" Then
+        ' Zahlungsart (Bar) vorbelegen, falls Sendedatum leer ist
+        cbBar.Checked = String.IsNullOrWhiteSpace(sRDSenden)
 
-            cbBar.Checked = True
-        Else
-            cbBar.Checked = False
+        ' Rechnungsdatum validieren und dem DateTimePicker zuweisen
+        If String.IsNullOrWhiteSpace(sRdatum) Then
+            sRdatum = fcUmDatum(Date.Today)
         End If
-
-
-
-        If sRdatum.Trim = "" Then sRdatum = fcUmDatum(Date.Today)
         dtpRDatum.Value = fcUmDatum(sRdatum)
-        tbRNr.Text = sRNrID                                         'rechnungsnummer 
-        If tbRNr.Text.Trim = "" Then
+
+        ' Rechnungsnummer setzen oder neu generieren
+        tbRNr.Text = sRNrID.Trim()
+        If String.IsNullOrWhiteSpace(tbRNr.Text) Then
             bNewRNr = True
             sRNr = fcGetNr("RNr")
-            tbRNr.Text = Date.Today.Year & "-" & sRNr
+            tbRNr.Text = $"{Date.Today.Year}-{sRNr}"
         End If
 
+        ' 2. Zimmer-Array initialisieren (arZ)
         arZ(0, 0) = "99"
         arZ(0, 1) = "Weiteres Zimmer"
-        Dim n As Integer = 0
-        Dim i As Integer
-        If dt.Rows.Count > 0 Then
-            For i = 0 To dt.Rows.Count - 1
-                arZ(i + 1, 0) = dt.Rows(i).Item("ZimID").ToString
-                arZ(i + 1, 2) = dt.Rows(i).Item("ID").ToString
-                arZ(i + 1, 1) = " "
-            Next
-        End If
 
-        For i = 1 To 20
-            If arZ(i, 0) <> Nothing Then
-                arZ(i, 1) = fcGetObjektZimmerName(dtZim, arZ(i, 0)).Trim
-                If arZ(i, 1) <> "" Then
-                    chliZimmer.Items.Add(arZ(i, 1) & "[" & arZ(i, 2) & "]")
-                    chliZimmer.SetItemChecked(n, True)
-                    n += 1
-                End If
-            End If
+        ' Gefundene Zimmer in das Array übertragen
+        For i As Integer = 0 To dt.Rows.Count - 1
+            Dim row As DataRow = dt.Rows(i)
+            arZ(i + 1, 0) = Convert.ToString(row("ZimID"))
+            arZ(i + 1, 2) = Convert.ToString(row("ID"))
+            arZ(i + 1, 1) = " "
         Next
+
+        ' 3. CheckedListBox (chliZimmer) befüllen
+        chliZimmer.BeginUpdate()
+        Try
+            chliZimmer.Items.Clear() ' Vorherige Einträge löschen, um Dopplungen zu vermeiden
+            Dim n As Integer = 0
+
+            ' Array auswerten (Begrenzt auf max. 20 Einträge laut Ihrer Struktur)
+            For i As Integer = 1 To 20
+                If arZ(i, 0) IsNot Nothing Then
+                    arZ(i, 1) = fcGetObjektZimmerName(dtZim, arZ(i, 0)).Trim()
+
+                    If Not String.IsNullOrWhiteSpace(arZ(i, 1)) Then
+                        ' Eintrag hinzufügen (Format: Zimmername [ID])
+                        chliZimmer.Items.Add($"{arZ(i, 1)}[{arZ(i, 2)}]")
+                        chliZimmer.SetItemChecked(n, True)
+                        n += 1
+                    End If
+                End If
+            Next
+        Finally
+            chliZimmer.EndUpdate()
+        End Try
+
+        ' HINWEIS: Der Aufruf von prRefreshRechnungsPosition() wurde hier entfernt, 
+        ' da er im 'frmMain_Load' unmittelbar nach dieser Methode ohnehin aufgerufen wird.
+    End Sub
+
+    ''' <summary>
+    ''' Löst die Aktualisierung der Rechnungspositionen aus, sobald der Benutzer die Maustaste 
+    ''' über der Zimmer-Auswahlliste (chliZimmer) loslässt.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (chliZimmer).</param>
+    ''' <param name="e">Die Ereignisdaten mit den Mauskoordinaten.</param>
+    ''' <remarks>
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltetes 'Call'-Schlüsselwort entfernt.
+    ''' - XML-Dokumentation für Parameter vervollständigt.
+    ''' </remarks>
+    Private Sub chliZimmer_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles chliZimmer.MouseUp
         prRefreshRechnungsPosition()
     End Sub
 
     ''' <summary>
-    ''' Mit Loslassen der Maustaste Rechnungspositionen aktualisieren
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>
-    ''' 27.03.2012 Create
-    ''' </remarks>
-    Private Sub chliZimmer_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles chliZimmer.MouseUp
-        Call prRefreshRechnungsPosition()
-    End Sub
-
-    ''' <summary>
-    ''' Für jeden ausgewählten Eintrag die Rechnungsdaten laden
+    ''' Setzt die bestehenden Rechnungsdaten und Summen zurück und lädt für jedes in der Liste 
+    ''' aktivierte Zimmer die aktuellen Rechnungspositionen und Steuersätze neu.
     ''' </summary>
     ''' <remarks>
-    ''' 27.03.2012 Create
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltetes 'Call'-Schlüsselwort bei 'prAddRechnungsPosition' und 'prCalculateSumme' entfernt.
+    ''' - UI-Aktualisierung der ComboBox (coZimmer) und des Grids beschleunigt (BeginUpdate/EndUpdate), um Flackern zu minimieren.
+    ''' - Zuweisung des Initialwerts für 'lbAnzahlung' kaufmännisch sauber formatiert.
     ''' </remarks>
     Private Sub prRefreshRechnungsPosition()
+        ' Vorherige Zeilen und Steuerelemente leeren
         dgRechnung.Rows.Clear()
-        coZimmer.Items.Clear()
-        nGNetto = 0
-        nGBrutto = 0
-        nGSt7 = 0
-        nGSt19 = 0
-        nAnzahlung = 0
-        lbAnzahlung.Text = nAnzahlung
-        If chliZimmer.CheckedItems.Count = 0 Then Exit Sub
 
-        For Each item As Object In chliZimmer.CheckedItems
-            Call prAddRechnungsPosition(item.ToString())
-            coZimmer.Items.Add(item.ToString())
-        Next
-        Call prCalculateSumme()
+        ' UI-Zeichnen für die ComboBox temporär einfrieren (Performance-Schutz)
+        coZimmer.BeginUpdate()
+        Try
+            coZimmer.Items.Clear()
+
+            ' Globale Summen- und Anzahlungsspeicher zurücksetzen
+            nGNetto = 0
+            nGBrutto = 0
+            nGSt7 = 0
+            nGSt19 = 0
+            nAnzahlung = 0
+
+            ' Anzahlungs-Label zurücksetzen (Formatiert als Standard-Dezimalzahl)
+            lbAnzahlung.Text = nAnzahlung.ToString("F2")
+
+            ' Wenn kein Zimmer angehakt ist, brechen wir nach dem Leeren ab
+            If chliZimmer.CheckedItems.Count = 0 Then Exit Sub
+
+            ' Alle ausgewählten Zimmer durchlaufen und deren Positionen laden
+            For Each item As Object In chliZimmer.CheckedItems
+                If item IsNot Nothing Then
+                    Dim sItemText As String = item.ToString()
+                    prAddRechnungsPosition(sItemText)
+                    coZimmer.Items.Add(sItemText)
+                End If
+            Next
+        Finally
+            ' UI-Zeichnen wieder freigeben
+            coZimmer.EndUpdate()
+        End Try
+
+        ' Gesamtsumme der aktiven Positionen neu kalkulieren
+        prCalculateSumme()
     End Sub
 
     ''' <summary>
-    ''' Rechnungsposition zum GridView hinzufügen
+    ''' Bereitet eine Buchung sowie deren Zimmer- und Frühstücksinformationen auf und fügt diese als neue Position dem Rechnungs-GridView (dgRechnung) hinzu.
     ''' </summary>
-    ''' <param name="sZim"></param>
+    ''' <param name="sZim">Der rohe Zimmer-String, der die Buchungs-ID in eckigen Klammern enthält (z. B. "Zimmer 101 [1234]").</param>
     ''' <remarks>
-    ''' 27.03.2012 Create
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Doppelten Datenbankaufruf (fcReadDataTable + fcGetData) entfernt; Daten werden direkt aus der ersten Abfrage verwendet.
+    ''' - Veraltete 'Val()'-Funktion durch typsicheres 'Decimal.TryParse' bzw. 'Integer.TryParse' ersetzt.
+    ''' - Typkonvertierungen für Währungs- und Steuerberechnungen mathematisch präzisiert.
+    ''' - Unnötiges 'Call'-Schlüsselwort bei 'prGetExtrasZimmer' entfernt.
+    ''' - String-Bereinigung und Fehlerabsicherung bei potenziellen Leerwerten optimiert.
     ''' </remarks>
     Private Sub prAddRechnungsPosition(ByVal sZim As String)
         Dim arT() As String
@@ -290,148 +386,249 @@ Public Class frmRechnung
         Dim nRB As Decimal = 0
         Dim nRBF As Decimal = 0
         Dim nRBG As Decimal = 0
-        Dim nFr As Integer          'Anzahl Frühstück
+        Dim nFr As Integer = 0
+
+        ' IDs aus dem übergebenen Zimmer-String extrahieren
         Dim sID As String = Extract(sZim, "[", "]", 1)
         sZim = AtLeft(sZim, "[", 1)
         sZID = fcGetObjektZimmerID(dtZim, sZim, "ID")
-        Dim sSQL As String = "Select * from Buchung Where BID='" & sgRBID & "' and ID='" & sID & "'"
 
-        Dim dt As DataTable = fcReadDataTable(sSQL)
-        If dt.Rows.Count = 0 Then Exit Sub
+        Dim sSQL As String = "SELECT * FROM Buchung WHERE BID='" & sgRBID & "' AND ID='" & sID & "'"
 
+        ' OPTIMIERUNG: Wir holen die Felddaten direkt. Wenn das Array leer ist, gab es keine Zeilen.
         arT = fcGetData(sSQL, 0, {"Von", "Bis", "ZimID", "Personen", "Art", "Frueh", "Preis", "Anzahlung", "FPreis", "ID", "Storno", "Summe", "MwstU", "MwstS", "MwstG", "Gpreis", "GKU", "GKS", "GKG"})
-        arF = fcGetData("select * From Zimmer Where ID ='" & sZID & "'", 0, {"Name", "Art", "Ausstattung"})
+        If arT Is Nothing OrElse arT.Length = 0 Then Exit Sub
+
+        ' Zimmer-Stammdaten abrufen
+        arF = fcGetData("SELECT * FROM Zimmer WHERE ID ='" & sZID & "'", 0, {"Name", "Art", "Ausstattung"})
+
+        ' Zimmerart/Kategorie in das Buchungs-Array übertragen
         arT(2) = arF(1)
-        If Trim(arT(15)) = "" Then arT(15) = "0"
-        'Anzahl Tage
+
+        ' Absicherung für den Getränkepreis (Gpreis), falls dieser leer ist
+        If String.IsNullOrWhiteSpace(arT(15)) Then arT(15) = "0"
+
+        ' Anzahl der Aufenthaltstage ermitteln
         nTage = fcGetAnzahlTage(arT(0), arT(1))
-        nFr = Val(arT(5))
-        'Zimmer
-        nRB = Val(arT(6))
-        'Frühstück
+
+        ' Sicheres Parsen der numerischen Werte aus den DB-Strings (Ersetzt das unpräzise Val())
+        Integer.TryParse(arT(5), nFr)
+        Decimal.TryParse(arT(6), nRB)
+
+        ' Frühstücks- und Getränkeberechnung bei Ü/F
         If arT(4) = "Ü/F" Then
-            nRBF = Val(arT(8) * nFr) 'arIni(17)speise Frühstück
-            nRBG = Val(arT(15) * nFr) 'getränke
+            Dim nFPreis As Decimal = 0
+            Dim nGPreis As Decimal = 0
+
+            Decimal.TryParse(arT(8), nFPreis)
+            Decimal.TryParse(arT(15), nGPreis)
+
+            nRBF = nFPreis * nFr ' Speisenanteil Frühstück
+            nRBG = nGPreis * nFr ' Getränkeanteil Frühstück
+
+            ' Reiner Zimmerpreis abzüglich der darin enthaltenen Frühstücksanteile
             nRB = nRB - nRBF - nRBG
         End If
+
+        ' Globale Variablen für Steuersätze und Konten befüllen
         sSS7 = arT(12)
         sSS19 = arT(13)
         sSSS = arT(14)
         sGKU = arT(16)
         sGKS = arT(17)
         sGKG = arT(18)
-        arL = fcGetDataForRechnung(dgRechnung.Rows.Count, nTage, sZim, arT(2), nRB, nRBF, sSS7, sSS19, "0", arT(0), arT(1), arT(3), arT(4), arF(2), arT(8), arT(9), arT(10), arT(11), sSSS, arT(15))
+
+
+
+        ' VORBEREITUNG FÜR DEN FUNKTIONSAUFRUF:
+        ' Sicheres Parsen der Steuersätze, um leere Strings/Leerzeichen abzufangen
+        Dim nSteuer7Wert As Integer = 0
+        Dim nSteuer19Wert As Integer = 0
+        Dim nSteuerSWert As Integer = 0
+
+        ' Zuweisung & Parsen für MwstU (Steuer 7%)
+        sSS7 = arT(12)
+        Integer.TryParse(sSS7, nSteuer7Wert)
+
+        ' Zuweisung & Parsen für MwstS (Steuer 19%)
+        sSS19 = arT(13)
+        Integer.TryParse(sSS19, nSteuer19Wert)
+
+        ' Zuweisung & Parsen für MwstG (Sonstige Steuer)
+        sSSS = arT(14)
+        Integer.TryParse(sSSS, nSteuerSWert)
+
+        ' Konten-Strings bleiben unberührt
+        sGKU = arT(16)
+        sGKS = arT(17)
+        sGKG = arT(18)
+
+        ' AUFRUF DER FUNKTION MIT DEN REINEN ZAHLEN-VARIABLEN:
+        arL = fcGetDataForRechnung(dgRechnung.Rows.Count, nTage, sZim, arT(2), nRB, nRBF,
+                                   nSteuer7Wert, nSteuer19Wert, "0", arT(0), arT(1),
+                                   arT(3), arT(4), arF(2), arT(8), arT(9), arT(10),
+                                   arT(11), nSteuerSWert, arT(15))
         dgRechnung.Rows.Add(arL)
 
-        'Anzahlung
-        nAnzahlung += Val(arT(7)) / 100
+        ' Anzahlung kaufmännisch korrekt aufsummieren
+        Dim nAktuelleAnzahlung As Decimal = 0
+        Decimal.TryParse(arT(7), nAktuelleAnzahlung)
+        nAnzahlung += (nAktuelleAnzahlung / 100D)
 
-        'Extras
-        Call prGetExtrasZimmer(sgRBID, sZID)
-
+        ' Zusatzleistungen/Extras des Zimmers einlesen
+        prGetExtrasZimmer(sgRBID, sZID)
     End Sub
 
     ''' <summary>
-    ''' Anzahl der Tage ermitteln
+    ''' Berechnet die Anzahl der Aufenthaltstage zwischen einem Anreise- und Abreisedatum.
+    ''' Erhöht das Abreisedatum intern um einen Tag und ermittelt die mathematische Differenz.
     ''' </summary>
-    ''' <param name="sVon"></param>
-    ''' <param name="sBis"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <param name="sVon">Das Anreisedatum als Zeichenfolge (String).</param>
+    ''' <param name="sBis">Das Abreisedatum als Zeichenfolge (String).</param>
+    ''' <returns>Die Anzahl der Tage als formatierte Zeichenfolge (String). Bei Fehlern wird "0" zurückgegeben.</returns>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltete VB6-Befehle 'DateAdd' und 'DateDiff' durch native .NET-Arithmetik (.AddDays und .Subtract) ersetzt.
+    ''' - Rückgabe über den Funktionsnamen ('fcGetAnzahlTage =') durch das moderne 'Return'-Schlüsselwort abgelöst.
+    ''' - 'Date.TryParse' integriert, um Abstürze bei fehlerhaften Datumsformaten im System abzufangen.
+    ''' </remarks>
     Public Function fcGetAnzahlTage(ByVal sVon As String, ByVal sBis As String) As String
-        fcGetAnzahlTage = "0"
-        Dim dVon As Date = fcUmDatum(sVon)
-        Dim dBis As Date = fcUmDatum(sBis)
-        dBis = DateAdd(DateInterval.Day, 1, dBis)
-        fcGetAnzahlTage = DateDiff(DateInterval.Day, dVon, dBis)
+        Dim dVon As Date
+        Dim dBis As Date
+
+        ' Sicheres Parsen der Datums-Strings unter Einbeziehung Ihrer Konvertierungsfunktion fcUmDatum.
+        ' Falls das Format ungültig ist, wird sicher "0" zurückgegeben.
+        If Not Date.TryParse(fcUmDatum(sVon).ToString(), dVon) OrElse
+           Not Date.TryParse(fcUmDatum(sBis).ToString(), dBis) Then
+            Return "0"
+        End If
+
+        ' Abreisedatum kaufmännisch um einen Tag erhöhen
+        dBis = dBis.AddDays(1)
+
+        ' Differenz in Tagen über die TimeSpan berechnen (.Days gibt die Ganzzahl zurück)
+        Dim nTage As Integer = dBis.Subtract(dVon).Days
+
+        ' Rückgabe als String
+        Return nTage.ToString()
     End Function
 
     ''' <summary>
-    ''' Datensatz für Rechnungsposition zusammenstellen
+    ''' Berechnet die Netto-, Steuer- und Bruttobeträge für die verschiedenen Steuersätze einer Rechnungsposition 
+    ''' und stellt diese zusammen mit den Stammdaten als String-Array für das GridView bereit.
     ''' </summary>
-    ''' <param name="nPos"></param>
-    ''' <param name="nTage"></param>
-    ''' <param name="sZim"></param>
-    ''' <param name="sText"></param>
-    ''' <param name="nBrutto7"></param>
-    ''' <param name="nBrutto19"></param>
-    ''' <param name="nSteuer7"></param>
-    ''' <param name="nSteuer19"></param>
-    ''' <returns></returns>
+    ''' <param name="nPos">Die fortlaufende Positionsnummer der Zeile.</param>
+    ''' <param name="nTage">Anzahl der Aufenthaltstage.</param>
+    ''' <param name="sZim">Bezeichnung des Zimmers.</param>
+    ''' <param name="sText">Kategorie-/Zimmertext.</param>
+    ''' <param name="nBrutto7">Rohbetrag für den ermäßigten Steuersatz (z. B. Übernachtung).</param>
+    ''' <param name="nBrutto19">Rohbetrag für den vollen Steuersatz (z. B. Speisen/Frühstück).</param>
+    ''' <param name="nSteuer7">Der Prozentsatz der ermäßigten Steuer (z. B. 7).</param>
+    ''' <param name="nSteuer19">Der Prozentsatz der vollen Steuer (z. B. 19).</param>
+    ''' <param name="sZusatz">Kennzeichen für Zusatzleistungen ("0" für Standardübernachtung).</param>
+    ''' <param name="sVon">Anreisedatum.</param>
+    ''' <param name="sBis">Abreisedatum.</param>
+    ''' <param name="sPersonen">Anzahl der Personen als Zeichenfolge.</param>
+    ''' <param name="sArt">Verpflegungsart (z. B. Ü/F).</param>
+    ''' <param name="sAusstattung">Ausstattungsmerkmale des Zimmers.</param>
+    ''' <param name="fPreis">Frühstücks-Basispreis.</param>
+    ''' <param name="sID">Eindeutige Buchungszeilen-ID.</param>
+    ''' <param name="sStorno">Stornierungsstatus oder Kennzeichen.</param>
+    ''' <param name="sSumme">Vorgegebene Pauschalsumme bei Pauschalabrechnung.</param>
+    ''' <param name="nSteuerS">Sondersteuersatz (z. B. für Getränkeanteile).</param>
+    ''' <param name="nBruttoS">Rohbetrag des Sondersteuersatzes.</param>
+    ''' <returns>Ein stark typisiertes String-Array mit allen berechneten und formatierten Werten für die Tabellenzeile.</returns>
     ''' <remarks>
-    ''' 02.04.2012 Add Zusatz und Datum (von-bis)
+    ''' 02.04.2012 - Add Zusatz und Datum (von-bis)
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Rückgabetyp von 'Array' auf das typsichere 'String()' umgestellt.
+    ''' - Veraltete Zuweisung über Funktionsnamen durch 'Return' ersetzt.
+    ''' - Auskommentierte Berechnungsaltlasten im Rechenkern entfernt.
+    ''' - Fehleranfälliges 'Val()' durch 'Integer.TryParse' und 'Decimal.TryParse' ersetzt.
+    ''' - Datums-Arithmetik für das Abrechnungsdatum durch 'Date.TryParse' abgesichert.
     ''' </remarks>
-    Private Function fcGetDataForRechnung(ByVal nPos As Integer, ByVal nTage As Integer, _
-                                          ByVal sZim As String, ByVal sText As String, _
-                                          ByVal nBrutto7 As Decimal, ByVal nBrutto19 As Decimal, _
-                                          ByVal nSteuer7 As Integer, ByVal nSteuer19 As Integer, _
-                                          ByVal sZusatz As String, ByVal sVon As String, _
-                                          ByVal sBis As String, ByVal sPersonen As String, _
-                                          ByVal sArt As String, ByVal sAusstattung As String, _
-                                          ByVal fPreis As String, ByVal sID As String, _
-                                          ByVal sStorno As String, ByVal sSumme As String, _
-                                          ByVal nSteuerS As Integer, ByVal nBruttoS As Decimal) As Array
+    Private Function fcGetDataForRechnung(ByVal nPos As Integer, ByVal nTage As Integer,
+                                          ByVal sZim As String, ByVal sText As String,
+                                          ByVal nBrutto7 As Decimal, ByVal nBrutto19 As Decimal,
+                                          ByVal nSteuer7 As Integer, ByVal nSteuer19 As Integer,
+                                          ByVal sZusatz As String, ByVal sVon As String,
+                                          ByVal sBis As String, ByVal sPersonen As String,
+                                          ByVal sArt As String, ByVal sAusstattung As String,
+                                          ByVal fPreis As String, ByVal sID As String,
+                                          ByVal sStorno As String, ByVal sSumme As String,
+                                          ByVal nSteuerS As Integer, ByVal nBruttoS As Decimal) As String()
 
         Dim arL(18) As String
-        Dim nRB As Decimal = 0       'rb= Brutto
-        Dim nRBF As Decimal = 0
-        Dim nRBS As Decimal = 0
-        Dim nRN As Decimal = 0        'rn =netto
-        Dim nRNF As Decimal = 0
-        Dim nRNS As Decimal = 0
-        Dim nST As Decimal = 0         'Steuer
-        Dim nSTF As Decimal = 0
-        Dim nSTS As Decimal = 0
-        Dim nBruttoS1 As Decimal = nBruttoS * Val(sPersonen)  'Frühstück ?
+        Dim nRB As Decimal = 0       ' Brutto ermäßigt (7%)
+        Dim nRBF As Decimal = 0      ' Brutto voll (19%)
+        Dim nRBS As Decimal = 0      ' Brutto Sonder
+        Dim nRN As Decimal = 0       ' Netto ermäßigt
+        Dim nRNF As Decimal = 0      ' Netto voll
+        Dim nRNS As Decimal = 0      ' Netto Sonder
+        Dim nST As Decimal = 0       ' Steuer ermäßigt
+        Dim nSTF As Decimal = 0      ' Steuer voll
+        Dim nSTS As Decimal = 0      ' Steuer Sonder
+
+        ' Personenanzahl sicher ermitteln
+        Dim nPersonenCount As Integer = 0
+        Integer.TryParse(sPersonen, nPersonenCount)
+
+        Dim nBruttoS1 As Decimal = nBruttoS * nPersonenCount
+
+        ' 1. Standard-Berechnungen nach Steuersätzen getrennt
         If nBrutto7 > 0 Then
-            'nRN = Math.Round((nBrutto7 / 100) / (1 + nSteuer7 / 100), 2)
-            'nST = ((nBrutto7 / 100) - nRN) * nTage
-            'nRN = nRN * nTage
-            'nRB = (nBrutto7 * nTage) / 100
-            'nRN = nRN
-            nRB = (nBrutto7 * nTage) / 100
-            nRN = Math.Round((nRB) / (1 + nSteuer7 / 100), 2)
-            nST = nRB - nRN
-            'nRN = nRN
-            '            nRN = Math.Round(nRB / (1 + nSteuer7 / 100), 2)
-            '           nST = nRB - nRN
-        End If
-        If nBrutto19 > 0 Then
-            nRBF = (nBrutto19 * nTage) / 100
-            nRNF = Math.Round(nRBF / (1 + nSteuer19 / 100), 2)
-            nSTF = nRBF - nRNF
-        End If
-        If nBruttoS > 0 Then
-            nRBS = (nBruttoS1 * nTage) / 100
-            nRNS = Math.Round(nRBS / (1 + nSteuerS / 100), 2)
-            nSTS = nRBS - nRNS
-        End If
-        If nReArt = 4 Then
-            If nBruttoS > 0 Then   'Getränke
-                nRBS = (nBruttoS1 * nTage) / 100
-                nRNS = Math.Round(nRBS / (1 + nSteuerS / 100), 2)
-                nSTS = nRBS - nRNS
-            End If
-            If nBrutto19 > 0 Then   'Früschstück
-                nRBF = (nBrutto19 * nTage) / 100
-                nRNF = Math.Round(nRBF / (1 + nSteuer19 / 100), 2)
-                nSTF = nRBF - nRNF
-            End If
-            nRB = (sSumme / 100) - nRBS - nRBF
-            nRN = Math.Round(nRB / (1 + nSteuer7 / 100), 2)
+            nRB = (nBrutto7 * nTage) / 100D
+            nRN = Math.Round(nRB / (1D + (nSteuer7 / 100D)), 2, MidpointRounding.AwayFromZero)
             nST = nRB - nRN
         End If
 
-        arL(0) = nPos.ToString
+        If nBrutto19 > 0 Then
+            nRBF = (nBrutto19 * nTage) / 100D
+            nRNF = Math.Round(nRBF / (1D + (nSteuer19 / 100D)), 2, MidpointRounding.AwayFromZero)
+            nSTF = nRBF - nRNF
+        End If
+
+        If nBruttoS > 0 Then
+            nRBS = (nBruttoS1 * nTage) / 100D
+            nRNS = Math.Round(nRBS / (1D + (nSteuerS / 100D)), 2, MidpointRounding.AwayFromZero)
+            nSTS = nRBS - nRNS
+        End If
+
+        ' 2. Sonderlogik für Pauschalabrechnungen (nReArt = 4) überschreibt obige Werte kaskadierend
+        If nReArt = 4 Then
+            If nBruttoS > 0 Then
+                nRBS = (nBruttoS1 * nTage) / 100D
+                nRNS = Math.Round(nRBS / (1D + (nSteuerS / 100D)), 2, MidpointRounding.AwayFromZero)
+                nSTS = nRBS - nRNS
+            End If
+
+            If nBrutto19 > 0 Then
+                nRBF = (nBrutto19 * nTage) / 100D
+                nRNF = Math.Round(nRBF / (1D + (nSteuer19 / 100D)), 2, MidpointRounding.AwayFromZero)
+                nSTF = nRBF - nRNF
+            End If
+
+            Dim nÜbergabeSumme As Decimal = 0
+            Decimal.TryParse(sSumme, nÜbergabeSumme)
+            If nÜbergabeSumme > 0 Then
+                ' Der Übernachtungsanteil ergibt sich aus der Gesamtsumme abzüglich Verpflegung und Getränke
+                nRB = (nÜbergabeSumme / 100D) - nRBS - nRBF
+                nRN = Math.Round(nRB / (1D + (nSteuer7 / 100D)), 2, MidpointRounding.AwayFromZero)
+                nST = nRB - nRN
+            End If
+        End If
+
+        ' 3. Array-Befüllung für die Tabellenzeile
+        arL(0) = nPos.ToString()
         arL(1) = sZim
-        arL(2) = nTage.ToString
+        arL(2) = nTage.ToString()
         arL(3) = sText
-        arL(4) = fcFormatDecimal((nBrutto7 + nBrutto19 + nBruttoS1) / 100, 2)
-        arL(5) = fcFormatDecimal((nST).ToString, 2) '"Steuer"
-        arL(6) = fcFormatDecimal((nSTF).ToString, 2) '"Steuer" 
-        arL(7) = fcFormatDecimal((nSTS).ToString, 2) '"Steuer" 
-        arL(8) = fcFormatDecimal((nRN + nRNF + nRNS).ToString, 2) '"Netto" 
-        arL(9) = fcFormatDecimal((nRB + nRBF + nRBS).ToString, 2) '"Brutto"
+        arL(4) = fcFormatDecimal(((nBrutto7 + nBrutto19 + nBruttoS1) / 100D).ToString(), 2)
+        arL(5) = fcFormatDecimal(nST.ToString(), 2)  ' lbSteuer     ermäßigt
+        arL(6) = fcFormatDecimal(nSTF.ToString(), 2) ' lbSteuer     voll
+        arL(7) = fcFormatDecimal(nSTS.ToString(), 2) ' lbSteuer     Sonder
+        arL(8) = fcFormatDecimal((nRN + nRNF + nRNS).ToString(), 2) 'lbNetto
+        arL(9) = fcFormatDecimal((nRB + nRBF + nRBS).ToString(), 2) 'lbBrutto
         arL(10) = sZusatz
         arL(12) = sArt
         arL(13) = sAusstattung
@@ -439,88 +636,106 @@ Public Class frmRechnung
         arL(15) = sID
         arL(16) = sStorno
         arL(17) = sSumme
-        arL(18) = nBruttoS
-        If sZusatz = "0" Then
+        arL(18) = nBruttoS.ToString()
 
-            arL(11) = fcUmDatum(sVon) & " - " & CDate(fcUmDatum(sBis)).AddDays(1) & "#" & sPersonen
+        ' Datumsbereich für den Ausdruck aufbereiten
+        If sZusatz = "0" Then
+            Dim dBisDatum As Date
+            If Date.TryParse(fcUmDatum(sBis).ToString(), dBisDatum) Then
+                ' Native Addition des Abreisetzubaus statt CDate-Cast
+                arL(11) = $"{fcUmDatum(sVon)} - {dBisDatum.AddDays(1).ToShortDateString()}#{sPersonen}"
+            Else
+                arL(11) = $"{fcUmDatum(sVon)} - {fcUmDatum(sBis)}#{sPersonen}"
+            End If
         Else
             arL(11) = "-#-"
         End If
 
-        fcGetDataForRechnung = arL
+        Return arL
     End Function
 
 
-
-
     ''' <summary>
-    ''' Extras zum Zimmer laden
+    ''' Lädt alle gebuchten Zusatzleistungen (Extras) zu einem bestimmten Zimmer aus der Datenbank,
+    ''' schlüsselt sie nach den hinterlegten Steuersätzen auf und fügt sie dem Rechnungs-GridView hinzu.
     ''' </summary>
-    ''' <param name="sBID"></param>
-    ''' <param name="sZID"></param>
+    ''' <param name="sBID">Die eindeutige Buchungs-ID (BuchID).</param>
+    ''' <param name="sZID">Die eindeutige Zimmer-ID (ZimID).</param>
     ''' <remarks>
-    ''' 20.03.2012 Create
-    ''' 02.04.2012 Add Zusatz und Datum
+    ''' 20.03.2012 - Create
+    ''' 02.04.2012 - Add Zusatz und Datum
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Datentypen für Geldbeträge konsistent auf 'Decimal' umgestellt (Verhindert Rundungsfehler).
+    ''' - 'For Each'-Schleife implementiert und auskommentierte Code-Leichen vollständig entfernt.
+    ''' - 'DBNull'-Prüfungen für alle Datenbankfelder ergänzt, um Laufzeitabstürze zu vermeiden.
+    ''' - Steuersatz-Übergabe an 'fcGetDataForRechnung' an die erwarteten Integer-Typen angepasst.
     ''' </remarks>
     Private Sub prGetExtrasZimmer(ByVal sBID As String, ByVal sZID As String)
         Dim arL() As String
-        Dim nZusatz As Double = 0
-        Dim dt As DataTable = fcReadDataTable("Select * from Zusaetze Where BuchID='" & sBID & "' and ZimID ='" & sZID & "'")
-        If dt.Rows.Count = 0 Then Exit Sub
-        Dim nMax As Integer = dt.Rows.Count - 1
-        Dim nSumme As Double
-        Dim nMenge As Integer
-        Dim nSteuerSatz As Integer = 0
-        Dim sText As String
-        Dim sZim As String
-        Dim sST As String = "0"
-        Dim sSTF As String = "0"
-        Dim sSTS As String = "0"
-        Dim nRB As Decimal = 0
-        Dim nRBF As Decimal = 0
-        Dim nRBS As Decimal = 0
-        Dim sZuID As String
+        Dim dt As DataTable = fcReadDataTable("SELECT Betrag, Menge, Steuer, Bezeichnung, ZimNr, ID FROM Zusaetze WHERE BuchID='" & sBID & "' AND ZimID ='" & sZID & "'")
+
+        ' Sicherheitsprüfung, ob Zusatzleistungen vorhanden sind
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+
         Try
-            For i As Integer = 0 To nMax
-                sST = "0"
-                sSTF = "0"
-                sSTS = "0"
-                nRB = 0
-                nRBF = 0
-                nRBS = 0
-                If dt.Rows(i).RowState <> DataRowState.Deleted Then
-                    nSumme = dt.Rows(i).Item("Betrag") '/ 100
-                    nMenge = dt.Rows(i).Item("Menge")
-                    nSteuerSatz = dt.Rows(i).Item("Steuer")
-                    sText = dt.Rows(i).Item("Bezeichnung")
-                    sZim = dt.Rows(i).Item("ZimNr")
-                    sZuID = dt.Rows(i).Item("ID")
-                    Select Case nSteuerSatz
-                        Case arIni(11)
-                            sST = arIni(11)
+            For Each row As DataRow In dt.Rows
+                ' Gelöschte Datenzeilen im Speicher überspringen
+                If row.RowState <> DataRowState.Deleted Then
+
+                    ' Werte absturzsicher aus der DataRow auslesen
+                    Dim nSumme As Decimal = If(IsDBNull(row("Betrag")), 0D, Convert.ToDecimal(row("Betrag")))
+                    Dim nMenge As Integer = If(IsDBNull(row("Menge")), 0, Convert.ToInt32(row("Menge")))
+                    Dim sText As String = If(IsDBNull(row("Bezeichnung")), "", row("Bezeichnung").ToString())
+                    Dim sZim As String = If(IsDBNull(row("ZimNr")), "", row("ZimNr").ToString())
+                    Dim sZuID As String = If(IsDBNull(row("ID")), "", row("ID").ToString())
+
+                    ' Roh-Steuersatz aus der DB lesen (wird als numerischer Wert oder String erwartet)
+                    Dim nSteuerSatzRaw As Integer = 0
+                    If Not IsDBNull(row("Steuer")) Then Integer.TryParse(row("Steuer").ToString(), nSteuerSatzRaw)
+
+                    ' Variablen für die steuerliche Aufteilung initialisieren
+                    Dim nSteuer7 As Integer = 0
+                    Dim nSteuer19 As Integer = 0
+                    Dim nSteuerS As Integer = 0
+
+                    Dim nRB As Decimal = 0   ' Netto/Brutto-Anteil 7%
+                    Dim nRBF As Decimal = 0  ' Netto/Brutto-Anteil 19%
+                    Dim nRBS As Decimal = 0  ' Netto/Brutto-Anteil Sonder
+
+                    ' Hilfsvariablen für den INI-Vergleich parsen
+                    Dim ini11 As Integer = 0
+                    Dim ini10 As Integer = 0
+                    Dim ini23 As Integer = 0
+
+                    If arIni(11) IsNot Nothing Then Integer.TryParse(arIni(11).ToString(), ini11)
+                    If arIni(10) IsNot Nothing Then Integer.TryParse(arIni(10).ToString(), ini10)
+                    If arIni(23) IsNot Threading.Thread.CurrentThread.CurrentCulture.NumberFormat Then Integer.TryParse(arIni(23).ToString(), ini23)
+
+                    ' Aufteilung anhand des Steuersatzes vornehmen
+                    Select Case nSteuerSatzRaw
+                        Case ini11
+                            nSteuer7 = ini11
                             nRB = nSumme
-                        Case arIni(10)
-                            sSTF = arIni(10)
+                        Case ini10
+                            nSteuer19 = ini10
                             nRBF = nSumme
-                        Case arIni(23)
-                            sSTS = arIni(23)
+                        Case ini23
+                            nSteuerS = ini23
                             nRBS = nSumme
+                        Case Else
+                            ' Fallback, falls der Steuersatz nicht in der INI definiert ist
+                            nSteuer7 = nSteuerSatzRaw
+                            nRB = nSumme
                     End Select
-                    'If nSteuerSatz = arIni(11) Then
-                    '    sST = arIni(11)
-                    '    nRB = nSumme
-                    'ElseIf nSteuerSatz = arIni(10) Then
-                    '    sSTF = arIni(10)
-                    '    nRBF = nSumme
-                    'End If
 
+                    ' Datensatz über die kaufmännische Funktion aufbereiten
+                    ' sZusatz wird als "1" übergeben, Datumsfelder bleiben für Extras leer ("")
+                    arL = fcGetDataForRechnung(dgRechnung.Rows.Count, nMenge, sZim, sText, nRB, nRBF,
+                                               nSteuer7, nSteuer19, "1", "", "", "", "", "",
+                                               nSteuerSatzRaw.ToString(), sZuID, "", "", nSteuerS, nRBS)
 
-                    arL = fcGetDataForRechnung(dgRechnung.Rows.Count, nMenge, sZim, sText, nRB, nRBF, sST, sSTF, "1", "", "", "", "", "", nSteuerSatz, sZuID, "", "", nRBS, sSTS)
-
+                    ' Zeile dem Grid hinzufügen
                     dgRechnung.Rows.Add(arL)
-                    'arL = fcGetDataForRechnung(dgRechnung.Rows.Count, nMenge, sZim, sText, nSumme * 100, nSteuerSatz, "1", "", "")
-                    'dgRechnung.Rows.Add(arL)
-
                 End If
             Next
         Catch ex As Exception
@@ -528,34 +743,28 @@ Public Class frmRechnung
         End Try
     End Sub
 
-    Private Sub rbExtraORe_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbExtraORe.CheckedChanged
+    ''' <summary>
+    ''' Zentraler Eventhandler für alle Rechnungsart-Optionen. 
+    ''' Ermittelt die gewählte Rechnungsart dynamisch aus der Tag-Eigenschaft des RadioButtons.
+    ''' </summary>
+    Private Sub RechnungsArt_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
+        Handles rbExtraORe.CheckedChanged, rbExtraMRe.CheckedChanged, rbExtraGRe.CheckedChanged, rbStorno.CheckedChanged, rbPausch.CheckedChanged
 
-        nReArt = 0
-        Call prRefreshRechnungsPosition()
+        Dim rb As RadioButton = DirectCast(sender, RadioButton)
+
+        ' Nur reagieren, wenn der RadioButton aktiv gesetzt wurde und ein gültiger Tag vorhanden ist
+        If rb.Checked AndAlso rb.Tag IsNot Nothing Then
+            Dim nGewaehlteArt As Integer = 0
+            If Integer.TryParse(rb.Tag.ToString(), nGewaehlteArt) Then
+                nReArt = nGewaehlteArt
+                prRefreshRechnungsPosition()
+            End If
+        End If
     End Sub
 
-    Private Sub rbExtraMRe_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbExtraMRe.CheckedChanged
-
-        nReArt = 1
-         Call prRefreshRechnungsPosition()
-    End Sub
-
-    Private Sub rbExtraGRe_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbExtraGRe.CheckedChanged
-
-        nReArt = 2
-        Call prRefreshRechnungsPosition()
-    End Sub
-    Private Sub rbStorno_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbStorno.CheckedChanged
-
-        nReArt = 3
-        Call prRefreshRechnungsPosition()
-    End Sub
-
-    Private Sub rbPausch_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbPausch.CheckedChanged
-        nReArt = 4
-        Call prRefreshRechnungsPosition()
-    End Sub
-
+    ''' <summary>
+    ''' Schließt das aktuelle Formular.
+    ''' </summary>
     Private Sub btClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btClose.Click
         Me.Close()
     End Sub
@@ -565,73 +774,122 @@ Public Class frmRechnung
 #Region "Einzelne Rechnungsposition bearbeiten oder hinzufügen....................................."
 
     ''' <summary>
-    ''' Mit Doppelclick Daten zum Bearbeiten auswählen
+    ''' Ermöglicht das Auswählen einer Rechnungsposition per Doppelklick, um deren Daten 
+    ''' in die Bearbeitungsmaske (Eingabefelder und Steuerlabels) zu übernehmen.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (dgRechnung).</param>
+    ''' <param name="e">Die Ereignisdaten mit den Zeilen- und Spaltenindizes.</param>
     ''' <remarks>
-    ''' 27.03.2012 Create
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Kritischen Index-Fehler bei Klick auf Spaltenköpfe (e.RowIndex = -1) abgefangen.
+    ''' - Absturzsichere String-Wandlung via 'Convert.ToString()' implementiert (fängt DBNull/Nothing ab).
+    ''' - Logik zur Steuersatz-Ermittlung (Spalte 5 vs 6) strukturiert und lesbarer gestaltet.
+    ''' - Fehlerhafter leerer Catch-Block entfernt bzw. für die Fehleranalyse vorbereitet.
     ''' </remarks>
     Private Sub dgRechnung_CellDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgRechnung.CellDoubleClick
-        Dim nSumme As Double = 0
+        ' CRITICAL BUGFIX: Klicks auf den Spaltenkopf (-1) oder außerhalb abfangen
+        If e.RowIndex < 0 Then Exit Sub
+
         Try
-            With dgRechnung.Rows(e.RowIndex)
-                'tbPos.Text = .Cells(0).Value
-                If .Cells(0).Value <> "" And .Cells(9).Value = "1" Then
-                    tbPos.Text = .Cells(0).Value
-                    tbPos.Enabled = False
-                    tbText.Enabled = False
-                    coZimmer.Enabled = False
-                    coZimmer.Text = .Cells(1).Value
-                    tbMenge.Text = .Cells(2).Value
-                    tbText.Text = .Cells(3).Value
-                    tbBetrag.Text = .Cells(4).Value
-                    nSumme = .Cells(5).Value
-                    If nSumme > 0 Then
-                        lbSteuer.Text = .Cells(5).Value
-                        coSteuer.Text = arIni(11)
-                    Else
-                        nSumme = .Cells(6).Value
-                        If nSumme > 0 Then
-                            lbSteuer.Text = .Cells(6).Value
-                            coSteuer.Text = arIni(10)
-                        Else
-                            lbSteuer.Text = "0,00"
-                            coSteuer.Text = "0"
-                        End If
-                    End If
-                    lbNetto.Text = .Cells(7).Value
-                    lbBrutto.Text = .Cells(8).Value
-                    lbZusatz.Text = .Cells(9).Value
-                    lbVon.Text = AtLeft(.Cells(10).Value, "-", 1)
-                    lbBis.Text = AtRight(.Cells(10).Value, "-", 1)
+            Dim row As DataGridViewRow = dgRechnung.Rows(e.RowIndex)
 
+            ' Zellwerte sicher in Strings konvertieren, um Fehler durch DBNull zu vermeiden
+            Dim sPos As String = Convert.ToString(row.Cells(0).Value).Trim()
+            Dim sZusatz As String = Convert.ToString(row.Cells(10).Value).Trim() ' ACHTUNG: Index 9 im alten Code entsprach der 10. Spalte (.Cells(10)) laut prSetTabelleRechnung
+
+            ' Prüfung: Position darf nicht leer sein und es muss sich um eine Zusatzleistung handeln
+            If Not String.IsNullOrWhiteSpace(sPos) AndAlso sZusatz = "1" Then
+
+                ' 1. Eingabefelder sperren und Text zuweisen
+                tbPos.Text = sPos
+                tbPos.Enabled = False
+                tbText.Enabled = False
+                coZimmer.Enabled = False
+
+                coZimmer.Text = Convert.ToString(row.Cells(1).Value)
+                tbMenge.Text = Convert.ToString(row.Cells(2).Value)
+                tbText.Text = Convert.ToString(row.Cells(3).Value)
+                tbBetrag.Text = Convert.ToString(row.Cells(4).Value)
+
+                ' 2. Steuersatz ermitteln (Auswertung der berechneten Steuerfelder)
+                Dim nSteuer7 As Double = 0
+                Dim nSteuer19 As Double = 0
+
+                ' Werte parsen, um mathematisch sauber auf "> 0" prüfen zu können
+                Double.TryParse(Convert.ToString(row.Cells(5).Value), nSteuer7)
+                Double.TryParse(Convert.ToString(row.Cells(6).Value), nSteuer19)
+
+                If nSteuer7 > 0 Then
+                    lbSteuer.Text = nSteuer7.ToString("F2")
+                    coSteuer.Text = Convert.ToString(arIni(11))
+                ElseIf nSteuer19 > 0 Then
+                    lbSteuer.Text = nSteuer19.ToString("F2")
+                    coSteuer.Text = Convert.ToString(arIni(10))
+                Else
+                    lbSteuer.Text = "0,00"
+                    coSteuer.Text = "0"
                 End If
-            End With
-        Catch ex As Exception
 
+                ' 3. Restliche kaufmännische Werte und Datumsbereiche zuweisen
+                lbNetto.Text = Convert.ToString(row.Cells(7).Value)
+                lbBrutto.Text = Convert.ToString(row.Cells(8).Value)
+                lbZusatz.Text = sZusatz
+
+                ' Datumsangaben extrahieren (Spalte 11 laut prSetTabelleRechnung, Index 11)
+                Dim sZeitraum As String = Convert.ToString(row.Cells(11).Value)
+                lbVon.Text = AtLeft(sZeitraum, "-", 1).Trim()
+                lbBis.Text = AtRight(sZeitraum, "-", 1).Trim()
+
+            End If
+
+        Catch ex As Exception
+            ' Fehler im Logbuch vermerken, statt ihn lautlos zu verschlucken
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
         End Try
     End Sub
 
-    Private Sub tbMenge_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbMenge.TextChanged
-        Call prNewCalculatePosition()
-    End Sub
+    ''' <summary>
+    ''' Löst eine automatische Live-Neuberechnung der aktuellen Rechnungsposition (prNewCalculatePosition) aus, 
+    ''' sobald der Benutzer die Menge (tbMenge), den Betrag (tbBetrag) oder den Steuersatz (coSteuer) ändert.
+    ''' </summary>
+    ''' <param name="sender">Das Steuerelement, das das Ereignis ausgelöst hat (tbMenge, tbBetrag oder coSteuer).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltetes 'Call'-Schlüsselwort beim Aufruf von 'prNewCalculatePosition' entfernt.
+    ''' - XML-Dokumentation für eine bessere Code-Verständlichkeit und Konformität erweitert.
+    ''' </remarks>
+    Private Sub tbMenge_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
+        Handles tbMenge.TextChanged, tbBetrag.TextChanged, coSteuer.SelectedIndexChanged
 
-    Private Sub tbBetrag_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBetrag.TextChanged
-        Call prNewCalculatePosition()
-    End Sub
-
-    Private Sub coSteuer_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles coSteuer.SelectedIndexChanged
-        Call prNewCalculatePosition()
+        prNewCalculatePosition()
     End Sub
 
     ''' <summary>
-    ''' Rechnungsposition neu kalkulieren
+    ''' Kalkuliert eine einzelne Rechnungsposition live während der Eingabe neu.
+    ''' Teilt den Betrag anhand des gewählten Steuersatzes auf und aktualisiert die Netto-, Brutto- und Steuerlabels.
     ''' </summary>
     ''' <remarks>
-    ''' 27.03.2012 Create
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Störenden UI-Eingriff entfernt (tbMenge.Text = 0 blockiert die Tastatureingabe beim Löschen).
+    ''' - Veraltete 'Val()'-Funktion durch präzise Typ-Parser ('Decimal.TryParse', 'Integer.TryParse') ersetzt.
+    ''' - Zuordnung der Steuer-Ergebnislabels am Ende dynamisiert und mit dem oberen Select Case synchronisiert.
+    ''' - Auskommentierte Code-Fragmente entfernt.
+    ''' - Kaufmännische Multiplikation über das Decimal-Literal (100D) abgesichert.
     ''' </remarks>
     Private Sub prNewCalculatePosition()
+        ' Sicheres Parsen der Eingabewerte, ohne direkt in die UI-Felder einzugreifen
+        Dim nMenge As Integer = 0
+        Integer.TryParse(tbMenge.Text, nMenge)
+
+        Dim nEingabeBetrag As Decimal = 0
+        Decimal.TryParse(tbBetrag.Text, nEingabeBetrag)
+
+        Dim nPos As Integer = 0
+        Integer.TryParse(tbPos.Text, nPos)
+
         Dim nRB As Decimal = 0
         Dim nRBF As Decimal = 0
         Dim nRBS As Decimal = 0
@@ -639,48 +897,89 @@ Public Class frmRechnung
         Dim nSTF As Decimal = 0
         Dim nSTS As Decimal = 0
         Dim arL() As String
-        Select Case coSteuer.Text
-            Case arIni(11)
-                nRB = Val(tbBetrag.Text) * 100
-                nST = Val(coSteuer.Text)
-            Case arIni(10)
-                nRBF = Val(tbBetrag.Text) * 100
-                nSTF = Val(coSteuer.Text)
-            Case arIni(23)
-                nRBS = Val(tbBetrag.Text) * 100
-                nSTS = Val(coSteuer.Text)
+
+        ' Steuersatz aus der ComboBox parsen
+        Dim nGewaehlterSteuerSatz As Integer = 0
+        Integer.TryParse(coSteuer.Text, nGewaehlterSteuerSatz)
+
+        ' INI-Vergleichswerte parsen
+        Dim ini11 As Integer = 0
+        Dim ini10 As Integer = 0
+        Dim ini23 As Integer = 0
+
+        If arIni(11) IsNot Nothing Then Integer.TryParse(arIni(11).ToString(), ini11)
+        If arIni(10) IsNot Nothing Then Integer.TryParse(arIni(10).ToString(), ini10)
+        If arIni(23) IsNot Nothing Then Integer.TryParse(arIni(23).ToString(), ini23)
+
+        ' Aufteilung anhand der Steuersatzdefinitionen aus der INI vornehmen
+        Select Case nGewaehlterSteuerSatz
+            Case ini11
+                nRB = nEingabeBetrag * 100D
+                nST = nGewaehlterSteuerSatz
+            Case ini10
+                nRBF = nEingabeBetrag * 100D
+                nSTF = nGewaehlterSteuerSatz
+            Case ini23
+                nRBS = nEingabeBetrag * 100D
+                nSTS = nGewaehlterSteuerSatz
+            Case Else
+                ' Fallback, falls ein abweichender Steuersatz direkt eingegeben wurde
+                nRB = nEingabeBetrag * 100D
+                nST = nGewaehlterSteuerSatz
         End Select
-        'If coSteuer.Text = "7" Then
-        '    nRB = Val(tbBetrag.Text) * 100
-        '    nST = Val(coSteuer.Text)
-        'Else
-        '    nRBF = Val(tbBetrag.Text) * 100
-        '    nSTF = Val(coSteuer.Text)
-        'End If
 
-        arL = fcGetDataForRechnung(Val(tbPos.Text), Val(tbMenge.Text), coZimmer.Text, tbText.Text, nRB, nRBF, nST, nSTF, "1", lbVon.Text, lbBis.Text, "", "", "", "", "", "", "", nSTS, nRBS)
+        ' Berechnung über die kaufmännische Funktion ausführen
+        ' sZusatz wird als "1" übergeben, Datumsfelder werden mit den Labels befüllt
+        arL = fcGetDataForRechnung(nPos, nMenge, coZimmer.Text, tbText.Text, nRB, nRBF,
+                                   Convert.ToInt32(nST), Convert.ToInt32(nSTF), "1",
+                                   lbVon.Text, lbBis.Text, "", "", "", "", "", "", "",
+                                   Convert.ToInt32(nSTS), nRBS)
 
-        If coSteuer.Text = "7" Then
-            lbSteuer.Text = arL(5)
-        Else
-            lbSteuer.Text = arL(6)
+        ' Sicherheitsprüfung, ob das Array korrekt generiert wurde
+        If arL IsNot Nothing AndAlso arL.Length > 9 Then
+            ' Dynamische Anzeige der berechneten Steuer im Steuerlabel
+            Select Case nGewaehlterSteuerSatz
+                Case ini11
+                    lbSteuer.Text = arL(5) ' Steuerwert ermäßigt (7%)
+                Case ini10
+                    lbSteuer.Text = arL(6) ' Steuerwert voll (19%)
+                Case ini23
+                    lbSteuer.Text = arL(7) ' Steuerwert Sonder
+                Case Else
+                    lbSteuer.Text = arL(5)
+            End Select
+
+            ' Zuweisung der summierten Netto- und Bruttowerte aus dem Array
+            lbNetto.Text = arL(8)
+            lbBrutto.Text = arL(9)
         End If
-        lbNetto.Text = arL(7)
-        lbBrutto.Text = arL(8)
     End Sub
 
     ''' <summary>
-    ''' Rechnungsposition in GridView einfügen / überschreiben
+    ''' Verarbeitet das Speichern einer Rechnungsposition. Erstellt entweder eine neue Position am Ende 
+    ''' der Tabelle (falls tbPos leer ist) oder überschreibt die bestehende Zeile im GridView mit den geänderten Daten.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (btPosSpeichern).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 27.03.2012 Create
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Kritischen Logik- und Absturzfehler behoben: Reihenfolge beim Hinzufügen neuer Zeilen korrigiert.
+    ''' - Veraltetes 'Call'-Schlüsselwort bei den Prozeduraufrufen entfernt.
+    ''' - Fehleranfälliges 'Val()' durch typsichere .NET-Parser ersetzt.
+    ''' - Zuweisung der Steuerwerte im Update-Zweig mit dynamischen INI-Variablen synchronisiert.
+    ''' - Indizierung für neue Zeilen logisch abgesichert.
     ''' </remarks>
     Private Sub btPosSpeichern_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btPosSpeichern.Click
-        Dim nPos As Integer = Val(tbPos.Text)
-        If tbPos.Text = "" Then    'neu
+        Dim nPos As Integer = 0
+
+        ' Wenn das Positionsfeld leer ist, handelt es sich um eine Neuanlage
+        If String.IsNullOrWhiteSpace(tbPos.Text) Then
             lNew = True
+
+            ' Die neue Positionsnummer entspricht der aktuellen Zeilenanzahl
+            nPos = dgRechnung.Rows.Count
+            tbPos.Text = nPos.ToString()
 
             Dim nRB As Decimal = 0
             Dim nRBF As Decimal = 0
@@ -689,214 +988,381 @@ Public Class frmRechnung
             Dim nSTF As Decimal = 0
             Dim nSTS As Decimal = 0
             Dim arL() As String
-            Select Case coSteuer.Text
-                Case arIni(11)
-                    nRB = Val(tbBetrag.Text) * 100
-                    nST = Val(coSteuer.Text)
-                Case arIni(10)
-                    nRBF = Val(tbBetrag.Text) * 100
-                    nSTF = Val(coSteuer.Text)
-                Case arIni(23)
-                    nRBS = Val(tbBetrag.Text) * 100
-                    nSTS = Val(coSteuer.Text)
+
+            ' Steuersatz aus der ComboBox parsen
+            Dim nGewaehlterSteuerSatz As Integer = 0
+            Integer.TryParse(coSteuer.Text, nGewaehlterSteuerSatz)
+
+            ' INI-Steuersätze parsen
+            Dim ini11 As Integer = 0
+            Dim ini10 As Integer = 0
+            Dim ini23 As Integer = 0
+
+            If arIni(11) IsNot Nothing Then Integer.TryParse(arIni(11).ToString(), ini11)
+            If arIni(10) IsNot Nothing Then Integer.TryParse(arIni(10).ToString(), ini10)
+            If arIni(23) IsNot Nothing Then Integer.TryParse(arIni(23).ToString(), ini23)
+
+            ' Betrag für kaufmännische Berechnung einlesen
+            Dim nEingabeBetrag As Decimal = 0
+            Decimal.TryParse(tbBetrag.Text, nEingabeBetrag)
+
+            Select Case nGewaehlterSteuerSatz
+                Case ini11
+                    nRB = nEingabeBetrag * 100D
+                    nST = nGewaehlterSteuerSatz
+                Case ini10
+                    nRBF = nEingabeBetrag * 100D
+                    nSTF = nGewaehlterSteuerSatz
+                Case ini23
+                    nRBS = nEingabeBetrag * 100D
+                    nSTS = nGewaehlterSteuerSatz
+                Case Else
+                    nRB = nEingabeBetrag * 100D
+                    nST = nGewaehlterSteuerSatz
             End Select
-           
-            dgRechnung.Rows(nPos).Cells(13).Value = coSteuer.Text
-            tbPos.Text = dgRechnung.Rows.Count
-            arL = fcGetDataForRechnung(Val(tbPos.Text), Val(tbMenge.Text), coZimmer.Text, tbText.Text, nRB, nRBF, nST, nSTF, "1", lbVon.Text, lbBis.Text, "", "", "", "", "", "", "", nSTS, nRBS)
 
+            Dim nMenge As Integer = 0
+            Integer.TryParse(tbMenge.Text, nMenge)
 
-          
+            ' Daten-Array über Hilfsfunktion generieren
+            arL = fcGetDataForRechnung(nPos, nMenge, coZimmer.Text, tbText.Text, nRB, nRBF,
+                                       Convert.ToInt32(nST), Convert.ToInt32(nSTF), "1",
+                                       lbVon.Text, lbBis.Text, "", "", "", "", "", "", "",
+                                       Convert.ToInt32(nSTS), nRBS)
+
+            ' Zeile dem GridView hinzufügen
             dgRechnung.Rows.Add(arL)
 
+            ' BUGFIX: Erst nachdem die Zeile existiert, kann der Steuersatz-Text (Spalte 13) zugewiesen werden
+            dgRechnung.Rows(nPos).Cells(13).Value = coSteuer.Text
+
         Else
+            ' Bestehenden Datensatz aktualisieren
             lNew = False
-            With dgRechnung
-                .Rows(nPos).Cells(0).Value = tbPos.Text
-                .Rows(nPos).Cells(1).Value = coZimmer.Text
-                .Rows(nPos).Cells(2).Value = tbMenge.Text
-                .Rows(nPos).Cells(3).Value = tbText.Text
-                .Rows(nPos).Cells(4).Value = tbBetrag.Text
-                .Rows(nPos).Cells(13).Value = coSteuer.Text
-                If coSteuer.Text = arIni(11) Then
-                    .Rows(nPos).Cells(5).Value = lbSteuer.Text
-                    .Rows(nPos).Cells(6).Value = "0,00"
+            Integer.TryParse(tbPos.Text, nPos)
 
-                ElseIf coSteuer.Text = arIni(10) Then
-                    .Rows(nPos).Cells(5).Value = "0,00"
-                    .Rows(nPos).Cells(6).Value = lbSteuer.Text
+            ' Sicherheitsprüfung, ob der Index im gültigen Bereich liegt
+            If nPos >= 0 AndAlso nPos < dgRechnung.Rows.Count Then
+                With dgRechnung.Rows(nPos)
+                    .Cells(0).Value = tbPos.Text
+                    .Cells(1).Value = coZimmer.Text
+                    .Cells(2).Value = tbMenge.Text
+                    .Cells(3).Value = tbText.Text
+                    .Cells(4).Value = tbBetrag.Text
+                    .Cells(13).Value = coSteuer.Text
 
-                Else
-                    .Rows(nPos).Cells(5).Value = "0,00"
-                    .Rows(nPos).Cells(6).Value = "0,00"
+                    ' Steuerwerte anhand der INI-Definitionen aufteilen
+                    If coSteuer.Text = Convert.ToString(arIni(11)) Then
+                        .Cells(5).Value = lbSteuer.Text
+                        .Cells(6).Value = "0,00"
+                    ElseIf coSteuer.Text = Convert.ToString(arIni(10)) Then
+                        .Cells(5).Value = "0,00"
+                        .Cells(6).Value = lbSteuer.Text
+                    Else
+                        .Cells(5).Value = "0,00"
+                        .Cells(6).Value = "0,00"
+                    End If
 
-                End If
-                .Rows(nPos).Cells(7).Value = lbNetto.Text
-                .Rows(nPos).Cells(8).Value = lbBrutto.Text
-            End With
+                    .Cells(7).Value = lbNetto.Text
+                    .Cells(8).Value = lbBrutto.Text
+                End With
+            End If
         End If
+
+        ' Backend-Speicherung und Aktualisierung der Gesamtsummen
         prSaveZusatz(nPos)
-        Call prCalculateSumme()
-        Call prClearEingabe()
+        prCalculateSumme()
+        prClearEingabe()
     End Sub
+
+    '''' <summary>
+    '''' Speicherung durchführen
+    '''' </summary>
+    '''' <remarks>
+    '''' 18.12.2011 Create
+    '''' </remarks>
+    'Private Sub prSaveZusatz(ByRef nPos As Integer)
+    '    Dim sb As New StringBuilder
+    '    Dim sqlText As String = ""
+    '    Dim arFields(0), arValue(0) As String
+    '    Dim cBedingung As String = ""
+    '    Dim sID As String = ""
+    '    sID = dgRechnung.Rows(nPos).Cells(14).Value
+    '    If lNew Then
+    '        sID = fcGetTimeID(Date.Today)
+    '        dgRechnung.Rows(nPos).Cells(14).Value = sID
+    '    End If
+
+    '    Dim nSumme As Double = 0
+    '    Try
+
+    '        sqlText = "ID,BuchID,ZimID,Menge,Bezeichnung,Betrag,Steuer,Gesamt,Datum,ZimNr,Name"
+    '        arFields = Split(sqlText, ",")
+    '        sqlText = fcSaveZusatz(sID)
+    '        arValue = Split(sqlText, "°")
+
+    '        If lNew Then
+    '            Call fcInsertCommand("Zusaetze", arFields, arValue)
+    '        Else
+    '            cBedingung = " WHERE ID='" & sID & "'"
+    '            Call fcUpdateCommand("Zusaetze", arFields, arValue, cBedingung)
+    '        End If
+    '        ''DataTable aktualisieren
+    '        'If lNew Then
+    '        '    'Datensatz in DataTable "dtZ" speichern
+    '        '    Call fcInsertTable(dtZ, arFields, arValue)
+    '        'Else
+    '        '    'Datensatz in DataTable "dtZ" speichern
+    '        '    cBedingung = "ID Like '" & sID & "'"
+    '        '    Call fcUpdateTable(dtZ, arFields, arValue, cBedingung)
+    '        'End If
+
+    '        'Call prFuelleTabelleZusatz(dtZ)
+
+    '        lNew = False
+
+    '    Catch ex As Exception
+    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
+    '    Finally
+    '        ''Call prLoadObjInList(dtObj)
+    '        'Call prLoockZusatz(False)
+    '        lNew = False
+
+    '    End Try
+    'End Sub
+
     ''' <summary>
-    ''' Speicherung durchführen
+    ''' Speichert die Zusatzleistung (Extra) entweder als neuen Datensatz (INSERT) oder 
+    ''' aktualisiert einen bestehenden Eintrag (UPDATE) in der Datenbank-Tabelle "Zusaetze".
     ''' </summary>
+    ''' <param name="nPos">Der Zeilenindex der betroffenen Position im DataGridView.</param>
     ''' <remarks>
-    ''' 18.12.2011 Create
+    ''' 18.12.2011 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Kritischen Spaltenindex-Bug behoben: 'sID' von Index 14 auf den korrekten Index 15 verschoben ('FPreis' liegt auf 14).
+    ''' - Veraltete 'Split()'-Funktionen (VB6-Stil) durch performante String-Arrays ersetzt.
+    ''' - Unbenutzte Objekte ('StringBuilder', 'nSumme') zur Ressourceneinsparung entfernt.
+    ''' - Veraltetes 'Call'-Schlüsselwort entfernt.
+    ''' - Variable 'nPos' von gefährlichem 'ByRef' auf das sicherere 'ByVal' umgestellt.
     ''' </remarks>
-    Private Sub prSaveZusatz(ByRef nPos As Integer)
-        Dim sb As New StringBuilder
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
+    Private Sub prSaveZusatz(ByVal nPos As Integer)
+        ' Sicherheitsprüfung, ob der übergebene Index im gültigen Bereich der Tabellenzeilen liegt
+        If nPos < 0 OrElse nPos >= dgRechnung.Rows.Count Then Exit Sub
+
+        Dim arFields() As String
+        Dim arValue() As String
         Dim cBedingung As String = ""
-        Dim sID As String = ""
-        sID = dgRechnung.Rows(nPos).Cells(14).Value
+
+        ' BUGFIX: sID liegt laut prSetTabelleRechnung auf Index 15. Index 14 enthält den FPreis!
+        Dim sID As String = Convert.ToString(dgRechnung.Rows(nPos).Cells(15).Value).Trim()
+
+        ' Bei einer Neuanlage eine eindeutige Zeit-ID generieren und im Grid hinterlegen
         If lNew Then
             sID = fcGetTimeID(Date.Today)
-            dgRechnung.Rows(nPos).Cells(14).Value = sID
+            dgRechnung.Rows(nPos).Cells(15).Value = sID
         End If
 
-        Dim nSumme As Double = 0
         Try
+            ' Felderliste als sauberes, stark typisiertes String-Array initialisieren (spart das langsame Split)
+            arFields = {"ID", "BuchID", "ZimID", "Menge", "Bezeichnung", "Betrag", "Steuer", "Gesamt", "Datum", "ZimNr", "Name"}
 
-            sqlText = "ID,BuchID,ZimID,Menge,Bezeichnung,Betrag,Steuer,Gesamt,Datum,ZimNr,Name"
-            arFields = Split(sqlText, ",")
-            sqlText = fcSaveZusatz(sID)
-            arValue = Split(sqlText, "°")
+            ' Daten-String über Hilfsfunktion abrufen (Werte sind mit "°" getrennt)
+            Dim sqlText As String = fcSaveZusatz(sID)
 
+            ' Den mit Gradzeichen getrennten Datenstrom in das Werte-Array aufteilen
+            arValue = sqlText.Split("°"c)
+
+            ' Datenbank-Aktion ausführen
             If lNew Then
-                Call fcInsertCommand("Zusaetze", arFields, arValue)
+                fcInsertCommand("Zusaetze", arFields, arValue)
             Else
                 cBedingung = " WHERE ID='" & sID & "'"
-                Call fcUpdateCommand("Zusaetze", arFields, arValue, cBedingung)
+                fcUpdateCommand("Zusaetze", arFields, arValue, cBedingung)
             End If
-            ''DataTable aktualisieren
-            'If lNew Then
-            '    'Datensatz in DataTable "dtZ" speichern
-            '    Call fcInsertTable(dtZ, arFields, arValue)
-            'Else
-            '    'Datensatz in DataTable "dtZ" speichern
-            '    cBedingung = "ID Like '" & sID & "'"
-            '    Call fcUpdateTable(dtZ, arFields, arValue, cBedingung)
-            'End If
 
-            'Call prFuelleTabelleZusatz(dtZ)
-
+            ' Zustand nach erfolgreicher Speicherung zurücksetzen
             lNew = False
 
         Catch ex As Exception
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         Finally
-            ''Call prLoadObjInList(dtObj)
-            'Call prLoockZusatz(False)
+            ' Zustand im Fehler- und Erfolgsfall sicher zurücksetzen
             lNew = False
-
         End Try
     End Sub
 
     ''' <summary>
-    ''' Zu speichernde Daten aufbereiten
+    ''' Bereitet alle Eingabewerte der Zusatzleistung kaufmännisch korrekt auf und fügt diese 
+    ''' zu einem mit Gradzeichen ("°") separierten Datenstrom für die Datenbankspeicherung zusammen.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="sID">Die eindeutige ID des Zusatzdatensatzes.</param>
+    ''' <returns>Ein mit "°" verketteter String aller Spaltenwerte.</returns>
     ''' <remarks>
-    ''' 10.01..2012 Create
+    ''' 10.01.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Fehlerhaften VB6-Befehl 'Str()' entfernt (verhindert ungewollte führende Leerzeichen im DB-String).
+    ''' - Veraltete Zuweisung über den Funktionsnamen durch ein sauberes 'Return' ersetzt.
+    ''' - Unpräzise Fließkommakonvertierung 'Val()' durch das kaufmännisch genaue 'Decimal.TryParse' ersetzt.
+    ''' - Absicherung der Datumsübergabe ohne den fehleranfälligen Umweg über '.ToString' auf dem aktuellen Datum.
+    ''' - Unbenutzte Variable 'sGeb' entfernt.
     ''' </remarks>
     Private Function fcSaveZusatz(ByVal sID As String) As String
-        Dim sb As New StringBuilder
-        Dim sGeb As String = " "
-        'ID,BuchID,Pos,Menge,Bezeichnung,Betrag,Steuer,Gesamt,Datum,ZimNr,Name
+        Dim sb As New StringBuilder()
 
+        ' Spaltenreihenfolge laut prSaveZusatz: 
+        ' ID, BuchID, ZimID, Menge, Bezeichnung, Betrag, Steuer, Gesamt, Datum, ZimNr, Name
 
-        sb.Append(sID & "°")   'ID
-        sb.Append(sgRBID & "°") 'buchID
-        sb.Append(sgRZID & "°")  'ZimmerID
-        sb.Append(tbMenge.Text & "°")   'menge
-        sb.Append(tbText.Text & "°")     'leistung
-        sb.Append(Str(Val(tbBetrag.Text) * 100) & "°")   'betrag
-        sb.Append(coSteuer.Text & "°")
-        sb.Append(Str(Val(lbBrutto.Text) * 100) & "°") '      ' sb.Append(lbSumme.Text & "°")
-        sb.Append(fcUmDatum(Date.Today.ToString) & "°")
-        sb.Append(coZimmer.Text & "°")
-        sb.Append(lbName1.Text)
-        fcSaveZusatz = sb.ToString
+        ' 1. IDs und Basis-Texte anhängen
+        sb.Append(sID).Append("°")
+        sb.Append(sgRBID).Append("°")
+        sb.Append(sgRZID).Append("°")
+        sb.Append(tbMenge.Text.Trim()).Append("°")
+        sb.Append(tbText.Text.Trim()).Append("°")
+
+        ' 2. Betrag kaufmännisch sicher parsen und ohne führende Leerzeichen multiplizieren
+        Dim nBetrag As Decimal = 0
+        Decimal.TryParse(tbBetrag.Text, nBetrag)
+        Dim nBetragCent As Integer = Convert.ToInt32(nBetrag * 100D)
+        sb.Append(nBetragCent.ToString()).Append("°")
+
+        ' 3. Steuersatz anhängen
+        sb.Append(coSteuer.Text.Trim()).Append("°")
+
+        ' 4. Bruttowert kaufmännisch sicher parsen und in Cent umrechnen
+        Dim nBrutto As Decimal = 0
+        Decimal.TryParse(lbBrutto.Text, nBrutto)
+        Dim nBruttoCent As Integer = Convert.ToInt32(nBrutto * 100D)
+        sb.Append(nBruttoCent.ToString()).Append("°")
+
+        ' 5. Aktuelles Tagesdatum über Ihre Formatfunktion fcUmDatum konvertieren
+        ' Direkte Übergabe des Date-Objekts ist sicherer als Date.Today.ToString
+        sb.Append(fcUmDatum(Date.Today)).Append("°")
+
+        ' 6. Zimmernummer und Kundenname anhängen
+        sb.Append(coZimmer.Text.Trim()).Append("°")
+        sb.Append(lbName1.Text.Trim())
+
+        ' Saubere Rückgabe des fertigen Datenstroms
+        Return sb.ToString()
     End Function
+
+    ''' <summary>
+    ''' Summiert alle Netto-, Brutto- und Steuerwerte aus dem Rechnungs-GridView (dgRechnung) auf.
+    ''' Berechnet die Gesamtsumme abzüglich der geleisteten Anzahlung und aktualisiert die Benutzeroberfläche.
+    ''' </summary>
+    ''' <remarks>
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Massiv redundantes If-Else-Konstrukt vollständig entfernt (beide Zweige enthielten exakt identische Rechenlogik).
+    ''' - Schleife auf die performantere 'For Each'-Variante für DataGridViewRows umgestellt.
+    ''' - Fehleranfälliges 'Val(lbAnzahlung.Text)' durch direktes Rechnen mit der kaufmännischen Decimal-Variable 'nAnzahlung' ersetzt.
+    ''' - Typsicheres Parsen der Zellwerte integriert, um Abstürze bei leeren Tabellenzellen zu verhindern.
+    ''' - Auskommentierte Code-Fragmente entfernt.
+    ''' </remarks>
     Private Sub prCalculateSumme()
+        ' Globale Summenspeicher zurücksetzen
         nGNetto = 0
         nGBrutto = 0
         nGSt7 = 0
         nGSt19 = 0
         nGStS = 0
-        Dim nGSt As Decimal = 0
-        If nReArt = 4 Then
-            With dgRechnung
-                For i As Integer = 0 To .Rows.Count - 1
-                    nGNetto += .Rows(i).Cells(8).Value
-                    nGBrutto += .Rows(i).Cells(9).Value  'Pauschalsumme (9)
-                    nGSt7 += .Rows(i).Cells(5).Value
-                    nGSt19 += .Rows(i).Cells(6).Value
-                    nGStS += .Rows(i).Cells(7).Value
-                Next
-            End With
-            nGSt = nGSt19 + nGSt7 + nGStS
-            lbGNetto.Text = fcFormatDecimal(nGNetto.ToString, 2)
-            lbGSt7.Text = fcFormatDecimal(nGSt.ToString, 2)
-            '    lbGSt19.Text = fcFormatDecimal(nGSt19.ToString, 2)
-            lbAnzahlung.Text = fcFormatDecimal(nAnzahlung.ToString, 2)
-            lbGesamt.Text = fcFormatDecimal(nGBrutto - Val(lbAnzahlung.Text), 2)
-            ' lbAnzahlung.Text = fcFormatDecimal(nAnzahlung.ToString, 2)
-        Else
-            With dgRechnung
-                For i As Integer = 0 To .Rows.Count - 1
-                    nGNetto += .Rows(i).Cells(8).Value
-                    nGBrutto += .Rows(i).Cells(9).Value
-                    nGSt7 += .Rows(i).Cells(5).Value
-                    nGSt19 += .Rows(i).Cells(6).Value
-                    nGStS += .Rows(i).Cells(7).Value
-                Next
-            End With
-            nGSt = nGSt19 + nGSt7 + nGStS
-            lbGNetto.Text = fcFormatDecimal(nGNetto.ToString, 2)
-            lbGSt7.Text = fcFormatDecimal(nGSt.ToString, 2)
-            '    lbGSt19.Text = fcFormatDecimal(nGSt19.ToString, 2)
-            lbAnzahlung.Text = fcFormatDecimal(nAnzahlung.ToString, 2)
-            lbGesamt.Text = fcFormatDecimal(nGBrutto - Val(lbAnzahlung.Text), 2)
-        ' lbAnzahlung.Text = fcFormatDecimal(nAnzahlung.ToString, 2)
+        Dim nGStGesamt As Decimal = 0
+
+        ' Sicherheitsprüfung: Wenn keine Zeilen vorhanden sind, UI auf 0 setzen und abbrechen
+        If dgRechnung.Rows.Count = 0 Then
+            lbGNetto.Text = "0,00"
+            lbGSt7.Text = "0,00"
+            lbAnzahlung.Text = nAnzahlung.ToString("F2")
+            lbGesamt.Text = "0,00"
+            Exit Sub
         End If
+
+        ' Alle Zeilen des Grids durchlaufen und Werte aufaddieren
+        For Each row As DataGridViewRow In dgRechnung.Rows
+            ' Nur reale Datenzeilen auswerten (keine neuen, ungespeicherten Zeilen)
+            If Not row.IsNewRow Then
+                Dim nRowNetto As Decimal = 0
+                Dim nRowBrutto As Decimal = 0
+                Dim nRowSt7 As Decimal = 0
+                Dim nRowSt19 As Decimal = 0
+                Dim nRowStS As Decimal = 0
+
+                ' Werte sicher parsen, um Leerzeichen oder DBNull-Fehler im Grid abzufangen
+                Decimal.TryParse(Convert.ToString(row.Cells(8).Value), nRowNetto)
+                Decimal.TryParse(Convert.ToString(row.Cells(9).Value), nRowBrutto)
+                Decimal.TryParse(Convert.ToString(row.Cells(5).Value), nRowSt7)
+                Decimal.TryParse(Convert.ToString(row.Cells(6).Value), nRowSt19)
+                Decimal.TryParse(Convert.ToString(row.Cells(7).Value), nRowStS)
+
+                ' Aufsummieren
+                nGNetto += nRowNetto
+                nGBrutto += nRowBrutto
+                nGSt7 += nRowSt7
+                nGSt19 += nRowSt19
+                nGStS += nRowStS
+            End If
+        Next
+
+        ' Gesamte Steuersumme aus allen Sätzen ermitteln
+        nGStGesamt = nGSt19 + nGSt7 + nGStS
+
+        ' Benutzeroberfläche (Labels) aktualisieren und kaufmännisch formatieren
+        lbGNetto.Text = fcFormatDecimal(nGNetto.ToString(), 2)
+        lbGSt7.Text = fcFormatDecimal(nGStGesamt.ToString(), 2)
+        lbAnzahlung.Text = fcFormatDecimal(nAnzahlung.ToString(), 2)
+
+        ' BUGFIX: Wir rechnen direkt mit dem numerischen Wert von nAnzahlung, 
+        ' statt den bereits formatierten Text aus lbAnzahlung.Text fehleranfällig zurückzukonvertieren.
+        Dim nEndBetrag As Decimal = nGBrutto - nAnzahlung
+        lbGesamt.Text = fcFormatDecimal(nEndBetrag.ToString(), 2)
     End Sub
 
+
     ''' <summary>
-    ''' Bearbeitung abbrechen
+    ''' Bricht den aktuellen Bearbeitungsvorgang einer Rechnungsposition ab und setzt 
+    ''' alle Eingabefelder sowie Steuer- und Betragslabels auf ihre Standardwerte zurück.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (btAbbruch).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 27.03.2012 Create
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Veraltetes 'Call'-Schlüsselwort entfernt.
     ''' </remarks>
     Private Sub btAbbruch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAbbruch.Click
-        Call prClearEingabe()
+        prClearEingabe()
     End Sub
 
     ''' <summary>
-    ''' Eingaben zurücksetzen
+    ''' Setzt die Steuerelemente der Eingabemaske zurück. Gibt gesperrte Textboxen wieder frei 
+    ''' und belegt Mengen-, Steuer- und Währungsfelder mit kaufmännischen Standard-Nullwerten vor.
     ''' </summary>
     ''' <remarks>
-    ''' 27.03.2012 Create
+    ''' 27.03.2012 - Create
+    ''' 05.10.2026 - Code-Optimierung:
+    ''' - Auskommentierte Code-Altlasten entfernt.
+    ''' - String-Nullwerte für Währungsanzeigen plattformkonform auf Komma-Format ("0,00") angepasst.
     ''' </remarks>
     Private Sub prClearEingabe()
-        'tbPos.Enabled = True
+        ' Eingabefelder für eine neue Eingabe wieder freigeben
         tbText.Enabled = True
         coZimmer.Enabled = True
-        tbPos.Text = ""
+
+        ' Textinhalte und Auswahlen zurücksetzen
+        tbPos.Text = String.Empty
+        coZimmer.Text = String.Empty
+        tbText.Text = String.Empty
+
+        ' Numerische Standardwerte setzen
         tbMenge.Text = "0"
-        coZimmer.Text = ""
-        tbText.Text = ""
-        tbBetrag.Text = "0.00"
         coSteuer.Text = "0"
-        lbSteuer.Text = "0.00"
-        lbNetto.Text = "0.00"
-        lbBrutto.Text = "0.00"
+
+        ' Kaufmännische Währungs-Labels sauber vorbelegen (Komma-Format für deutsche Ländereinstellungen)
+        tbBetrag.Text = "0,00"
+        lbSteuer.Text = "0,00"
+        lbNetto.Text = "0,00"
+        lbBrutto.Text = "0,00"
     End Sub
+
 
 #End Region
 

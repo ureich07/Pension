@@ -23,8 +23,8 @@ Public Class frmZusatz
         tsMain.BackColor = sColor
         paZusatz.BackColor = sColor
 
-        lbZimNr.Text = frmReservierung.lbZimNr.Text
-        lbName.Text = frmReservierung.tbName1.Text
+        lbZimNr.Text = frmReservierungDest.lbZimNr.Text
+        lbName.Text = frmReservierungDest.tbName1.Text
         'dtZ = fcReadDataTable("Select * from Zusaetze Where BuchID='" & sgRBID & "' and ZimNr ='" & sgZNr & "'")
         dtZ = fcReadDataTable("Select * from Zusaetze Where BuchID='" & sgRBID & "' and ZimID ='" & sgRZID & "'")
         Call prSetTableZusatz()
