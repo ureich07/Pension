@@ -1316,6 +1316,33 @@ Public Class frmReservierungDest
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Lädt den Buchungsindex für die aktuelle Buchungsreferenz aus der Datenbank.
+    ''' Falls noch kein Index existiert, wird die Referenz-ID in der Buchungstabelle aktualisiert
+    ''' und der Index anschließend erneut eingelesen.
+    ''' </summary>
+    ''' <remarks>
+    ''' 25.02.2012 Create <br/>
+    ''' 08.10.2026 Code-Optimierung: Entfernung von VB6-Altlasten (Split, Call), Vereinfachung der Tabellenprüfungen, 
+    ''' Bereinigung von totem Code und Umstellung auf String-Interpolation.
+    ''' </remarks>
+    Private Sub prCreatTabelIndex()
+        Dim sSQL As String = $"Select * From Buchung Where IDRef='{sIDB}' Order By BIDindex Asc"
+        dtBuchIndex = fcReadDataTable(sSQL)
+
+        ' Saubere und lesbare Prüfung, ob die DataTable leer ist
+        If dtBuchIndex.Rows.Count = 0 Then
+            Dim arFields() As String = {"IDRef"}
+            Dim arValue() As String = {sIDB}
+            Dim cBedingung As String = $" WHERE ID='{sIDB}'"
+
+            ' Aktualisierung der Datenbank
+            fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+
+            ' Erneutes Laden der Daten nach dem Update
+            dtBuchIndex = fcReadDataTable(sSQL)
+        End If
+    End Sub
 
 #End Region
 
@@ -1406,27 +1433,102 @@ Public Class frmReservierungDest
 #Region "Preis- und Gasteliste....................................................................."
 
     ''' <summary>
-    ''' Mit Doppelklick einen Gast auswählen und Liste schliessen
+    ''' Aktualisiert die globale Variable für die Werbeherkunft, wenn sich die Auswahl in der ComboBox ändert.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation hinzugefügt.
+    ''' </remarks>
+    Private Sub coWerbung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles coWerbung.SelectedIndexChanged
+        sgWerbung = coWerbung.Text
+    End Sub
+
+    ''' <summary>
+    ''' Triggert die Gastsuchen-Aktualisierung, sobald sich der Text im Vornamen- oder Nachnamenfeld ändert.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (tbVorname oder tbName1).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - 'tbVorname_TextChanged' und 'tbName1_TextChanged' zu einem einzigen Handler zusammengefasst (Code-Duplizierung eliminiert).
+    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
+    ''' </remarks>
+    Private Sub GastSuche_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbVorname.TextChanged, tbName1.TextChanged
+        ' Gästeliste neu laden und passenden Gast fokussieren
+        prLoadGastInList()
+        prFindGast()
+    End Sub
+
+    ''' <summary>
+    ''' Wählt einen Gast per Doppelklick aus der Liste aus, lädt dessen Daten und aktualisiert die Ansicht.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (das ListView-Steuerelement).</param>
+    ''' <param name="e">Die Ereignisdaten für das Mausereignis.</param>
+    ''' <remarks>
+    ''' 25.02.2012 - Create
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' - 'With'-Block aufgelöst, um den Code flacher und lesbarer zu gestalten.
+    ''' - Sicherheitsabfrage für die Indexierung des ausgewählten Elements optimiert.
+    ''' - Inline-Kommentare zur besseren Wartbarkeit hinzugefügt.
     ''' </remarks>
     Private Sub lvGast_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lvGast.MouseDoubleClick
+        ' Standardwert zurücksetzen, falls kein Element gültig selektiert ist
         lbGastID.Text = "0"
-        With lvGast
-            If .SelectedItems.Count <> 0 Then
-                lbGastID.Text = .SelectedItems(0).SubItems(5).Text
-            End If
-        End With
-        'paPreise.Visible = False
-        'lvPreise.Visible = False
-        'lvGast.Visible = False
-        Call prLadeGastDaten(lbGastID.Text)
+
+        ' Prüfen, ob ein Element in der ListView ausgewählt wurde
+        If lvGast.SelectedItems.Count > 0 Then
+            ' Die Gast-ID aus der sechsten Spalte (Index 5) auslesen
+            lbGastID.Text = lvGast.SelectedItems(0).SubItems(5).Text
+        End If
+
+        ' Stammdaten des ausgewählten Gastes laden
+        prLadeGastDaten(lbGastID.Text)
+
+        ' Status auf Stammgast setzen
         coWerbung.Text = "Stammgast"
     End Sub
 
+    ''' <summary>
+    ''' Blendet die E-Mail-Vorschlagsliste aus, sobald der Mauszeiger das E-Mail-Textfeld verlässt.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (die E-Mail-Textbox).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation vollständig hinzugefügt.
+    ''' - Methodennamen korrigiert ('_TextChanged_1' zu '_MouseLeave'), da die Methode an das 'MouseLeave'-Ereignis gebunden ist.
+    ''' - 'ByVal'-Schlüsselwörter für eine explizite Parameterübergabe ergänzt.
+    ''' </remarks>
+    Private Sub tbEMail_MouseLeave(ByVal sender As Object, ByVal e As EventArgs) Handles tbEMail.MouseLeave
+        ' Vorschlagsliste unsichtbar machen
+        lbMailList.Visible = False
+    End Sub
+
+    ''' <summary>
+    ''' Bereitet die E-Mail-Liste auf und zeigt sie an, sobald der Mauszeiger über dem E-Mail-Textfeld verweilt.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (die E-Mail-Textbox).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - Methodennamen von '_TextChanged' zu '_MouseHover' korrigiert, um dem tatsächlichen Ereignis zu entsprechen.
+    ''' - Veraltete VB6-'Replace'-Funktion durch die moderne '.Replace'-Methode der String-Klasse ersetzt.
+    ''' - 'Method Chaining' angewendet, um mehrfache Zuweisungen an 'lbMailList.Text' zu verhindern und die Performance zu verbessern.
+    ''' - 'ByVal'-Schlüsselwörter für eine explizite Parameterübergabe ergänzt.
+    ''' </remarks>
+    Private Sub tbEMail_MouseHover(ByVal sender As Object, ByVal e As EventArgs) Handles tbEMail.MouseHover
+        ' Prüfen, ob überhaupt Text vorhanden ist, um unnötige Operationen zu vermeiden
+        If Not String.IsNullOrEmpty(tbEMail.Text) Then
+            ' Semikolons durch Zeilenumbrüche ersetzen und Leerzeichen entfernen
+            lbMailList.Text = tbEMail.Text.Replace(";", vbCrLf).Replace(" ", "")
+
+            ' Liste sichtbar machen
+            lbMailList.Visible = True
+        End If
+    End Sub
 
 
 #End Region
@@ -2883,6 +2985,23 @@ RefactorCell:
         End If
     End Sub
 
+    ''' <summary>
+    ''' Steuert die Sichtbarkeit des Gruppenfelds für Zusatznamen basierend auf dem Zustand der CheckBox.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (die CheckBox).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation vollständig hinzugefügt.
+    ''' - 'If-Else'-Struktur durch direkte Zuweisung des Eigenschaftswerts ersetzt (Einzeiler).
+    ''' - Redundanten Vergleich auf '= True' entfernt.
+    ''' - 'ByVal'-Schlüsselwörter für eine explizite Parameterübergabe ergänzt.
+    ''' </remarks>
+    Private Sub cbZusatz_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles cbZusatz.CheckedChanged
+        ' Die Sichtbarkeit des GroupBox-Panels direkt an den Zustand der CheckBox koppeln
+        gbNameZ.Visible = cbZusatz.Checked
+    End Sub
+
 
 #End Region
 
@@ -3036,6 +3155,33 @@ RefactorCell:
         If fcMailBezahlt(sgRBID) Then
             ' Bei erfolgreichem Versand wird das "Bezahlt"-Kontrollkästchen aktiviert
             cbBezalt.Checked = True
+        End If
+    End Sub
+
+#End Region
+
+#Region "Bewertungsmail absetzen..................................................................."
+
+    ''' <summary>
+    ''' Prüft beim Klicken auf die Bewertungs-Schaltfläche, ob bereits eine Bewertung existiert, und legt diese bei Bedarf an.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei 'fcInsertCommand' entfernt.
+    ''' - 'sTem(0) = " "' durch die robustere Methode 'String.IsNullOrWhiteSpace' ersetzt.
+    ''' - Datentyp bei der Deklaration direkt zugewiesen (Inline-Deklaration).
+    ''' - Fehleranfällige String-Verkettung im SQL-Statement durch lesbares 'String.Format' ersetzt.
+    ''' </remarks>
+    Private Sub tsbBewertung_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBewertung.Click
+        ' Abfrage-String sicher zusammensetzen und Bewertung suchen
+        Dim sqlQuery As String = String.Format("SELECT * FROM Bewertung WHERE BuchID = '{0}'", sgRBID)
+        Dim sTem As Array = fcDataSeek(sqlQuery, sgRBID, 0, {"ID"})
+
+        ' Wenn kein Eintrag existiert (Leerstring oder Leerzeichen), neuen Datensatz anlegen
+        If sTem IsNot Nothing AndAlso (sTem.Length = 0 OrElse String.IsNullOrWhiteSpace(sTem(0).ToString())) Then
+            fcInsertCommand("Bewertung", {"Id", "BuchID", "Status"}, {fcGetTimeID(Date.Today), sgRBID, "-1"})
         End If
     End Sub
 
@@ -3272,147 +3418,80 @@ RefactorCell:
 
 #End Region
 
+#Region "Rechnungskopie............................................................................"
 
+#End Region
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    Private Sub coWerbung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles coWerbung.SelectedIndexChanged
-        sgWerbung = coWerbung.Text
-    End Sub
-
-
-
-
-
-    Private Sub tsbBewertung_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbBewertung.Click
-        Dim sTem As Array
-        sTem = fcDataSeek("select * From Bewertung Where BuchID ='", sgRBID, 0, {"ID"}) 'kontrolle ob schon geschriben
-        If sTem(0) = " " Then
-            Call fcInsertCommand("Bewertung", {"Id", "BuchID", "Status"}, {fcGetTimeID(Date.Today), sgRBID, "-1"})
-        End If
-    End Sub
-
-    Private Sub tbVorname_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbVorname.TextChanged
-        Call prLoadGastInList()
-        Call prFindGast()
-
-    End Sub
-
-
-
-    Private Sub tbName1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbName1.TextChanged
-        Call prLoadGastInList()
-        Call prFindGast()
-
-    End Sub
-
-
+#Region "Check in.................................................................................."
 
     ''' <summary>
-    ''' Lädt den Buchungsindex für die aktuelle Buchungsreferenz aus der Datenbank.
-    ''' Falls noch kein Index existiert, wird die Referenz-ID in der Buchungstabelle aktualisiert
-    ''' und der Index anschließend erneut eingelesen.
+    ''' Öffnet das Check-in-Formular, wenn der Benutzer auf die entsprechende Schaltfläche klickt.
     ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (die Check-in-Schaltfläche).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create <br/>
-    ''' 08.10.2026 Code-Optimierung: Entfernung von VB6-Altlasten (Split, Call), Vereinfachung der Tabellenprüfungen, 
-    ''' Bereinigung von totem Code und Umstellung auf String-Interpolation.
+    ''' 13.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation vollständig hinzugefügt.
+    ''' - Sicherheitsprüfung eingebaut, um sicherzustellen, dass das Formular nicht mehrfach geöffnet wird oder auf ein freigegebenes Objekt ('Disposed') zugegriffen wird.
     ''' </remarks>
-    Private Sub prCreatTabelIndex()
-        Dim sSQL As String = $"Select * From Buchung Where IDRef='{sIDB}' Order By BIDindex Asc"
-        dtBuchIndex = fcReadDataTable(sSQL)
-
-        ' Saubere und lesbare Prüfung, ob die DataTable leer ist
-        If dtBuchIndex.Rows.Count = 0 Then
-            Dim arFields() As String = {"IDRef"}
-            Dim arValue() As String = {sIDB}
-            Dim cBedingung As String = $" WHERE ID='{sIDB}'"
-
-            ' Aktualisierung der Datenbank
-            fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
-
-            ' Erneutes Laden der Daten nach dem Update
-            dtBuchIndex = fcReadDataTable(sSQL)
-        End If
-    End Sub
-
-
-
-
-
-
-
-
-    Private Function fcGetObjID(ByVal sZim As String) As String
-        fcGetObjID = " "
-        Dim nMax As Integer = dtZim.Rows.Count - 1
-        For i As Integer = 0 To nMax
-            If dtZim.Rows(i).Item("ID") = sZim Then
-                fcGetObjID = dtZim.Rows(i).Item("IDObjekte")
-                Exit For
-            End If
-        Next
-    End Function
-
-    Private Sub PreisToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PreisToolStripMenuItem.Click
-        Dim P As String = fcGetZimPreis(sgRZID, tbAnzPer.Text, lbAbreise.Text, lbAnreise.Text)
-    End Sub
-
-    Private Sub prCheckinMail(ByRef sNummer As String)
-
-        Dim sb As New StringBuilder
-        Dim sqlText As String = ""
-        Dim arFields(0), arValue(0) As String
-        Dim cBedingung As String
-        Try
-            cBedingung = " WHERE BID ='" & sgRBID & "'"
-            sqlText = "SendMailZugang"
-            arFields = Split(sqlText, ",")
-            sqlText = sNummer
-            arValue = Split(sqlText, "°")
-            Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
-        Catch ex As Exception
-            ErrReport(ex.Message, ex.Source, ex.StackTrace)
-        Finally
-
-
-        End Try
-    End Sub
-
-    Private Sub tsbCheckin_Click(sender As Object, e As EventArgs) Handles tsbCheckin.Click
-        frmCheckin.Show()
-
-    End Sub
-    Private Sub tbEMail_TextChanged(sender As Object, e As EventArgs) Handles tbEMail.MouseHover
-
-        lbMailList.Visible = True
-        lbMailList.Text = Replace(tbEMail.Text, ";", vbCrLf)
-        lbMailList.Text = Replace(lbMailList.Text, " ", "")
-
-    End Sub
-
-    Private Sub tbEMail_TextChanged_1(sender As Object, e As EventArgs) Handles tbEMail.MouseLeave
-
-        lbMailList.Visible = False
-    End Sub
-    Private Sub cbZusatz_CheckedChanged(sender As Object, e As EventArgs) Handles cbZusatz.CheckedChanged
-        If cbZusatz.Checked = True Then
-            gbNameZ.Visible = True
+    Private Sub tsbCheckin_Click(ByVal sender As Object, ByVal e As EventArgs) Handles tsbCheckin.Click
+        ' Prüfen, ob die Formularinstanz existiert und noch aktiv ist
+        If frmCheckin IsNot Nothing AndAlso Not frmCheckin.IsDisposed Then
+            ' Wenn es bereits geöffnet ist, in den Vordergrund bringen
+            frmCheckin.BringToFront()
         Else
-            gbNameZ.Visible = False
+            ' Falls nicht vorhanden oder geschlossen, neu initialisieren und anzeigen
+            frmCheckin = New frmCheckin()
+            frmCheckin.Show()
         End If
     End Sub
+
+
+#End Region
+
+
+
+
+
+
+
+    'Private Function fcGetObjID(ByVal sZim As String) As String
+    '    fcGetObjID = " "
+    '    Dim nMax As Integer = dtZim.Rows.Count - 1
+    '    For i As Integer = 0 To nMax
+    '        If dtZim.Rows(i).Item("ID") = sZim Then
+    '            fcGetObjID = dtZim.Rows(i).Item("IDObjekte")
+    '            Exit For
+    '        End If
+    '    Next
+    'End Function
+
+    'Private Sub PreisToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PreisToolStripMenuItem.Click
+    '    Dim P As String = fcGetZimPreis(sgRZID, tbAnzPer.Text, lbAbreise.Text, lbAnreise.Text)
+    'End Sub
+
+    'Private Sub prCheckinMail(ByRef sNummer As String)
+
+    '    Dim sb As New StringBuilder
+    '    Dim sqlText As String = ""
+    '    Dim arFields(0), arValue(0) As String
+    '    Dim cBedingung As String
+    '    Try
+    '        cBedingung = " WHERE BID ='" & sgRBID & "'"
+    '        sqlText = "SendMailZugang"
+    '        arFields = Split(sqlText, ",")
+    '        sqlText = sNummer
+    '        arValue = Split(sqlText, "°")
+    '        Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+    '    Catch ex As Exception
+    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
+    '    Finally
+
+
+    '    End Try
+    'End Sub
+
+
+
 
 End Class

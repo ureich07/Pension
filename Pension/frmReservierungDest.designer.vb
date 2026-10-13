@@ -1115,103 +1115,103 @@ Partial Class frmReservierungDest
         '
         Me.tsbAufZimmer.Image = CType(resources.GetObject("tsbAufZimmer.Image"), System.Drawing.Image)
         Me.tsbAufZimmer.Name = "tsbAufZimmer"
-        Me.tsbAufZimmer.Size = New System.Drawing.Size(247, 22)
+        Me.tsbAufZimmer.Size = New System.Drawing.Size(251, 26)
         Me.tsbAufZimmer.Text = "Schreibe auf Zimmer"
         '
         'tsbBestätigung
         '
         Me.tsbBestätigung.Name = "tsbBestätigung"
-        Me.tsbBestätigung.Size = New System.Drawing.Size(247, 22)
+        Me.tsbBestätigung.Size = New System.Drawing.Size(251, 26)
         Me.tsbBestätigung.Text = "Buchungsbestätigung drucken"
         '
         'tsbMail
         '
         Me.tsbMail.Name = "tsbMail"
-        Me.tsbMail.Size = New System.Drawing.Size(247, 22)
+        Me.tsbMail.Size = New System.Drawing.Size(251, 26)
         Me.tsbMail.Text = "Buchungsbestätigung versenden"
         '
         'ToolStripSeparator7
         '
         Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-        Me.ToolStripSeparator7.Size = New System.Drawing.Size(244, 6)
+        Me.ToolStripSeparator7.Size = New System.Drawing.Size(248, 6)
         '
         'tsbRechnung
         '
         Me.tsbRechnung.Image = CType(resources.GetObject("tsbRechnung.Image"), System.Drawing.Image)
         Me.tsbRechnung.Name = "tsbRechnung"
-        Me.tsbRechnung.Size = New System.Drawing.Size(247, 22)
+        Me.tsbRechnung.Size = New System.Drawing.Size(251, 26)
         Me.tsbRechnung.Text = "Rechnung generieren"
         '
         'tsbBezahlt
         '
         Me.tsbBezahlt.Name = "tsbBezahlt"
-        Me.tsbBezahlt.Size = New System.Drawing.Size(247, 22)
+        Me.tsbBezahlt.Size = New System.Drawing.Size(251, 26)
         Me.tsbBezahlt.Text = "Zahlungsbestätigung"
         '
         'ToolStripSeparator8
         '
         Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-        Me.ToolStripSeparator8.Size = New System.Drawing.Size(244, 6)
+        Me.ToolStripSeparator8.Size = New System.Drawing.Size(248, 6)
         '
         'tsbBewertung
         '
         Me.tsbBewertung.Name = "tsbBewertung"
-        Me.tsbBewertung.Size = New System.Drawing.Size(247, 22)
+        Me.tsbBewertung.Size = New System.Drawing.Size(251, 26)
         Me.tsbBewertung.Text = "Bewertung Mail"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(244, 6)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(248, 6)
         '
         'tsmStorno
         '
         Me.tsmStorno.Name = "tsmStorno"
-        Me.tsmStorno.Size = New System.Drawing.Size(247, 22)
+        Me.tsmStorno.Size = New System.Drawing.Size(251, 26)
         Me.tsmStorno.Text = "Rechnung stornieren"
         '
         'tsSep1
         '
         Me.tsSep1.Name = "tsSep1"
-        Me.tsSep1.Size = New System.Drawing.Size(244, 6)
+        Me.tsSep1.Size = New System.Drawing.Size(248, 6)
         '
         'tsbDelReservierung
         '
         Me.tsbDelReservierung.Image = CType(resources.GetObject("tsbDelReservierung.Image"), System.Drawing.Image)
         Me.tsbDelReservierung.Name = "tsbDelReservierung"
-        Me.tsbDelReservierung.Size = New System.Drawing.Size(247, 22)
+        Me.tsbDelReservierung.Size = New System.Drawing.Size(251, 26)
         Me.tsbDelReservierung.Text = "Reservierung löschen"
         Me.tsbDelReservierung.ToolTipText = "Gesammte Reservierung (alle Zimmer) löschen."
         '
         'tsbDelZimmer
         '
         Me.tsbDelZimmer.Name = "tsbDelZimmer"
-        Me.tsbDelZimmer.Size = New System.Drawing.Size(247, 22)
+        Me.tsbDelZimmer.Size = New System.Drawing.Size(251, 26)
         Me.tsbDelZimmer.Text = "Zimmer löschen"
         Me.tsbDelZimmer.ToolTipText = "Ausgewählte Zimmer löschen."
         '
         'tsmKopie
         '
         Me.tsmKopie.Name = "tsmKopie"
-        Me.tsmKopie.Size = New System.Drawing.Size(247, 22)
+        Me.tsmKopie.Size = New System.Drawing.Size(251, 26)
         Me.tsmKopie.Text = "Rechnungskopie"
         Me.tsmKopie.Visible = False
         '
         'tsSep2
         '
         Me.tsSep2.Name = "tsSep2"
-        Me.tsSep2.Size = New System.Drawing.Size(244, 6)
+        Me.tsSep2.Size = New System.Drawing.Size(248, 6)
         '
         'tsbCheckin
         '
         Me.tsbCheckin.Name = "tsbCheckin"
-        Me.tsbCheckin.Size = New System.Drawing.Size(247, 22)
+        Me.tsbCheckin.Size = New System.Drawing.Size(251, 26)
         Me.tsbCheckin.Text = "Checkin"
         '
         'PreisToolStripMenuItem
         '
         Me.PreisToolStripMenuItem.Name = "PreisToolStripMenuItem"
-        Me.PreisToolStripMenuItem.Size = New System.Drawing.Size(247, 22)
+        Me.PreisToolStripMenuItem.Size = New System.Drawing.Size(251, 26)
         Me.PreisToolStripMenuItem.Text = "Preis"
         '
         'ToolStripSeparator4
