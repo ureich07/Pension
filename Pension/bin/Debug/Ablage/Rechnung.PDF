@@ -12,7 +12,7 @@
 endobj
 5 0 obj
 <<
-/Length 0000005313
+/Length 0000005289
 >>
 stream
 0.0283465 0 0 0.0283465 0 0 cm
@@ -40,19 +40,19 @@ BT
 ET
 BT
 2500 22505 Td
-[(Max Mustermann)] TJ
+[(Uwe Reich)] TJ
 ET
 BT
 2500 22105 Td
-[( )] TJ
+[(Grüner Weg 34)] TJ
 ET
 BT
 2500 21705 Td
-[( )] TJ
+[(Neuenkirchen)] TJ
 ET
 BT
 2500 21305 Td
-[(DE  )] TJ
+[(DE 17498)] TJ
 ET
 BT
 2500 20705 Td
@@ -77,12 +77,12 @@ BT
 ET
 BT
 16500 21371 Td
-[(07.10.2026)] TJ
+[(10.05.2026)] TJ
 ET
 /F2 352 Tf
 BT
 2500 19971 Td
-[(Rechnung Nr. 2026-352)] TJ
+[(Kopie der Rechnung Nr. 2026-347)] TJ
 ET
 BT
 11000 19971 Td
@@ -238,11 +238,11 @@ BT
 ET
 BT
 9699 17614 Td
-[(14.10.2026 - 15.10.2026)] TJ
+[(10.05.2026 - 15.05.2026)] TJ
 ET
 BT
 13700 17614 Td
-[(1)] TJ
+[(3)] TJ
 ET
 BT
 14700 17614 Td
@@ -250,7 +250,7 @@ BT
 ET
 BT
 16899 17614 Td
-[(       100,00 €)] TJ
+[(       400,00 €)] TJ
 ET
 2500 17500 m
 19000 17500 l
@@ -309,7 +309,7 @@ BT
 ET
 BT
 9699 17114 Td
-[(14.10.2026 - 15.10.2026)] TJ
+[(10.05.2026 - 16.05.2026)] TJ
 ET
 BT
 13700 17114 Td
@@ -321,7 +321,7 @@ BT
 ET
 BT
 16899 17114 Td
-[(        95,00 €)] TJ
+[(       520,00 €)] TJ
 ET
 13600 17000 m
 19000 17000 l
@@ -356,7 +356,7 @@ BT
 ET
 BT
 16899 16448 Td
-[(       195,00 €)] TJ
+[(       920,00 €)] TJ
 ET
 BT
 13700 15614 Td
@@ -364,7 +364,7 @@ BT
 ET
 BT
 16899 15614 Td
-[(        50,00 €)] TJ
+[(         0,00 €)] TJ
 ET
 BT
 13700 14781 Td
@@ -372,7 +372,7 @@ BT
 ET
 BT
 16899 14781 Td
-[(       145,00 €)] TJ
+[(       920,00 €)] TJ
 ET
 2500 16000 m
 13500 16000 l
@@ -448,15 +448,15 @@ BT
 ET
 BT
 5350 14927 Td
-[(       182,24 €)] TJ
+[(       859,81 €)] TJ
 ET
 BT
 8100 14927 Td
-[(        12,76 €)] TJ
+[(        60,19 €)] TJ
 ET
 BT
 10850 14927 Td
-[(       195,00 €)] TJ
+[(       920,00 €)] TJ
 ET
 BT
 2600 14552 Td
@@ -476,7 +476,7 @@ BT
 ET
 BT
 2500 13105 Td
-[(Bitte überweisen Sie den Gesamtbetrag bis: 15.01.2026 auf unten genanntes Konto)] TJ
+[(Betrag dankend erhalten)] TJ
 ET
 /F1 282 Tf
 BT
@@ -604,34 +604,34 @@ endobj
 3 0 obj
 <<
 /Producer (Virtual Print Engine PDF Win x64 v7.40 - www.IdealSoftware.com)
-/CreationDate (D:20261013161427+02'00')
+/CreationDate (D:20261014095832+02'00')
 /Creator (Virtual Print Engine PDF Win x64 v7.40 - www.IdealSoftware.com)
 >>
 endobj
 xref
 0 15
 0000000000 00000 f 
-0000008404 00000 n 
-0000008463 00000 n 
-0000008512 00000 n 
+0000008380 00000 n 
+0000008439 00000 n 
+0000008488 00000 n 
 0000000019 00000 n 
 0000000124 00000 n 
-0000005496 00000 n 
-0000005591 00000 n 
-0000005612 00000 n 
+0000005472 00000 n 
+0000005567 00000 n 
+0000005588 00000 n 
 0000000000 00000 f 
-0000006808 00000 n 
-0000006987 00000 n 
-0000007009 00000 n 
+0000006784 00000 n 
+0000006963 00000 n 
+0000006985 00000 n 
 0000000000 00000 f 
-0000008216 00000 n 
+0000008192 00000 n 
 trailer
 <<
 /Size 15
 /Root 2 0 R
 /Info 3 0 R
-/ID [ <304f2127c549edd30600c04ff0c70ea7> <304f2127c549edd30600c04ff0c70ea7> ]
+/ID [ <ac092e1c1eb9cf527893bbc6d248462a> <ac092e1c1eb9cf527893bbc6d248462a> ]
 >>
 startxref
-8722
+8698
 %%EOF

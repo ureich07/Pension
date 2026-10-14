@@ -1589,4 +1589,35 @@ fktAdd_Fiels_Err:
     'End Function
 
 
+    ''' <summary>
+    ''' Lädt die Buchungsdaten für eine bestimmte ID und schreibt alle Spaltenwerte kommagetrennt in ein Textfeld.
+    ''' </summary>
+    ''' <remarks>
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation hinzugefügt.
+    ''' - Syntaxfehler im SQL-String korrigiert.
+    ''' - Absturzsicherung (Null- und Zeilenprüfung) für die DataTable integriert.
+    ''' - Nutzen von LINQ und 'String.Join' für eine performante, kommagetrennte Zusammenführung aller Felder.
+    ''' </remarks>
+    Public Function prLadeBuchungInTextfeld(sRID As String) As String
+        ' 1. SQL-Abfrage definieren (Syntax korrigiert)
+        Dim sSQL As String = "SELECT * FROM Buchung WHERE BID = '" & sRID & "'"
+
+        ' 2. Daten über die Hilfsfunktion laden
+        Dim dt As DataTable = fcReadDataTable(sSQL)
+
+        ' 3. Prüfen, ob ein Datensatz gefunden wurde
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            ' Erste Zeile der Tabelle referenzieren
+            Dim row As DataRow = dt.Rows(0)
+
+            ' Alle Spaltenwerte der Zeile in Strings konvertieren und mit Komma verbinden
+            Return String.Join(", ", row.ItemArray.Select(Function(x) x.ToString()))
+        Else
+            ' Fallback, falls keine Daten gefunden wurden
+            Return String.Empty
+        End If
+    End Function
+
+
 End Module

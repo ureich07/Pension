@@ -1281,15 +1281,10 @@ Public Class frmMain
     ''' </summary>
     ''' <remarks>
     ''' 19.01.2012 Create
-    ''' 23.09.2026 Code optimiert: Setzt Flags nur bei den relevanten Tasten (B und G) zurück
     ''' </remarks>
     Private Sub dgBuchung_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles dgBuchung.KeyUp
-        Select Case e.KeyCode
-            Case Keys.B
-                lBuc = False
-            Case Keys.G
-                lGesp = False
-        End Select
+        lBuc = False
+        lGesp = False
     End Sub
 
     ''' <summary>
@@ -1326,8 +1321,8 @@ Public Class frmMain
                                   ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) _
                                   Handles dgBuchung.CellMouseUp
 
-        ' 1. Nur auf den Linksklick reagieren
-        If e.Button <> Windows.Forms.MouseButtons.Left Then Exit Sub
+        '' 1. Nur auf den Linksklick reagieren
+        'If e.Button <> Windows.Forms.MouseButtons.Left Then Exit Sub
 
         ' 2. Klicks auf Spalten- oder Zeilenüberschriften abfangen (-1 verhindern)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Exit Sub
@@ -2421,4 +2416,7 @@ Public Class frmMain
         tiWait.Enabled = False
     End Sub
 
+    Private Sub dgBuchung_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgBuchung.CellContentClick
+
+    End Sub
 End Class

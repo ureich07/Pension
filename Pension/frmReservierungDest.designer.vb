@@ -123,7 +123,6 @@ Partial Class frmReservierungDest
         Me.tsSep1 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsbDelReservierung = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsbDelZimmer = New System.Windows.Forms.ToolStripMenuItem()
-        Me.tsmKopie = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsSep2 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsbCheckin = New System.Windows.Forms.ToolStripMenuItem()
         Me.PreisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -1105,7 +1104,7 @@ Partial Class frmReservierungDest
         'ToolStripDropDownButton1
         '
         Me.ToolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripDropDownButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbAufZimmer, Me.tsbBestätigung, Me.tsbMail, Me.ToolStripSeparator7, Me.tsbRechnung, Me.tsbBezahlt, Me.ToolStripSeparator8, Me.tsbBewertung, Me.ToolStripSeparator3, Me.tsmStorno, Me.tsSep1, Me.tsbDelReservierung, Me.tsbDelZimmer, Me.tsmKopie, Me.tsSep2, Me.tsbCheckin, Me.PreisToolStripMenuItem})
+        Me.ToolStripDropDownButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbAufZimmer, Me.tsbBestätigung, Me.tsbMail, Me.ToolStripSeparator7, Me.tsbRechnung, Me.tsbBezahlt, Me.ToolStripSeparator8, Me.tsbBewertung, Me.ToolStripSeparator3, Me.tsmStorno, Me.tsSep1, Me.tsbDelReservierung, Me.tsbDelZimmer, Me.tsSep2, Me.tsbCheckin, Me.PreisToolStripMenuItem})
         Me.ToolStripDropDownButton1.Image = CType(resources.GetObject("ToolStripDropDownButton1.Image"), System.Drawing.Image)
         Me.ToolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripDropDownButton1.Name = "ToolStripDropDownButton1"
@@ -1189,13 +1188,6 @@ Partial Class frmReservierungDest
         Me.tsbDelZimmer.Size = New System.Drawing.Size(251, 26)
         Me.tsbDelZimmer.Text = "Zimmer löschen"
         Me.tsbDelZimmer.ToolTipText = "Ausgewählte Zimmer löschen."
-        '
-        'tsmKopie
-        '
-        Me.tsmKopie.Name = "tsmKopie"
-        Me.tsmKopie.Size = New System.Drawing.Size(251, 26)
-        Me.tsmKopie.Text = "Rechnungskopie"
-        Me.tsmKopie.Visible = False
         '
         'tsSep2
         '
@@ -1570,7 +1562,6 @@ Partial Class frmReservierungDest
     Friend WithEvents tssInfo As System.Windows.Forms.ToolStripStatusLabel
     Friend WithEvents lbGast As System.Windows.Forms.Label
     Friend WithEvents tsbDelZimmer As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents tsmKopie As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents lbSumme As System.Windows.Forms.ToolStripLabel
     Friend WithEvents tsSep2 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents grBText As System.Windows.Forms.GroupBox

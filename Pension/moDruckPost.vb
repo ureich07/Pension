@@ -1369,7 +1369,12 @@ Module moDruckPost
         arfeld1 = fcDataSeek("select * From Objekte Where ID ='", sOID, 0, {"Name", "Strasse", "HNr", "PLZ", "Ort"})
 
         prVpeTextFormat("Times New Roman", 10)
-        prVpeText(xlaenge, 94, "[N B]" & fcLanguage(nSpracheLokal, "Rechnung") & " Nr. " & nRNr)
+        If lgRech Then
+            prVpeText(xlaenge, 94, "[N B]" & fcLanguage(nSpracheLokal, "Kopie der Rechnung") & " Nr. " & nRNr)
+        Else
+            prVpeText(xlaenge, 94, "[N B]" & fcLanguage(nSpracheLokal, "Rechnung") & " Nr. " & nRNr)
+        End If
+
         prVpeText(xlaenge + 85, 94, "[N B]" & fcLanguage(nSprache, "Objekt") & ":")
         prVpeText(xlaenge, 102, fcLanguage(nSpracheLokal, "hiermit berechne ich Ihnen folgende Leistungen:"))
 

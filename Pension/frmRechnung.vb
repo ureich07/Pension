@@ -225,10 +225,12 @@ Public Class frmRechnung
     ''' - Schleifenvariablen lokal typisiert und ungenutztes 'nMax' entfernt.
     ''' </remarks>
     Private Sub prLoadZimmer(ByVal sBid As String, ByVal sRNrID As String)
+
+
         Dim sSQL As String = "SELECT RDatum, RDSenden, Pausch, ZimID, ID FROM Buchung WHERE BID='" & sBid & "' AND RID='" & sRNrID & "'"
         Dim dt As DataTable = fcReadDataTable(sSQL)
 
-        ' CRITICAL BUGFIX: Sofort abbrechen, wenn keine Daten gefunden wurden (verhindert Absturz bei dt.Rows(0))
+        '' CRITICAL BUGFIX: Sofort abbrechen, wenn keine Daten gefunden wurden (verhindert Absturz bei dt.Rows(0))
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
 
         Dim firstRow As DataRow = dt.Rows(0)
@@ -299,6 +301,61 @@ Public Class frmRechnung
         ' HINWEIS: Der Aufruf von prRefreshRechnungsPosition() wurde hier entfernt, 
         ' da er im 'frmMain_Load' unmittelbar nach dieser Methode ohnehin aufgerufen wird.
     End Sub
+
+    'Private Sub prLoadZimmer(ByVal sBid As String, ByVal sRNrID As String)
+    '    Dim sSQL As String = "Select * from Buchung Where BID='" & sBid & "' and RID='" & sRNrID & "'"
+    '    Dim dt As DataTable = fcReadDataTable(sSQL)
+    '    Dim nMax As Integer = dt.Rows.Count - 1
+    '    sRdatum = dt.Rows(0).Item("RDatum") 'rechnungsdatum
+    '    sRDSenden = dt.Rows(0).Item("RDSenden").ToString.Trim
+    '    sPausch = dt.Rows(0).Item("Pausch").ToString.Trim
+    '    If sPausch = "1" Then
+    '        rbPausch.Checked = True
+    '        nReArt = 4
+    '    End If
+
+    '    If sRDSenden.Trim = "" Then
+
+    '        cbBar.Checked = True
+    '    Else
+    '        cbBar.Checked = False
+    '    End If
+
+
+
+    '    If sRdatum.Trim = "" Then sRdatum = fcUmDatum(Date.Today)
+    '    dtpRDatum.Value = fcUmDatum(sRdatum)
+    '    tbRNr.Text = sRNrID                                         'rechnungsnummer 
+    '    If tbRNr.Text.Trim = "" Then
+    '        bNewRNr = True
+    '        sRNr = fcGetNr("RNr")
+    '        tbRNr.Text = Date.Today.Year & "-" & sRNr
+    '    End If
+
+    '    arZ(0, 0) = "99"
+    '    arZ(0, 1) = "Weiteres Zimmer"
+    '    Dim n As Integer = 0
+    '    Dim i As Integer
+    '    If dt.Rows.Count > 0 Then
+    '        For i = 0 To dt.Rows.Count - 1
+    '            arZ(i + 1, 0) = dt.Rows(i).Item("ZimID").ToString
+    '            arZ(i + 1, 2) = dt.Rows(i).Item("ID").ToString
+    '            arZ(i + 1, 1) = " "
+    '        Next
+    '    End If
+
+    '    For i = 1 To 20
+    '        If arZ(i, 0) <> Nothing Then
+    '            arZ(i, 1) = fcGetObjektZimmerName(dtZim, arZ(i, 0)).Trim
+    '            If arZ(i, 1) <> "" Then
+    '                chliZimmer.Items.Add(arZ(i, 1) & "[" & arZ(i, 2) & "]")
+    '                chliZimmer.SetItemChecked(n, True)
+    '                n += 1
+    '            End If
+    '        End If
+    '    Next
+    '    prRefreshRechnungsPosition()
+    'End Sub
 
     ''' <summary>
     ''' Löst die Aktualisierung der Rechnungspositionen aus, sobald der Benutzer die Maustaste 
@@ -766,9 +823,82 @@ Public Class frmRechnung
     ''' <summary>
     ''' Schließt das aktuelle Formular.
     ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation standardisiert.
+    ''' </remarks>
     Private Sub btClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btClose.Click
+        frmReservierungDest.prChangeMenue(lgRech)
         Me.Close()
     End Sub
+
+    ''' <summary>
+    ''' Aktualisiert das globale Rechnungsdatum bei Änderung des DateTimePickers.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation hinzugefügt.
+    ''' </remarks>
+    Private Sub dtpRDatum_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpRDatum.ValueChanged
+        ' Datum über die Konvertierungsfunktion formatieren und zuweisen
+        sRdatum = fcUmDatum(dtpRDatum.Value)
+    End Sub
+
+    ''' <summary>
+    ''' Öffnet die Gästeverwaltung zur Auswahl eines Gastes und startet die Überwachung auf Änderungen.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation hinzugefügt.
+    ''' - Logische Reihenfolge optimiert: ID-Sicherung erfolgt direkt vor dem Öffnen des Formulars.
+    ''' </remarks>
+    Private Sub btGastDaten_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btGastDaten.Click
+        ' Timer zur Überwachung der Gast-ID aktivieren
+        tiGast.Enabled = True
+
+        ' Aktuelle Gast-ID als Referenz zwischenspeichern
+        sGKNr = sgGID
+
+        ' Gästeverwaltungsformular anzeigen
+        frmGaeste.Show()
+    End Sub
+
+    ''' <summary>
+    ''' Überwacht periodisch, ob im geöffneten Gästeformular ein anderer Gast ausgewählt wurde.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - Gefährliches 'Application.DoEvents()' entfernt, um UI-Reentrancy-Fehler und Stack-Overflows zu verhindern.
+    ''' - Veraltete 'Call'-Syntax beim Methodenaufruf entfernt.
+    ''' - Timer wird sofort bei Erkennung einer Änderung gestoppt, um mehrfache, kaskadierende Messageboxen zu blockieren.
+    ''' </remarks>
+    Private Sub tiGast_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tiGast.Tick
+        ' Prüfen, ob sich die globale Gast-ID geändert hat
+        If sGKNr <> sgGID Then
+            ' Timer sofort stoppen, um Überlappungen während der Benutzerinteraktion (MsgBox) zu verhindern
+            tiGast.Enabled = False
+
+            ' Benutzer fragen, ob die Daten übernommen werden sollen
+            If MsgBox("Sollen die Gastdaten überschrieben werden?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Gastauswahl") = MsgBoxResult.Yes Then
+                ' Neue Gastdaten laden
+                prLadeGastDaten(sgGID)
+                ' Neuen Referenzwert setzen
+                sGKNr = sgGID
+            Else
+                ' Wenn 'Nein': Timer wieder aktivieren, falls der Benutzer weiter suchen möchte
+                tiGast.Enabled = True
+            End If
+        End If
+    End Sub
+
 
 #End Region
 
@@ -1076,62 +1206,6 @@ Public Class frmRechnung
         prClearEingabe()
     End Sub
 
-    '''' <summary>
-    '''' Speicherung durchführen
-    '''' </summary>
-    '''' <remarks>
-    '''' 18.12.2011 Create
-    '''' </remarks>
-    'Private Sub prSaveZusatz(ByRef nPos As Integer)
-    '    Dim sb As New StringBuilder
-    '    Dim sqlText As String = ""
-    '    Dim arFields(0), arValue(0) As String
-    '    Dim cBedingung As String = ""
-    '    Dim sID As String = ""
-    '    sID = dgRechnung.Rows(nPos).Cells(14).Value
-    '    If lNew Then
-    '        sID = fcGetTimeID(Date.Today)
-    '        dgRechnung.Rows(nPos).Cells(14).Value = sID
-    '    End If
-
-    '    Dim nSumme As Double = 0
-    '    Try
-
-    '        sqlText = "ID,BuchID,ZimID,Menge,Bezeichnung,Betrag,Steuer,Gesamt,Datum,ZimNr,Name"
-    '        arFields = Split(sqlText, ",")
-    '        sqlText = fcSaveZusatz(sID)
-    '        arValue = Split(sqlText, "°")
-
-    '        If lNew Then
-    '            Call fcInsertCommand("Zusaetze", arFields, arValue)
-    '        Else
-    '            cBedingung = " WHERE ID='" & sID & "'"
-    '            Call fcUpdateCommand("Zusaetze", arFields, arValue, cBedingung)
-    '        End If
-    '        ''DataTable aktualisieren
-    '        'If lNew Then
-    '        '    'Datensatz in DataTable "dtZ" speichern
-    '        '    Call fcInsertTable(dtZ, arFields, arValue)
-    '        'Else
-    '        '    'Datensatz in DataTable "dtZ" speichern
-    '        '    cBedingung = "ID Like '" & sID & "'"
-    '        '    Call fcUpdateTable(dtZ, arFields, arValue, cBedingung)
-    '        'End If
-
-    '        'Call prFuelleTabelleZusatz(dtZ)
-
-    '        lNew = False
-
-    '    Catch ex As Exception
-    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
-    '    Finally
-    '        ''Call prLoadObjInList(dtObj)
-    '        'Call prLoockZusatz(False)
-    '        lNew = False
-
-    '    End Try
-    'End Sub
-
     ''' <summary>
     ''' Speichert die Zusatzleistung (Extra) entweder als neuen Datensatz (INSERT) oder 
     ''' aktualisiert einen bestehenden Eintrag (UPDATE) in der Datenbank-Tabelle "Zusaetze".
@@ -1317,7 +1391,6 @@ Public Class frmRechnung
         lbGesamt.Text = fcFormatDecimal(nEndBetrag.ToString(), 2)
     End Sub
 
-
     ''' <summary>
     ''' Bricht den aktuellen Bearbeitungsvorgang einer Rechnungsposition ab und setzt 
     ''' alle Eingabefelder sowie Steuer- und Betragslabels auf ihre Standardwerte zurück.
@@ -1367,264 +1440,9 @@ Public Class frmRechnung
 
 #End Region
 
-    Private Sub btGastDaten_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btGastDaten.Click
-        tiGast.Enabled = True
-        sGKNr = sgGID
-        frmGaeste.Show()
-    End Sub
 
-    Private Sub tiGast_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tiGast.Tick
-        Application.DoEvents()
-        If sGKNr <> sgGID Then
-            tiGast.Enabled = False
-            If MsgBox("Sollen die Gastdaten überschrieben werden?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Gastauswahl") = MsgBoxResult.Yes Then
-                Call prLadeGastDaten(sgGID)
-                sGKNr = sgGID
-            End If
 
-        End If
-    End Sub
-
-    '''' <summary>
-    '''' Verarbeitet den Klick auf den Drucken-Button. Erstellt die Rechnungsdaten 
-    '''' basierend auf der gewählten Rechnungsart (Standard, Zusatz, Storno oder Pauschal), 
-    '''' stößt den Druckprozess an, aktualisiert den Status in der Datenbank und 
-    '''' generiert die ZUGFeRD-konforme PDF-Rechnung im Archiv.
-    '''' </summary>
-    '''' <param name="sender">Das auslösende Objekt (Button).</param>
-    '''' <param name="e">Die Ereignisdaten des Click-Events.</param>
-    '''' <remarks>
-    '''' 11.04.2012 - Create
-    '''' 07.10.2026 - Code-Optimierung:
-    '''' - Altlasten entfernt: VB6-Funktionen wie 'Mid()' konsequent durch modernes '.Substring()' ersetzt.
-    '''' - Stabilität erhöht: Null-Conditional-Operator ('?.ToString()') verhindert Abstürze bei leeren Grid-Zellen.
-    '''' - Array-Fixes: Dynamisches 'ReDim Preserve' logisch abgesichert und Indizes für jeden Rechnungsblock sauber zurückgesetzt.
-    '''' - Syntax bereinigt: Redundante 'Call'-Schlüsselwörter entfernt, Zuweisungsoperatoren modernisiert ('&=' / '+=') und Variablen-Scoping geschärft.
-    '''' </remarks>
-    'Private Sub btDruck_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btDruck.Click
-    '    Dim arDruck(-1) As String
-    '    Dim sZeile As String
-    '    Dim arfeld3(3) As String
-    '    Dim cBedingung As String
-
-    '    sRNr1 = tbRNr.Text
-    '    prVpeOpen()
-    '    nReArt = 4
-
-    '    ' =====================================================================
-    '    ' --- BLOCK 1: RECHNUNGSART 0 ODER 1 (Standard / Kombiniert) --------
-    '    ' =====================================================================
-    '    If nReArt = 0 Or nReArt = 1 Then
-    '        ReDim arDruck(-1)
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            If dgRechnung.Rows(i).Cells(10).Value?.ToString() = "0" Then
-    '                sZeile = ""
-    '                For j As Integer = 1 To 18
-    '                    If j = 8 Or j = 9 Then
-    '                        sZeile &= StrTrim(dgRechnung.Rows(i).Cells(j).Value, ".") & "#"
-    '                    Else
-    '                        sZeile &= dgRechnung.Rows(i).Cells(j).Value?.ToString() & "#"
-    '                    End If
-    '                Next
-
-    '                ReDim Preserve arDruck(arDruck.Length)
-    '                If sZeile.Length > 0 Then
-    '                    sZeile = sZeile.Substring(0, sZeile.Length - 1)
-    '                End If
-    '                arDruck(arDruck.Length - 1) = sZeile
-    '            End If
-    '        Next
-
-    '        sgRNr = tbRNr.Text
-    '        prX_Rechnung_CII(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung, sRDSenden, sSS7, sSS19, nReArt, arDruck)
-    '        prDruckRechnung(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung, sRDSenden, sSS7, sSS19, sSSS, nReArt, arDruck)
-
-    '        arfeld3(0) = tbRNr.Text
-    '        arfeld3(1) = sRdatum
-    '        arfeld3(2) = "-1"
-    '        arfeld3(3) = sgGID
-
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            cBedingung = " WHERE ID='" & dgRechnung.Rows(i).Cells(15).Value?.ToString() & "'"
-    '            fcUpdateCommand("Buchung", {"RId", "RDatum", "Rechnung", "kunID"}, arfeld3, cBedingung)
-    '        Next
-
-    '        If bNewRNr Then prSetNr("RNr", fcGetNr("RNr"))
-
-    '        Dim arBewertungCheck() As String = fcDataSeek("select * From Bewertung Where BuchID ='", sgRBID, 0, {"ID"})
-    '        If arBewertungCheck.Length > 0 AndAlso arBewertungCheck(0) = " " Then
-    '            If CheckBox1.Checked Then
-    '                fcInsertCommand("Bewertung", {"Id", "BuchID", "Status"}, {fcGetTimeID(Date.Today), sgRBID, "-1"})
-    '            End If
-    '        End If
-
-    '        If nReArt = 0 Then prVpeVeiw()
-    '    End If
-
-    '    ' =====================================================================
-    '    ' --- BLOCK 2: RECHNUNGSART 2 ODER 1 (Zusatz / Kombiniert) -----------
-    '    ' =====================================================================
-    '    If nReArt = 2 Or nReArt = 1 Then
-    '        Dim ii As Integer = 0
-    '        ReDim arDruck(-1)
-
-    '        If nReArt = 1 Then prVpeNewPage()
-
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            If dgRechnung.Rows(i).Cells(9).Value?.ToString() = "1" Then
-    '                sZeile = ""
-    '                For j As Integer = 1 To 13
-    '                    sZeile &= dgRechnung.Rows(i).Cells(j).Value?.ToString() & "#"
-    '                Next
-
-    '                ReDim Preserve arDruck(ii)
-    '                If sZeile.Length > 0 Then
-    '                    sZeile = sZeile.Substring(0, sZeile.Length - 1)
-    '                End If
-    '                arDruck(ii) = sZeile
-    '                ii += 1
-    '            End If
-    '        Next
-
-    '        prDruckRechnungZusatz(sgRBID, sgGID, tbRNr.Text & "-1", sRdatum, True, 0, arDruck)
-
-    '        Dim arZusatzFeld(1) As String
-    '        arZusatzFeld(0) = tbRNr.Text & "-1"
-    '        arZusatzFeld(1) = sRdatum
-
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            cBedingung = " WHERE ID='" & dgRechnung.Rows(i).Cells(15).Value?.ToString() & "'"
-    '            fcUpdateCommand("Zusaetze", {"RID", "RDatum"}, arZusatzFeld, cBedingung)
-    '        Next
-
-    '        arfeld3(0) = tbRNr.Text
-    '        arfeld3(1) = sRdatum
-    '        arfeld3(2) = "-1"
-    '        arfeld3(3) = sgGID
-
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            cBedingung = " WHERE ID='" & dgRechnung.Rows(i).Cells(15).Value?.ToString() & "'"
-    '            fcUpdateCommand("Buchung", {"RId", "RDatum", "Rechnung", "kunID"}, arfeld3, cBedingung)
-    '        Next
-
-    '        If bNewRNr Then prSetNr("RNr", fcGetNr("RNr"))
-    '        prVpeVeiw()
-    '    End If
-
-    '    ' =====================================================================
-    '    ' --- BLOCK 3: RECHNUNGSART 3 (Storno) --------------------------------
-    '    ' =====================================================================
-    '    If nReArt = 3 Then
-    '        ReDim arDruck(-1)
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            If dgRechnung.Rows(i).Cells(9).Value?.ToString() = "0" Then
-    '                sZeile = ""
-    '                For j As Integer = 1 To 16
-    '                    If j = 7 Or j = 8 Then
-    '                        sZeile &= StrTrim(dgRechnung.Rows(i).Cells(j).Value, ".") & "#"
-    '                    Else
-    '                        sZeile &= dgRechnung.Rows(i).Cells(j).Value?.ToString() & "#"
-    '                    End If
-    '                Next
-
-    '                ReDim Preserve arDruck(arDruck.Length)
-    '                If sZeile.Length > 0 Then
-    '                    sZeile = sZeile.Substring(0, sZeile.Length - 1)
-    '                End If
-    '                arDruck(arDruck.Length - 1) = sZeile
-    '            End If
-    '        Next
-
-    '        prDruckRechnungStorno(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung, sRDSenden, arDruck)
-
-    '        arfeld3(0) = tbRNr.Text
-    '        arfeld3(1) = sRdatum
-    '        arfeld3(2) = "-1"
-    '        arfeld3(3) = sgGID
-
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            cBedingung = " WHERE ID='" & dgRechnung.Rows(i).Cells(15).Value?.ToString() & "'"
-    '            fcUpdateCommand("Buchung", {"RId", "RDatum", "Rechnung", "kunID"}, arfeld3, cBedingung)
-    '        Next
-
-    '        If bNewRNr Then prSetNr("RNr", fcGetNr("RNr"))
-
-    '        Dim arBewertungCheck() As String = fcDataSeek("select * From Bewertung Where BuchID ='", sgRBID, 0, {"ID"})
-    '        If arBewertungCheck.Length > 0 AndAlso arBewertungCheck(0) = " " Then
-    '            If CheckBox1.Checked Then
-    '                fcInsertCommand("Bewertung", {"Id", "BuchID", "Status"}, {fcGetTimeID(Date.Today), sgRBID, "-1"})
-    '            End If
-    '        End If
-
-    '        prVpeVeiw()
-    '    End If
-
-    '    ' =====================================================================
-    '    ' --- BLOCK 4: RECHNUNGSART 4 (Pauschal) ------------------------------
-    '    ' =====================================================================
-    '    If nReArt = 4 Then
-    '        ReDim arDruck(-1)
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            If dgRechnung.Rows(i).Cells(9).Value?.ToString() <> "0" Then
-    '                sZeile = ""
-    '                For j As Integer = 1 To 18
-    '                    If j = 7 Or j = 8 Then
-    '                        sZeile &= StrTrim(dgRechnung.Rows(i).Cells(j).Value, ".") & "#"
-    '                    Else
-    '                        sZeile &= dgRechnung.Rows(i).Cells(j).Value?.ToString() & "#"
-    '                    End If
-    '                Next
-
-    '                ReDim Preserve arDruck(arDruck.Length)
-    '                If sZeile.Length > 0 Then
-    '                    sZeile = sZeile.Substring(0, sZeile.Length - 1)
-    '                End If
-    '                arDruck(arDruck.Length - 1) = sZeile
-    '            End If
-    '        Next
-
-    '        prX_Rechnung_CII(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung, sRDSenden, sSS7, sSS19, nReArt, arDruck)
-    '        prDruckRechnung(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung, sRDSenden, sSS7, sSS19, sSSS, nReArt, arDruck)
-
-    '        arfeld3(0) = tbRNr.Text
-    '        arfeld3(1) = sRdatum
-    '        arfeld3(2) = "-1"
-    '        arfeld3(3) = sgGID
-
-    '        For i As Integer = 0 To dgRechnung.Rows.Count - 1
-    '            cBedingung = " WHERE ID='" & dgRechnung.Rows(i).Cells(15).Value?.ToString() & "'"
-    '            fcUpdateCommand("Buchung", {"RId", "RDatum", "Rechnung", "kunID"}, arfeld3, cBedingung)
-    '        Next
-
-    '        If bNewRNr Then prSetNr("RNr", fcGetNr("RNr"))
-    '        Dim arBewertungCheck() As String = fcDataSeek("select * From Bewertung Where BuchID ='", sgRBID, 0, {"ID"})
-    '        If arBewertungCheck.Length > 0 AndAlso arBewertungCheck(0) = " " Then
-    '            If CheckBox1.Checked Then
-    '                fcInsertCommand("Bewertung", {"Id", "BuchID", "Status"}, {fcGetTimeID(Date.Today), sgRBID, "-1"})
-    '            End If
-    '        End If
-    '        prVpeVeiw()
-    '    End If
-    '    ' =====================================================================
-    '    ' --- ABSCHLUSS: PDF-ARCHIVIERUNG & ZUGFeRD EMBEDDING -----------------
-    '    ' =====================================================================
-    '    Dim sJahr As String = ""
-    '    If tbRNr.Text.Length >= 4 Then
-    '        sJahr = tbRNr.Text.Substring(0, 4)
-    '    End If
-    '    If Not String.IsNullOrEmpty(sJahr) Then
-    '        Dim sZielPfad As String = arIni(31) & "" & sJahr
-    '        If Not DirExists(sZielPfad) Then
-    '            CreateDir(sZielPfad)
-    '        End If
-    '        Dim sDateiPDF As String = Path.Combine(cgPfad, "Ablage\Rechnung.PDF")
-    '        Dim sDateiCII As String = Path.Combine(cgPfad, "Ablage\Rechnung.xml")
-    '        Dim sDateiZug As String = Path.Combine(cgPfad, "Rechnung_" & tbRNr.Text & ".pdf")
-    '        'Dim sDateiZug As String = Path.Combine(sZielPfad , "Rechnung_" & tbRNr.Text & ".pdf")
-    '        EmbedXmlInPdf(sDateiPDF, sDateiCII, sDateiZug)
-    '    End If
-    '    buMail.Enabled = True
-    'End Sub
+#Region "Rechnung drucken.........................................................................."
 
     ''' <summary>
     ''' Verarbeitet den Klick auf den Drucken-Button. Erstellt die Rechnungsdaten 
@@ -1694,6 +1512,8 @@ Public Class frmRechnung
 
         prZugferdErzeugen()
         buMail.Enabled = True
+        'Rechnung wurde gedruckt, daher kann die Rechnung nicht mehr geändert werden
+        lgRech = True
     End Sub
 
     ''' <summary>
@@ -1777,20 +1597,69 @@ Public Class frmRechnung
         If bNewRNr Then prSetNr("RNr", fcGetNr("RNr"))
     End Sub
 
+    '''' <summary>
+    '''' Gemeinsamer Ablauf für Standard- und Pauschalrechnung: erzeugt die ZUGFeRD-XML (CII) 
+    '''' und stößt anschließend den Druck der Rechnung an.
+    '''' </summary>
+    '''' <param name="arDruck">Die vorbereiteten Druckzeilen (siehe fcGetDruckzeilen).</param>
+    '''' <remarks>
+    '''' 11.10.2026 - Create (ersetzt zwei identische Aufrufpaare aus btDruck_Click)
+    '''' </remarks>
+    'Private Sub prRechnungDrucken(arDruck() As String)
+    '    prX_Rechnung_CII(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung,
+    '                 sRDSenden, sSS7, sSS19, nReArt, arDruck)
+    '    If lgRech Then
+    '        ' Verwendung des modernen .NET MessageBox-Dialogs
+    '        Dim result As DialogResult = MessageBox.Show("Soll eine neue Rechnung erstellt und die Buchung freigeben oder eine Rechnungskopie erstellt werden?", "Bestätigung", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation)
+
+    '        If result = DialogResult.OK Then
+    '            lgRech = False
+    '            prDruckRechnung(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung,
+    '                        sRDSenden, sSS7, sSS19, sSSS, nReArt, arDruck)
+    '        Else
+    '            prDruckRechnung(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung,
+    '                        sRDSenden, sSS7, sSS19, sSSS, nReArt, arDruck)
+    '        End If
+    '    End If
+    'End Sub
+
     ''' <summary>
     ''' Gemeinsamer Ablauf für Standard- und Pauschalrechnung: erzeugt die ZUGFeRD-XML (CII) 
     ''' und stößt anschließend den Druck der Rechnung an.
+    ''' Erstellt und druckt die Rechnung (Original oder Kopie) basierend auf dem aktuellen Buchungsstatus.
     ''' </summary>
-    ''' <param name="arDruck">Die vorbereiteten Druckzeilen (siehe fcGetDruckzeilen).</param>
+    ''' <param name="arDruck">Ein Array von Strings, das die zu druckenden Zeilen oder Steuerbefehle enthält.</param>
     ''' <remarks>
     ''' 11.10.2026 - Create (ersetzt zwei identische Aufrufpaare aus btDruck_Click)
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - Code-Duplizierung entfernt: 'prDruckRechnung' wird nun zentral am Ende einmalig aufgerufen.
+    ''' - Logik verschlankt: Die 'If'-Bedingung steuert jetzt ausschließlich das Zurücksetzen des 'lgRech'-Flags.
+    ''' - End-Statement zu 'End Sub' korrigiert.
     ''' </remarks>
-    Private Sub prRechnungDrucken(arDruck() As String)
+    Private Sub prRechnungDrucken(ByVal arDruck() As String)
+        ' Generierung der CII-Rechnungsdaten (ZUGFeRD/Standard)
         prX_Rechnung_CII(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung,
-                     sRDSenden, sSS7, sSS19, nReArt, arDruck)
+                         sRDSenden, sSS7, sSS19, nReArt, arDruck)
+
+        ' Wenn die Rechnungserstellung aktiv/erforderlich ist, den Benutzer fragen
+        If lgRech Then
+            ' Bestätigung einholen: Bei 'OK' wird das Flag zurückgesetzt, bei 'Abbrechen' bleibt es aktiv
+            If MessageBox.Show("Soll eine neue Rechnung erstellt und die Buchung freigeben (OK) oder eine Rechnungskopie (Abbrechen) erstellt werden?",
+                               "Bestätigung", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) = DialogResult.OK Then
+
+                ' Buchung freigeben / als abgerechnet markiert
+                lgRech = False
+            End If
+        End If
+
+        ' Der Druckvorgang wird in jedem Fall (unabhängig von lgRech oder der MessageBox-Antwort) ausgeführt
         prDruckRechnung(sgRBID, sgGID, tbRNr.Text, sRdatum, cbBar.Checked, nAnzahlung,
-                    sRDSenden, sSS7, sSS19, sSSS, nReArt, arDruck)
+                        sRDSenden, sSS7, sSS19, sSSS, nReArt, arDruck)
+
     End Sub
+
+
+
 
     ''' <summary>
     ''' Archiviert die Rechnung: legt bei Bedarf den Jahresordner an und bettet die CII-XML 
@@ -1813,48 +1682,9 @@ Public Class frmRechnung
         EmbedXmlInPdf(sDateiPDF, sDateiCII, sDateiZug)
     End Sub
 
-    'Private Sub buMail_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buMail.Click
-    '    Dim arDruck(1) As String
-    '    Dim sZeile As String = ""
-    '    Dim arfeld3(3) As String
-    '    Dim ii As Integer = 0
-    '    Dim sJahr As String = Mid(sRNr1, 1, 4)
-    '    If FileExists(arIni(31) & "\" & sJahr & "\Rechnung_" & sRNr1 & ".PDF") = False Then
-    '        MsgBox("Rechnung noch nicht Erstelt", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly)
-    '        Exit Sub
-    '    End If
-    '    Dim sText As Array = Split(ReadOneValueFromSystemDb("Mail_Rechnung"), "#")
-    '    Dim sPdf As String = arIni(31) & "\" & sJahr & "\Rechnung_" & sRNr1 & ".PDF"
-    '    ' Dim sDatei1 As String = arIni(32) & "\Rechnung\Rech_" & sRNr1 & ".XML"
-    '    Dim arFeld(1) As String
-    '    Dim arfeld1(1) As String
-    '    ii = 0
-    '    Dim sKID As String
-    '    Dim sName As String = ""
-    '    arfeld1 = fcDataSeek("select * From Buchung Where BID ='", sgRBID, 0, {"KunID", "Sprache"})
-    '    sKID = arfeld1(0)
-    '    arFeld = fcDataSeek("select * From Kunden Where ID ='", sKID, 0, {"EMail", "Anrede", "Name1", "Vorname", "Strasse", "Ort", "plz", "Land"})
-    '    ii = Val(arfeld1(1))
-    '    If arFeld(0).Trim <> "" Then
-    '        If fcSendeMailAnlage(arFeld(0), "Rechnung", sText(ii), sDatei:=sPdf) = True Then
-    '            MsgBox("Rechnungs Mail Erfolgreich gesendet", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly)
-    '            Dim cBedingung As String
-    '            arfeld3(0) = tbRNr.Text 'Rechnungsmummer
-    '            arfeld3(1) = sRdatum  'Rechnungsdatum
-    '            arfeld3(2) = "-2"  'Rechnung geschrieben und versendet
-    '            arfeld3(3) = sgGID 'kunden ID
-    '            For i = 0 To dgRechnung.Rows.Count - 1
-    '                cBedingung = " WHERE ID='" & dgRechnung.Rows(i).Cells(15).Value & "'" 'feld 15 sind die Id für die Buchungen
-    '                Call fcUpdateCommand("Buchung", {"RId", "RDatum", "Rechnung", "kunID"}, arfeld3, cBedingung)
-    '            Next
-    '        Else
-    '            MsgBox(" F e h l e r  Rechnungs Mail ", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly)
-    '        End If
-    '    Else
-    '        MsgBox(" F e h l e r  Keine Mailadresse", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly)
-    '    End If
-    '    Me.Close()
-    'End Sub
+#End Region
+
+#Region "Rechnung per E-Mail versenden............................................................."
 
     ''' <summary>
     ''' Verarbeitet den Klick auf den Mail-Button. Prüft, ob die ZUGFeRD-Rechnung im Archiv vorliegt, 
@@ -1908,8 +1738,6 @@ Public Class frmRechnung
 
         Me.Close()
     End Sub
+#End Region
 
-    Private Sub dtpRDatum_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpRDatum.ValueChanged
-        sRdatum = fcUmDatum(dtpRDatum.Value)
-    End Sub
 End Class

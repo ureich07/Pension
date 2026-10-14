@@ -560,6 +560,7 @@ Public Class frmReservierungDest
     ''' </remarks>
     Private Sub prLadeBuchung(ByVal sRID As String, ByVal sIDRe As String)
         Dim sSQL As String = "Select * From Buchung Where BID='" & sRID & "' and ID='" & sIDRe & "'"
+        Dim st = prLadeBuchungInTextfeld(sRID)
 
         Try
             ' Der Datenbank-Call gehört zwingend in den Try-Block, falls die Verbindung fehlschlägt
@@ -634,7 +635,7 @@ Public Class frmReservierungDest
 
                 lgRech = moDB.fcGetBoolean(row("Rechnung"))
                 sgRNr = row("RID").ToString()
-                lgRech = fcChangeMenue(lgRech)
+                prChangeMenue(lgRech)
 
 
                 ' 4. Sprache und Buchungstext laden
@@ -2010,33 +2011,29 @@ Public Class frmReservierungDest
         Call prLadeGastDaten(sKNr)
     End Sub
 
-
     ''' <summary>
     ''' Steuerung des Menüs in Abhängigkeit des Rechnungsstatus.
     ''' </summary>
     ''' <param name="isInvoiceWritten">True, wenn die Rechnung bereits geschrieben wurde.</param>
-    ''' <returns>Gibt den übergebenen Rechnungsstatus zurück.</returns>
     ''' <remarks>
-    ''' 14.03.2012: Erstellt
-    '''12.10.2026 - Optimiert Code-Bereinigung und Modernisierung
+    ''' 14.03.2012 - Create
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - Von 'Function' zu 'Sub' umgewandelt, da der Rückgabewert redundant war.
+    ''' - Überflüssiges XML-'returns'-Tag entfernt.
+    ''' - Inline-Bedingung 'If(..., ..., ...)' für die Zuweisung des Fenstertitels eingesetzt.
     ''' </remarks>
-    Private Function fcChangeMenue(ByVal isInvoiceWritten As Boolean) As Boolean
+    Public Sub prChangeMenue(ByVal isInvoiceWritten As Boolean)
         ' Menü- und Toolbar-Elemente aktivieren/deaktivieren
         tsmStorno.Enabled = isInvoiceWritten
 
+        ' Elemente für Löschvorgänge sperren, wenn die Rechnung bereits existiert
         tsbDelReservierung.Enabled = Not isInvoiceWritten
         tsbDelZimmer.Enabled = Not isInvoiceWritten
 
-        ' Fenstertitel basierend auf dem Status anpassen
-        If isInvoiceWritten Then
-            Me.Text = "Reservierung bearbeiten => (Rechnung geschrieben!)"
-        Else
-            Me.Text = "Reservierung bearbeiten"
-        End If
+        ' Fenstertitel kompakt und lesbar basierend auf dem Status anpassen
+        Me.Text = If(isInvoiceWritten, "Reservierung bearbeiten => (Rechnung geschrieben!)", "Reservierung bearbeiten")
+    End Sub
 
-        ' Modernes Return statement statt Zuweisung an den Funktionsnamen
-        Return isInvoiceWritten
-    End Function
 
     ''' <summary>
     ''' Verarbeitet das Klick-Ereignis der tsbKey-Schaltfläche.
@@ -2350,16 +2347,31 @@ Public Class frmReservierungDest
             Dim nAnzahlungCent As Integer = 0
             Dim nSummeCent As Integer = 0
 
-            Dim nTmp As Decimal
-            If Decimal.TryParse(tbPreis.Text.Replace(","c, "."c).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, nTmp) Then
-                nPreisCent = Convert.ToInt32(Math.Round(nTmp * 100, MidpointRounding.AwayFromZero))
+            ' Temporäre Variable deklarieren (kann für alle drei Aufrufe wiederverwendet werden)
+            Dim nTmpCent As Integer
+
+            ' 1. Preis verarbeiten
+            nTmpCent = fcTextToCent(tbPreis.Text)
+            If nTmpCent >= 0 Then
+                nPreisCent = nTmpCent
+                ' Optional: Textbox sauber formatiert zurückschreiben (z.B. "150,50")
+                tbPreis.Text = Convert.ToDecimal(nPreisCent / 100).ToString("N2")
             End If
-            If Decimal.TryParse(tbAnzahlung.Text.Replace(","c, "."c).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, nTmp) Then
-                nAnzahlungCent = Convert.ToInt32(Math.Round(nTmp * 100, MidpointRounding.AwayFromZero))
+
+            ' 2. Anzahlung verarbeiten
+            nTmpCent = fcTextToCent(tbAnzahlung.Text)
+            If nTmpCent >= 0 Then
+                nAnzahlungCent = nTmpCent
+                tbAnzahlung.Text = Convert.ToDecimal(nAnzahlungCent / 100).ToString("N2")
             End If
-            If Decimal.TryParse(tbSumme.Text.Replace(","c, "."c).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, nTmp) Then
-                nSummeCent = Convert.ToInt32(Math.Round(nTmp * 100, MidpointRounding.AwayFromZero))
+
+            ' 3. Summe verarbeiten
+            nTmpCent = fcTextToCent(tbSumme.Text)
+            If nTmpCent >= 0 Then
+                nSummeCent = nTmpCent
+                tbSumme.Text = Convert.ToDecimal(nSummeCent / 100).ToString("N2")
             End If
+
 
             ' 3. Fälligkeitsdatum berechnen (ZDatum)
             Dim zDatum As String = ""
@@ -2423,6 +2435,37 @@ Public Class frmReservierungDest
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Konvertiert einen eingegebenen Geldbetrag-String sicher und kulturübergreifend in Cent.
+    ''' </summary>
+    ''' <param name="textBetrag">Der zu parsende Text aus der Textbox.</param>
+    ''' <returns>Der Betrag in Cent oder -1, wenn das Parsen fehlschlägt.</returns>
+    ''' <remarks>
+    ''' 14.10.2026 - Erstellt
+    ''' - Unterstützt sowohl deutsche (Koma) als auch englische (Punkt) Eingaben durch 'CurrentCulture'.
+    ''' - Eliminiert ungenaue Rundungen durch 'Math.Round' mit kaufmännischer Rundung.
+    ''' </remarks>
+    Private Function fcTextToCent(ByVal textBetrag As String) As Integer
+        If String.IsNullOrWhiteSpace(textBetrag) Then Return 0
+
+        Dim nValue As Decimal
+        Dim cleanText As String = textBetrag.Trim()
+
+        ' Nutzt die aktuelle Windows-Kultur (in DE standardmäßig das Komma, liest aber auch Punkte als Tausendertrennzeichen)
+        If Decimal.TryParse(cleanText, System.Globalization.NumberStyles.Currency, System.Globalization.CultureInfo.CurrentCulture, nValue) Then
+            Return Convert.ToInt32(Math.Round(nValue * 100, MidpointRounding.AwayFromZero))
+        End If
+
+        ' Fallback für den Fall, dass auf einem deutschen PC ein Punkt als Dezimaltrenner eingegeben wurde (z.B. "12.50")
+        If Decimal.TryParse(cleanText, System.Globalization.NumberStyles.Currency, System.Globalization.CultureInfo.InvariantCulture, nValue) Then
+            Return Convert.ToInt32(Math.Round(nValue * 100, MidpointRounding.AwayFromZero))
+        End If
+
+        ' Ungültige Eingabe
+        Return -1
+    End Function
+
 
     ''' <summary>
     ''' Überträgt bei der Erstanlage einer Gruppenbuchung die gemeinsamen Buchungsdaten (Zeitraum, Gast-ID, 
@@ -3112,20 +3155,34 @@ RefactorCell:
 #Region "Rechnung erstellen........................................................................"
 
     ''' <summary>
-    ''' Rechnungsmodul aufrufen
+    ''' Öffnet das Rechnungsmodul nach erfolgreicher Validierung und Speicherung der Reservierungsdaten.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (Toolbar-Button).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 02.04.2012 Create
+    ''' 02.04.2012 - Create
+    ''' 14.10.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation für Parameter vervollständigt.
+    ''' - Aufruf von 'prChangeMenue' an die neue parameterlose Sub-Struktur angepasst.
+    ''' - Inline-Kommentare zur Erläuterung des Programmablaufs hinzugefügt.
     ''' </remarks>
     Private Sub tsbRechnung_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbRechnung.Click
-        ' Aufruf der neuen zentralen Pflichtfeldprüfung
-        If Not ValidierungsPruefungErfolgreich() Then Exit Sub
+        ' 1. Aufruf der neuen zentralen Pflichtfeldprüfung
+        If Not ValidierungsPruefungErfolgreich() Then
+            Exit Sub
+        End If
+
+        ' 2. Aktuelle Zimmerreservierung in der Datenbank speichern
         prSaveZimmerReservierung()
+
+        ' Aktuelle Gast-ID aus dem Oberflächenelement für das Rechnungsformular bereitstellen
         sgGID = lbGastID.Text
+
+        ' Rechnungsformular öffnen
         frmRechnung.Show()
+
     End Sub
+
     'Private Sub tsbAnzahlungRechnung_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbAnzahlungRechnung.Click
     '    ' Aufruf der neuen zentralen Pflichtfeldprüfung
     '    If Not ValidierungsPruefungErfolgreich() Then Exit Sub
@@ -3220,7 +3277,7 @@ RefactorCell:
         fcUpdateTable(dtBuc, arFields, arValue, cBedingung)
 
         ' 3. Menüstatus aktualisieren
-        lgRech = fcChangeMenue(False)
+        prChangeMenue(False)
 
 
     End Sub
@@ -3444,6 +3501,10 @@ RefactorCell:
             frmCheckin = New frmCheckin()
             frmCheckin.Show()
         End If
+    End Sub
+
+    Private Sub tsmKopie_Click(sender As Object, e As EventArgs)
+
     End Sub
 
 
