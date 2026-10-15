@@ -10,11 +10,11 @@
 		</ram:GuidelineSpecifiedDocumentContextParameter>
 	</rsm:ExchangedDocumentContext>
 	<rsm:ExchangedDocument>
-		<ram:ID>2026-347</ram:ID>
+		<ram:ID>2026-358</ram:ID>
 		<ram:TypeCode>380</ram:TypeCode>
 		<ram:IssueDateTime>
 			<!-- Format YYYYMMDD -->
-			<udt:DateTimeString format="102">20260510</udt:DateTimeString>
+			<udt:DateTimeString format="102">20261015</udt:DateTimeString>
 		</ram:IssueDateTime>
 	</rsm:ExchangedDocument>
 	<rsm:SupplyChainTradeTransaction>
@@ -24,11 +24,11 @@
 				<ram:LineID>1</ram:LineID>
 			</ram:AssociatedDocumentLineDocument>
 			<ram:SpecifiedTradeProduct>
-				<ram:Name>Dreibettzimmer</ram:Name>
+				<ram:Name>Doppelzimmer</ram:Name>
 			</ram:SpecifiedTradeProduct>
 			<ram:SpecifiedLineTradeAgreement>
 				<ram:NetPriceProductTradePrice>
-					<ram:ChargeAmount>373.83</ram:ChargeAmount>
+					<ram:ChargeAmount>443.93</ram:ChargeAmount>
 					 <!-- ?BT-149 -->
 					<ram:BasisQuantity unitCode="DAY">1</ram:BasisQuantity>
 				</ram:NetPriceProductTradePrice>
@@ -43,36 +43,7 @@
 					<ram:RateApplicablePercent>7.00</ram:RateApplicablePercent>
 				</ram:ApplicableTradeTax>
 				<ram:SpecifiedTradeSettlementLineMonetarySummation>
-					<ram:LineTotalAmount>373.83</ram:LineTotalAmount>
-				</ram:SpecifiedTradeSettlementLineMonetarySummation>
-			</ram:SpecifiedLineTradeSettlement>
-		</ram:IncludedSupplyChainTradeLineItem>
-		<!-- Rechnungsposition_ENDE-->	    <!-- Rechnungsposition -->
-		<ram:IncludedSupplyChainTradeLineItem>
-			<ram:AssociatedDocumentLineDocument>
-				<ram:LineID>2</ram:LineID>
-			</ram:AssociatedDocumentLineDocument>
-			<ram:SpecifiedTradeProduct>
-				<ram:Name>Dreibettzimmer</ram:Name>
-			</ram:SpecifiedTradeProduct>
-			<ram:SpecifiedLineTradeAgreement>
-				<ram:NetPriceProductTradePrice>
-					<ram:ChargeAmount>485.98</ram:ChargeAmount>
-					 <!-- ?BT-149 -->
-					<ram:BasisQuantity unitCode="DAY">1</ram:BasisQuantity>
-				</ram:NetPriceProductTradePrice>
-			</ram:SpecifiedLineTradeAgreement>
-			<ram:SpecifiedLineTradeDelivery>
-				<ram:BilledQuantity unitCode="DAY">1</ram:BilledQuantity>
-			</ram:SpecifiedLineTradeDelivery>
-			<ram:SpecifiedLineTradeSettlement>
-				<ram:ApplicableTradeTax>
-					<ram:TypeCode>VAT</ram:TypeCode>
-					<ram:CategoryCode>S</ram:CategoryCode>
-					<ram:RateApplicablePercent>7.00</ram:RateApplicablePercent>
-				</ram:ApplicableTradeTax>
-				<ram:SpecifiedTradeSettlementLineMonetarySummation>
-					<ram:LineTotalAmount>485.98</ram:LineTotalAmount>
+					<ram:LineTotalAmount>443.93</ram:LineTotalAmount>
 				</ram:SpecifiedTradeSettlementLineMonetarySummation>
 			</ram:SpecifiedLineTradeSettlement>
 		</ram:IncludedSupplyChainTradeLineItem>
@@ -117,13 +88,13 @@
 
 			<ram:ActualDeliverySupplyChainEvent>
 				<ram:OccurrenceDateTime>
-					<udt:DateTimeString format="102">20260510</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261018</udt:DateTimeString>
 				</ram:OccurrenceDateTime>
 			</ram:ActualDeliverySupplyChainEvent>
 		</ram:ApplicableHeaderTradeDelivery>
 		
 		<ram:ApplicableHeaderTradeSettlement>
-			<ram:PaymentReference>R.Nr.:2026-347/10.05.2026 - 15.05.2026</ram:PaymentReference>
+			<ram:PaymentReference>R.Nr.:2026-358/18.10.2026 - 23.10.2026</ram:PaymentReference>
 			<ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
 			<ram:SpecifiedTradeSettlementPaymentMeans>
 				<ram:TypeCode>58</ram:TypeCode>
@@ -137,32 +108,32 @@
 				</ram:PayeeSpecifiedCreditorFinancialInstitution>
 			</ram:SpecifiedTradeSettlementPaymentMeans>
 			<ram:ApplicableTradeTax>
-				<ram:CalculatedAmount>60.19</ram:CalculatedAmount>
+				<ram:CalculatedAmount>31.07</ram:CalculatedAmount>
 				<ram:TypeCode>VAT</ram:TypeCode>
-				<ram:BasisAmount>859.81</ram:BasisAmount>
+				<ram:BasisAmount>443.93</ram:BasisAmount>
 				<ram:CategoryCode>S</ram:CategoryCode>
 				<ram:RateApplicablePercent>7.00</ram:RateApplicablePercent>
 			</ram:ApplicableTradeTax>
 			<ram:BillingSpecifiedPeriod>
 				<ram:StartDateTime>
-					<udt:DateTimeString format="102">20260510</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261018</udt:DateTimeString>
 				</ram:StartDateTime>
 				<ram:EndDateTime>
-					<udt:DateTimeString format="102">20260516</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261023</udt:DateTimeString>
 				</ram:EndDateTime>
 			</ram:BillingSpecifiedPeriod>
 			<ram:SpecifiedTradePaymentTerms>
 				<!-- <ram:Description></ram:Description> -->
 				<ram:DueDateDateTime>
-					<udt:DateTimeString format="102">20261028</udt:DateTimeString>
+					<udt:DateTimeString format="102">20261016</udt:DateTimeString>
 				</ram:DueDateDateTime>
 			</ram:SpecifiedTradePaymentTerms>
 			<ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-				<ram:LineTotalAmount>859.81</ram:LineTotalAmount>
-				<ram:TaxBasisTotalAmount>859.81</ram:TaxBasisTotalAmount>
-				<ram:TaxTotalAmount currencyID="EUR">60.19</ram:TaxTotalAmount>
-				<ram:GrandTotalAmount>920.00</ram:GrandTotalAmount>
-				<ram:DuePayableAmount>920.00</ram:DuePayableAmount>
+				<ram:LineTotalAmount>443.93</ram:LineTotalAmount>
+				<ram:TaxBasisTotalAmount>443.93</ram:TaxBasisTotalAmount>
+				<ram:TaxTotalAmount currencyID="EUR">31.07</ram:TaxTotalAmount>
+				<ram:GrandTotalAmount>475.00</ram:GrandTotalAmount>
+				<ram:DuePayableAmount>475.00</ram:DuePayableAmount>
 			</ram:SpecifiedTradeSettlementHeaderMonetarySummation>
 		</ram:ApplicableHeaderTradeSettlement>
 	</rsm:SupplyChainTradeTransaction>

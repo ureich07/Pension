@@ -1527,6 +1527,8 @@ fktAdd_Fiels_Err:
     ''' <remarks>
     ''' 09.10.2026 - Update:
     ''' - Unterstützung für Access/VB6-Altlasterkennung ergänzt: '-1' wird jetzt korrekt als 'True' interpretiert.
+    ''' 15.10.2026 - Update:
+    ''' - Unterstützung für negative Integer-Werte (z. B. '-1', '-2') hinzugefügt, die als 'True' gewertet werden.
     ''' </remarks>
     Public Function fcGetBoolean(ByVal dbValue As Object, Optional ByVal defaultValue As Boolean = False) As Boolean
         ' Prüfen auf Null oder DBNull
@@ -1542,7 +1544,7 @@ fktAdd_Fiels_Err:
         End If
 
         ' Legacy-Werte aus älteren Datenbanken (Access, SQL Server, VB6) abfangen
-        If sValue = "1" OrElse sValue = "-1" Then Return True
+        If sValue = "1" OrElse sValue = "-1" OrElse sValue = "-2" Then Return True
         If sValue = "0" Then Return False
 
         ' Standard-Parsing für Text ("True" / "False")

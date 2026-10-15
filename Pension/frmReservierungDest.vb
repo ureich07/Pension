@@ -11,7 +11,6 @@ Public Class frmReservierungDest
     Dim arOld(24) As String
     Dim arNew(24) As String
     Dim sBID As String 'ID einer einzelnen Reservierung
-    Dim lRec As Boolean
     Dim lUnbekannt As Boolean = False
     Dim sDayStart As Date
     Dim sDayEnd As Date
@@ -627,7 +626,6 @@ Public Class frmReservierungDest
 
                 ' Werbung und Rechnung initialisieren
                 Dim sW As String = row("Werbung").ToString()
-                lRec = moDB.fcGetBoolean(row("Rechnung"))
 
                 If coWerbung.Text = "Unbekannt" Then
                     coWerbung.Text = sW
@@ -3498,7 +3496,7 @@ RefactorCell:
             frmCheckin.BringToFront()
         Else
             ' Falls nicht vorhanden oder geschlossen, neu initialisieren und anzeigen
-            frmCheckin = New frmCheckin()
+            'frmCheckin = New frmCheckin()
             frmCheckin.Show()
         End If
     End Sub

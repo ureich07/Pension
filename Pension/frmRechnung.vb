@@ -1709,6 +1709,7 @@ Public Class frmRechnung
         End If
         'Dim sPdf As String = Path.Combine(cgPfad, "Rechnung_" & tbRNr.Text & ".pdf")
         Dim sPdf As String = Path.Combine(arIni(31), sRNr1.Substring(0, 4), "Rechnung_" & sRNr1 & ".PDF")
+
         If Not FileExists(sPdf) Then
             MsgBox("Rechnung noch nicht Erstelt", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly)
             Return
