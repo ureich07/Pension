@@ -125,7 +125,6 @@ Partial Class frmReservierungDest
         Me.tsbDelZimmer = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsSep2 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsbCheckin = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PreisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.tscoZim = New System.Windows.Forms.ToolStripComboBox()
@@ -1104,7 +1103,7 @@ Partial Class frmReservierungDest
         'ToolStripDropDownButton1
         '
         Me.ToolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripDropDownButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbAufZimmer, Me.tsbBestätigung, Me.tsbMail, Me.ToolStripSeparator7, Me.tsbRechnung, Me.tsbBezahlt, Me.ToolStripSeparator8, Me.tsbBewertung, Me.ToolStripSeparator3, Me.tsmStorno, Me.tsSep1, Me.tsbDelReservierung, Me.tsbDelZimmer, Me.tsSep2, Me.tsbCheckin, Me.PreisToolStripMenuItem})
+        Me.ToolStripDropDownButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbAufZimmer, Me.tsbBestätigung, Me.tsbMail, Me.ToolStripSeparator7, Me.tsbRechnung, Me.tsbBezahlt, Me.ToolStripSeparator8, Me.tsbBewertung, Me.ToolStripSeparator3, Me.tsmStorno, Me.tsSep1, Me.tsbDelReservierung, Me.tsbDelZimmer, Me.tsSep2, Me.tsbCheckin})
         Me.ToolStripDropDownButton1.Image = CType(resources.GetObject("ToolStripDropDownButton1.Image"), System.Drawing.Image)
         Me.ToolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripDropDownButton1.Name = "ToolStripDropDownButton1"
@@ -1199,12 +1198,6 @@ Partial Class frmReservierungDest
         Me.tsbCheckin.Name = "tsbCheckin"
         Me.tsbCheckin.Size = New System.Drawing.Size(251, 26)
         Me.tsbCheckin.Text = "Checkin"
-        '
-        'PreisToolStripMenuItem
-        '
-        Me.PreisToolStripMenuItem.Name = "PreisToolStripMenuItem"
-        Me.PreisToolStripMenuItem.Size = New System.Drawing.Size(251, 26)
-        Me.PreisToolStripMenuItem.Text = "Preis"
         '
         'ToolStripSeparator4
         '
@@ -1606,7 +1599,6 @@ Partial Class frmReservierungDest
     Friend WithEvents ToolStripStatusLabel4 As System.Windows.Forms.ToolStripStatusLabel
     Friend WithEvents tbAbZeit As System.Windows.Forms.TextBox
     Friend WithEvents tbAnZeit As System.Windows.Forms.TextBox
-    Friend WithEvents PreisToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents lbPauschPreis As Label
     Friend WithEvents cbPausch As CheckBox
     Friend WithEvents tsbBezahlt As ToolStripMenuItem

@@ -858,32 +858,6 @@ Public Class frmReservierungDest
         End If
     End Sub
 
-    '''' <summary>
-    '''' Anzahl der Personen und Übernachtungen
-    '''' </summary>
-    '''' <param name="dt"></param>
-    '''' <remarks>
-    '''' 03.02.2012 Create
-    '''' </remarks>
-    'Private Sub prLaderPersonenUeberNachtung(ByVal dt As DataTable)
-    '    tbInternetNr.Text = dt.Rows(0).Item("InternetNr").ToString
-    '    tbAnzPer.Text = dt.Rows(0).Item("Personen").ToString
-    '    tbUArt.Text = dt.Rows(0).Item("Kategorie").ToString
-    '    coArt.Text = dt.Rows(0).Item("Art").ToString
-    '    tbPreis.Text = fcFormatDecimal(Val(dt.Rows(0).Item("Preis").ToString) / 100)
-    '    tbAnzahlung.Text = fcFormatDecimal(Val(dt.Rows(0).Item("Anzahlung").ToString) / 100)
-    '    Dim sVariable As String = dt.Rows(0).Item("Variable").ToString
-    '    Select Case sVariable
-    '        Case "0"
-    '            rbNormal.Checked = True
-    '        Case "1"
-    '            rbFest.Checked = True
-    '        Case "2"
-    '            rbVariabel.Checked = True
-    '    End Select
-
-    'End Sub
-
     ''' <summary>
     ''' Lädt die Anzahl der Personen, Übernachtungspreise, Kategorien sowie die Preisgestaltungs-Variable aus der Buchungstabelle und befüllt die Benutzeroberfläche.
     ''' </summary>
@@ -1002,44 +976,6 @@ Public Class frmReservierungDest
         End If
     End Sub
 
-    '''' <summary>
-    '''' Aktuelle Werte in ein Array sichern (Vergleich vorher / nacher) => Daten speichern
-    '''' </summary>
-    '''' <param name="arT"></param>
-    '''' <returns></returns>
-    '''' <remarks>
-    '''' 25.02.2012 Create
-    '''' </remarks>
-    'Private Function fcCollectDataInArray(ByVal arT() As String) As Array
-    '    'Dim arT(22) As String
-    '    arT(0) = tbAnzPer.Text
-    '    arT(1) = coArt.Text
-    '    arT(2) = tbUArt.Text
-    '    arT(3) = tbPreis.Text
-    '    arT(4) = tbAnzahlung.Text
-    '    arT(5) = coAnrede.Text
-    '    arT(6) = tbName1.Text
-    '    arT(7) = tbName2.Text
-    '    arT(8) = tbVorname.Text
-    '    arT(9) = tbStrasse.Text
-    '    arT(10) = tbPLZ.Text
-    '    arT(11) = tbOrt.Text
-    '    arT(12) = coLand.Text
-    '    arT(13) = tbTel.Text
-    '    arT(14) = tbFax.Text
-    '    arT(15) = tbFunk.Text
-    '    arT(16) = tbEMail.Text
-    '    arT(17) = "" 'tbPass.Text
-    '    arT(18) = tbInfo.Text
-    '    arT(19) = fcUmDatum(dpGeb.Value)
-    '    arT(20) = coWerbung.Text
-    '    arT(21) = lbAnreise.Text
-    '    arT(22) = lbAbreise.Text
-    '    arT(23) = tbFPreis.Text
-    '    arT(24) = lbMakro.Text
-    '    fcCollectDataInArray = arT
-    'End Function
-
     ''' <summary>
     ''' Sichert die aktuellen Formular- und Buchungswerte in ein String-Array, um einen späteren Vorher-Nachher-Vergleich für die Speicherung zu ermöglichen.
     ''' </summary>
@@ -1132,87 +1068,60 @@ Public Class frmReservierungDest
         prCheckNumericKey(e.KeyChar, currentTextBox)
     End Sub
 
-
-
-
-
     ''' <summary>
     ''' Wenn ein neuer Eintrag ausgewählt wurde wird geprüft ob Änderungen in der alten Auswahl
     ''' vorgenommen wurden. Wenn Ja, dann wird die Änderung gespeichert und die neue Buchung geladen. 
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen vollständig entfernt.
+    ''' - Verschachtelte If-Strukturen durch ein übersichtlicheres 'Select Case' ersetzt.
+    ''' - Explizite Datentyp-Konvertierungen und Bereinigungen für 'tscoZim.Text' durchgeführt.
+    ''' - XML-Kommentare vervollständigt.
     ''' </remarks>
-    Private Sub tscoZim_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tscoZim.SelectedIndexChanged
+    Private Sub tscoZim_SelectedIndexChanged(sender As Object, e As EventArgs) Handles tscoZim.SelectedIndexChanged
         If lStart Then Exit Sub
 
-        If tscoZim.Text = "Gleiches Zimmer" Then
-            ' Aufruf der neuen zentralen Pflichtfeldprüfung
-            If Not ValidierungsPruefungErfolgreich() Then Exit Sub
-            Call prSaveZimmerReservierung()
-            tsbVorAnreise.Visible = True
-            tsbNachAbreise.Visible = True
+        Dim ausgewaehlterText As String = tscoZim.Text.Trim()
 
+        Select Case ausgewaehlterText
+            Case "Gleiches Zimmer"
+                ' Aufruf der neuen zentralen Pflichtfeldprüfung
+                If Not ValidierungsPruefungErfolgreich() Then Exit Sub
 
-        Else
+                prSaveZimmerReservierung()
+                tsbVorAnreise.Visible = True
+                tsbNachAbreise.Visible = True
 
-            If tscoZim.Text = "Weiteres Zimmer" Then
-                '   If lRec = False Then 'Keine Rechnung geschrieben
+            Case "Weiteres Zimmer"
                 tscoFreiZim.Visible = True
                 tsbAddZimmer.Visible = True
-                If tscoFreiZim.Items.Count > 0 Then tscoFreiZim.SelectedIndex = 0
+
+                If tscoFreiZim.Items.Count > 0 Then
+                    tscoFreiZim.SelectedIndex = 0
+                End If
                 tscoFreiZim.Select()
-                'End If
-            Else
+
+            Case Else
                 tscoFreiZim.Visible = False
                 tsbAddZimmer.Visible = False
-                sgRZID = fcGetObjektZimmerID(dtZim, tscoZim.Text, "ID")
-                sIDR = Extract(tscoZim.Text, "[", "]", 1)
-                '       = sIDR
-                Call prLadeBuchung(sgRBID, sIDR)
-                Call Summe(sgRBID, sgRZID)
+
+                ' Daten für das ausgewählte Zimmer ermitteln und laden
+                sgRZID = fcGetObjektZimmerID(dtZim, ausgewaehlterText, "ID")
+                sIDR = Extract(ausgewaehlterText, "[", "]", 1)
+
+                prLadeBuchung(sgRBID, sIDR)
+                Summe(sgRBID, sgRZID)
+
                 arOld = fcCollectDataInArray(arOld)
                 tbAnzPer.Select()
 
-                Call prCreatTabelIndex()
-            End If
-        End If
+                prCreatTabelIndex()
+        End Select
     End Sub
-
-    '''' <summary>
-    '''' Steuert die Aktivierung und Sichtbarkeit von Menü- und Steuerelementen in Abhängigkeit des Rechnungsstatus (z. B. ob eine Rechnung gesperrt oder bereits abgeschlossen ist).
-    '''' </summary>
-    '''' <param name="lr">Ein boolescher Wert, der angibt, ob die Rechnung gesperrt bzw. schreibgeschützt ist (<c>True</c>) oder bearbeitet werden kann (<c>False</c>).</param>
-    '''' <remarks>
-    '''' 28.02.2012 - Create
-    '''' 05.10.2026 - Code-Optimierung:
-    '''' - Altlasten und auskommentierte Codezeilen ('gbPersonen', 'tsmAnAbReise') vollständig entfernt.
-    '''' - XML-Dokumentation detailliert ausformuliert und Parameterbeschreibung ergänzt.
-    '''' </remarks>
-    'Private Sub prLookForm(ByVal lr As Boolean)
-    '    Dim isEditable As Boolean = Not lr
-
-    '    ' Steuerung der Bearbeitbarkeit von Eingabebereichen und Speichern-Aktionen
-    '    gbGast.Enabled = isEditable
-    '    tsbSave.Enabled = isEditable
-
-    '    ' Sichtbarkeit von rechnungs- und reservierungsbezogenen Toolbar-Aktionen steuern
-    '    tsbAufZimmer.Visible = isEditable
-    '    tsbRechnung.Visible = isEditable
-    '    tsbBestätigung.Visible = isEditable
-    '    tsbErinnerung.Visible = isEditable
-    '    tsbDelReservierung.Visible = isEditable
-    '    tsbDelZimmer.Visible = isEditable
-
-    '    ' Trennstriche in der Toolbar anpassen
-    '    tsSep1.Visible = isEditable
-    '    tsSep2.Visible = isEditable
-
-    '    ' Kopiefunktion ist nur sichtbar, wenn die Rechnung gesperrt/abgeschlossen ist
-    '    tsmKopie.Visible = lr
-    'End Sub
 
     ''' <summary>
     ''' Berechnet die Gesamtsumme für ein bestimmtes Zimmer inklusive aller gebuchten Zusatzleistungen und Steuern.
@@ -1708,306 +1617,329 @@ Public Class frmReservierungDest
 
 
     ''' <summary>
-    ''' Mit Klick in die Auswahlbox alle Daten in das Array "arNew" sichern (Vergleich)
+    ''' Sichert bei einem Klick in die Auswahlbox alle aktuellen Daten in das Array "arNew" für den späteren Vergleich.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Die Quelle des Ereignisses (die ComboBox).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Unnötig explizite Namensraum-Präfixe (System.Object, System.EventArgs) entfernt.
+    ''' - Modifizierer 'ByVal' entfernt (in modernem VB.NET der Standard und implizit).
+    ''' - XML-Dokumentation vervollständigt.
     ''' </remarks>
-    Private Sub tscoZim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tscoZim.Click
+    Private Sub tscoZim_Click(sender As Object, e As EventArgs) Handles tscoZim.Click
         arNew = fcCollectDataInArray(arNew)
-
     End Sub
 
-    Private Sub tsbVorAnreise_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbVorAnreise.Click
+    ''' <summary>
+    ''' Erstellt eine neue Buchung für das aktuelle Zimmer direkt vor dem aktuellen Anreisedatum, sofern das Zimmer frei ist.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Veraltete VB6-Funktionen (CDate, DateAdd, Space, Call, MsgBox) durch .NET-Standard ersetzt.
+    ''' - 'Date.TryParse' zur fehlerfreien Datumskonvertierung eingeführt.
+    ''' - Ungenutzte lokale Variable 'sZim' am Ende entfernt.
+    ''' </remarks>
+    Private Sub tsbVorAnreise_Click(sender As Object, e As EventArgs) Handles tsbVorAnreise.Click
+        Dim aktuellesAnreiseDatum As Date
+        If Not Date.TryParse(lbAnreise.Text, aktuellesAnreiseDatum) Then
+            MessageBox.Show("Das aktuelle Anreisedatum ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Sub
+        End If
 
-        Dim dDa As Date 'abreise datum wie bisheriges anreisedatum
-        Dim sAn As String = lbAnreise.Text
-        Dim sAb As String = lbAbreise.Text
-        dDa = CDate(sAn)
+        ' Neues Abreisedatum ist das alte Anreisedatum. Neues Anreisedatum ist 1 Tag davor.
+        Dim sAb As String = aktuellesAnreiseDatum.ToString("dd.MM.yyyy")
+        Dim sAn As String = aktuellesAnreiseDatum.AddDays(-1).ToString("dd.MM.yyyy")
+        Dim zimmerNr As String = lbZimNr.Text
 
-        sAb = dDa
-        dDa = DateAdd(DateInterval.Day, -1, dDa)
-        sAn = dDa
-
-        If frControlFreeZimmer(lbZimNr.Text, sAn, sAb) = True Then
-            Dim ID As String = fcAppendBlank("Buchung")
+        If frControlFreeZimmer(zimmerNr, sAn, sAb) Then
+            Dim id As String = fcAppendBlank("Buchung")
             Dim arFields() As String = {"SendMailZugang"}
             Dim arValue() As String = {"Y"}
-            Dim cBedingung As String = " WHERE ID='" & ID & "'"
-            Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+            Dim cBedingung As String = $" WHERE ID='{id}'"
 
-            sBID = ID
-            tscoZim.Items.Add(lbZimNr.Text & Space(30) & "[" & ID & "]")
+            fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+
+            sBID = id
+
+            ' Formatierung des ComboBox-Eintrags mit moderner String-Interpolation und PadRight
+            Dim eintragText As String = $"{zimmerNr.PadRight(37)}[{id}]"
+            tscoZim.Items.Add(eintragText)
+
             lbAnreise.Text = sAn
             lbAbreise.Text = sAb
+
             arNew(21) = sAn
             arNew(22) = sAb
             arNew = fcCollectDataInArray(arNew)
-            Call prAddNewZimmer(lbZimNr.Text, arNew, ID)
-            tscoZim.Text = lbZimNr.Text & Space(30) & "[" & ID & "]"
-            Dim sZim As String = fcGetObjektZimmerID(dtZim, lbZimNr.Text, "ID")
 
+            prAddNewZimmer(zimmerNr, arNew, id)
+            tscoZim.Text = eintragText
         Else
-
-            MsgBox("Zimmer schon vermietet", MsgBoxStyle.Question + MsgBoxStyle.OkOnly)
+            MessageBox.Show("Zimmer schon vermietet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Question)
         End If
+
         tsbVorAnreise.Visible = False
         tsbNachAbreise.Visible = False
     End Sub
 
-    Private Sub tsbNachAbreise_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbNachAbreise.Click
+    ''' <summary>
+    ''' Erstellt eine neue Buchung für das aktuelle Zimmer direkt nach dem aktuellen Abreisedatum, sofern das Zimmer frei ist.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Veraltete VB6-Befehle entfernt (Call, Space, MsgBox, DateAdd, CDate).
+    ''' - String-Verkettung auf moderne Interpolation ($"...") umgestellt.
+    ''' - Array-Zuweisung analog zur 'VorAnreise'-Logik vereinheitlicht.
+    ''' </remarks>
+    Private Sub tsbNachAbreise_Click(sender As Object, e As EventArgs) Handles tsbNachAbreise.Click
+        Dim aktuellesAbreiseDatum As Date
+        If Not Date.TryParse(lbAbreise.Text, aktuellesAbreiseDatum) Then
+            MessageBox.Show("Das aktuelle Abreisedatum ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Sub
+        End If
 
-        Dim dDa As Date 'anreise datum wie bisheriges abreisedatum
+        ' Neues Anreisedatum ist das alte Abreisedatum. Neues Abreisedatum ist 1 Tag danach.
+        Dim sAn As String = aktuellesAbreiseDatum.ToString("dd.MM.yyyy")
+        Dim sAb As String = aktuellesAbreiseDatum.AddDays(1).ToString("dd.MM.yyyy")
+        Dim zimmerNr As String = lbZimNr.Text
 
-        Dim sAn As String = lbAnreise.Text
-        Dim sAb As String = lbAbreise.Text
-        dDa = CDate(sAb)
-        sAn = lbAbreise.Text
-        dDa = DateAdd(DateInterval.Day, 1, dDa)
-        sAb = dDa
-
-
-        If frControlFreeZimmer(lbZimNr.Text, sAn, sAb) = True Then
-            Dim ID As String = fcAppendBlank("Buchung")
-
+        If frControlFreeZimmer(zimmerNr, sAn, sAb) Then
+            Dim id As String = fcAppendBlank("Buchung")
             Dim arFields() As String = {"SendMailZugang"}
             Dim arValue() As String = {"Y"}
-            Dim cBedingung As String = " WHERE ID='" & ID & "'"
-            Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+            Dim cBedingung As String = $" WHERE ID='{id}'"
 
+            fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
 
+            sBID = id
 
+            Dim eintragText As String = $"{zimmerNr.PadRight(37)}[{id}]"
+            tscoZim.Items.Add(eintragText)
 
-
-            sBID = ID
-            tscoZim.Items.Add(lbZimNr.Text & Space(30) & "[" & ID & "]")
             lbAnreise.Text = sAn
             lbAbreise.Text = sAb
+
             arNew(21) = sAn
             arNew(22) = sAb
-            Call prAddNewZimmer(lbZimNr.Text, arNew, ID)
-            tscoZim.Text = lbZimNr.Text & Space(30) & "[" & ID & "]"
 
+            prAddNewZimmer(zimmerNr, arNew, id)
+            tscoZim.Text = eintragText
         Else
-            MsgBox("Zimmer schon Vermittet", MsgBoxStyle.Question + MsgBoxStyle.OkOnly)
+            MessageBox.Show("Zimmer schon vermietet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Question)
         End If
+
         tsbVorAnreise.Visible = False
         tsbNachAbreise.Visible = False
     End Sub
-    Private Function frControlFreeZimmer(ByRef Zim As String, ByRef Von As String, ByRef sBis As String) As Boolean
-        frControlFreeZimmer = False
-        Dim dDa As Date = CDate(sBis)
-        dDa = DateAdd(DateInterval.Day, -1, dDa)
-        Dim Bis As String = CDate(dDa)
-        Dim sZim As String = fcGetObjektZimmerID(dtZim, Zim, "ID")
-        Dim dt As DataTable
-        Dim sSql As String
-        sSql = "Select * From Buchung  Where ZimID='" & sZim & "' and Von<='" & fcUmDatum(Von) & "' and Bis >= '" & fcUmDatum(Bis) & "'"
-        dt = fcReadDataTable(sSql)
-        If dt.Rows.Count = 0 Then frControlFreeZimmer = True
-
-    End Function
-
-    'Private Sub tbAnreise_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbAnreise.Click
-    '    Dim aSperr As String = ""
-    '    Dim aBuchung As String = ""
-    '    Dim sZim As String = fcGetObjektZimmerID(dtZim, lbZimNr.Text, "ID")
-    '    Dim dt As DataTable
-    '    Dim sSql As String
-    '    Dim sID As String = Extract(tscoZim.Text, "[", "]", 1)
-    '    Dim d1 As Date = DateAdd(DateInterval.Month, -8, CDate(lbAnreise.Text))
-    '    Dim d2 As Date = DateAdd(DateInterval.Month, 8, CDate(lbAnreise.Text))
-    '    sSql = "Select * From Buchung  Where ZimID='" & sZim & "' and Von<='" & fcUmDatum(CDate(d2)) & "' and Bis >= '" & fcUmDatum(CDate(d1)) & "'"
-    '    dt = fcReadDataTable(sSql)
-    '    For k = 0 To dt.Rows.Count - 1
-    '        If dt.Rows(k).Item("ID").ToString <> sID And dt.Rows(k).Item("BID").ToString <> sgRBID Then
-    '            aSperr = aSperr & ";" & dt.Rows(k).Item("von").ToString & "-" & dt.Rows(k).Item("bis").ToString
-
-    '        End If
-    '    Next
-    '    For k = 0 To dt.Rows.Count - 1
-    '        If dt.Rows(k).Item("ID").ToString <> sID And dt.Rows(k).Item("BID").ToString = sgRBID Then
-    '            aBuchung = aBuchung & ";" & dt.Rows(k).Item("von").ToString & "-" & dt.Rows(k).Item("bis").ToString
-
-    '        End If
-    '    Next
-
-    '    MyKalender1.Datum = fcUmDatum(lbAnreise.Text)
-    '    MyKalender1.Sperr = Mid(aSperr, 2)
-    '    MyKalender1.Buchung = Mid(aBuchung, 2)
-    '    MyKalender1.AnreiseAbreise = True
-
-    '    MyKalender1.Anreise = fcUmDatum(lbAnreise.Text) 'dAn
-    '    MyKalender1.Abreise = fcUmDatum(lbAbreise.Text) 'dAb
-    '    MyKalender1.Visible = True
-
-    'End Sub
-
-    'Private Sub tbAbreise_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbAbreise.Click
-    '    Dim aSperr As String = ""
-    '    Dim aBuchung As String = ""
-    '    Dim sZim As String = fcGetObjektZimmerID(dtZim, lbZimNr.Text, "ID")
-    '    Dim dt As DataTable
-    '    Dim sSql As String
-    '    Dim sID As String = Extract(tscoZim.Text, "[", "]", 1)
-    '    Dim d1 As Date = DateAdd(DateInterval.Month, -8, CDate(lbAnreise.Text))
-    '    Dim d2 As Date = DateAdd(DateInterval.Month, 8, CDate(lbAnreise.Text))
-    '    sSql = "Select * From Buchung  Where ZimID='" & sZim & "' and Von<='" & fcUmDatum(CDate(d2)) & "' and Bis >= '" & fcUmDatum(CDate(d1)) & "'"
-    '    dt = fcReadDataTable(sSql)
-    '    For k = 0 To dt.Rows.Count - 1
-    '        If dt.Rows(k).Item("ID").ToString <> sID And dt.Rows(k).Item("BID").ToString <> sgRBID Then
-    '            aSperr = aSperr & ";" & dt.Rows(k).Item("von").ToString & "-" & dt.Rows(k).Item("bis").ToString
-
-    '        End If
-    '    Next
-    '    For k = 0 To dt.Rows.Count - 1
-    '        If dt.Rows(k).Item("ID").ToString <> sID And dt.Rows(k).Item("BID").ToString = sgRBID Then
-    '            aBuchung = aBuchung & ";" & dt.Rows(k).Item("von").ToString & "-" & dt.Rows(k).Item("bis").ToString
-
-    '        End If
-    '    Next
-    '    ' dDa = DateAdd(DateInterval.Day, 1, dDa)
-    '    MyKalender1.Datum = fcUmDatum(lbAnreise.Text)
-    '    MyKalender1.Sperr = Mid(aSperr, 2)
-    '    MyKalender1.Buchung = Mid(aBuchung, 2)
-    '    MyKalender1.AnreiseAbreise = False
-    '    MyKalender1.Anreise = fcUmDatum(lbAnreise.Text) 'dAn
-    '    MyKalender1.Abreise = fcUmDatum(lbAbreise.Text) 'dAb
-    '    MyKalender1.Visible = True
-    'End Sub
-
-
-
-
 
     ''' <summary>
-    ''' Neues Zimmer zur Reservierung hinzufügen
+    ''' Prüft, ob ein bestimmtes Zimmer im angegebenen Zeitraum frei und nicht durch eine andere Buchung belegt ist.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="zimmerName">Der Name oder die Bezeichnung des Zimmers.</param>
+    ''' <param name="vonDatum">Das geplante Anreisedatum (als String).</param>
+    ''' <param name="bisDatum">Das geplante Abreisedatum (als String).</param>
+    ''' <returns>True, wenn das Zimmer im Zeitraum frei ist; andernfalls False.</returns>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Parameter auf standardmäßiges 'ByVal' umgestellt und sprechend benannt.
+    ''' - Veraltete Datumsfunktionen (CDate, DateAdd) durch typsicheres '.AddDays(-1)' ersetzt.
+    ''' - Explizite 'Return'-Anweisungen für sauberen Kontrollfluss eingeführt.
+    ''' - String-Interpolation ($"...") für die SQL-Generierung angewendet.
     ''' </remarks>
-    Private Sub tsbAddZimmer_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbAddZimmer.Click
-        Dim sZim As String = tscoFreiZim.Text
+    Private Function frControlFreeZimmer(zimmerName As String, vonDatum As String, bisDatum As String) As Boolean
+        Dim abreiseDatum As Date
 
-        Dim ID As String = fcAppendBlank("Buchung") 'fcGetTimeID(Date.Today)
+        ' Typsichere Konvertierung des Bis-Datums
+        If Not Date.TryParse(bisDatum, abreiseDatum) Then
+            Return False
+        End If
 
+        ' Den letzten Aufenthaltstag berechnen (Tag vor der Abreise)
+        Dim letzterTag As Date = abreiseDatum.AddDays(-1)
+        Dim bisFormatted As String = letzterTag.ToString("dd.MM.yyyy")
 
+        ' Zimmer-ID über die bestehende Hilfsfunktion ermitteln
+        Dim zimmerID As String = fcGetObjektZimmerID(dtZim, zimmerName, "ID")
+
+        ' SQL-Abfrage mit String-Interpolation aufbauen
+        Dim sSql As String = $"Select * From Buchung Where ZimID='{zimmerID}' And Von<='{fcUmDatum(vonDatum)}' And Bis>='{fcUmDatum(bisFormatted)}'"
+
+        ' DataTable abfragen
+        Dim dt As DataTable = fcReadDataTable(sSql)
+
+        ' Wenn keine überschneidende Buchung gefunden wurde, ist das Zimmer frei
+        Return (dt IsNot Nothing AndAlso dt.Rows.Count = 0)
+    End Function
+
+    ''' <summary>
+    ''' Fügt der aktuellen Buchung ein neues, zusätzliches Zimmer hinzu und aktualisiert die Benutzeroberfläche.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 25.02.2012 - Create
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'- und 'Space'-Befehle entfernt.
+    ''' - 'Space(30)' durch die präzisere .NET-Methode 'PadRight(37)' ersetzt, um Einträge sauber zu linksbündig zu formatieren.
+    ''' - String-Verkettungen auf moderne Interpolation ($"...") umgestellt.
+    ''' </remarks>
+    Private Sub tsbAddZimmer_Click(sender As Object, e As EventArgs) Handles tsbAddZimmer.Click
+        Dim sZim As String = tscoFreiZim.Text.Trim()
+
+        ' Neuen Buchungs-Datensatz vorbereiten
+        Dim id As String = fcAppendBlank("Buchung")
         Dim arFields() As String = {"SendMailZugang"}
         Dim arValue() As String = {"Y"}
-        Dim cBedingung As String = " WHERE ID='" & ID & "'"
-        Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+        Dim cBedingung As String = $" WHERE ID='{id}'"
 
+        fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
 
-        tscoZim.Items.Add(sZim & Space(30) & "[" & ID & "]")
-        tscoFreiZim.Items.Remove(tscoFreiZim.SelectedItem)
+        ' Eintrag formatieren (Zimmernummer wird linksbündig aufgefüllt, damit die IDs untereinander stehen)
+        Dim eintragText As String = $"{sZim.PadRight(37)}[{id}]"
+        tscoZim.Items.Add(eintragText)
+
+        ' Ausgewähltes Element aus der Liste der freien Zimmer entfernen
+        If tscoFreiZim.SelectedItem IsNot Nothing Then
+            tscoFreiZim.Items.Remove(tscoFreiZim.SelectedItem)
+        End If
+
         tscoFreiZim.Visible = False
         tsbAddZimmer.Visible = False
-        'Buchungsdatensatz anlegen
-        Call prAddNewZimmer(sZim, arNew, ID)
+
+        ' Buchungsdatensatz für das neue Zimmer anlegen
+        prAddNewZimmer(sZim, arNew, id)
     End Sub
 
     ''' <summary>
-    ''' Buchungsdatensatz für das neue Zimmer erzeugen
+    ''' Erzeugt die zugehörigen Datenbank- und Grid-Einträge für ein neu hinzugefügtes Zimmer.
     ''' </summary>
-    ''' <param name="sZim"></param>
-    ''' <param name="arT"></param>
+    ''' <param name="sZim">Die Bezeichnung des Zimmers.</param>
+    ''' <param name="arT">Das Array mit den aktuellen Buchungsdaten.</param>
+    ''' <param name="id">Die neue Buchungs-ID.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'ByVal'-Schlüsselwörter und 'Call'-Syntax entfernt.
+    ''' - Array-Zugriffe zur besseren Nachvollziehbarkeit dokumentiert.
+    ''' - Code-Struktur bereinigt.
     ''' </remarks>
-    Private Sub prAddNewZimmer(ByVal sZim As String, ByVal arT() As String, ByVal ID As String)
+    Private Sub prAddNewZimmer(sZim As String, arT() As String, id As String)
         Dim sBID As String = sgRBID
         Dim sKNr As String = lbGastID.Text
+
+        ' Zimmer- und Objekt-ID aus der Master-Tabelle ermitteln
         Dim sZID As String = fcGetObjektZimmerID(dtZim, sZim, "ID")
         Dim sOID As String = fcGetObjektZimmerID(dtZim, sZim, "IDObjekte")
 
-        Call prSaveNewReservierung(sBID, sKNr, sZID, sOID, arT, ID)
-        Call prSetReservierungInDataGrid(arT(21), arT(22), sZID, "0", arT(6), sBID, "Ü")
+        ' Hinweis: arT(21) = Anreisedatum, arT(22) = Abreisedatum, arT(6) = Status/Zusatzinfo
+        prSaveNewReservierung(sBID, sKNr, sZID, sOID, arT, id)
+        prSetReservierungInDataGrid(arT(21), arT(22), sZID, "0", arT(6), sBID, "Ü")
     End Sub
+
 
     ''' <summary>
-    ''' Neue Reservierung speichern
+    ''' Speichert eine neu angelegte Zimmer-Reservierung in der Datenbank und lädt anschließend die Gastdaten neu.
     ''' </summary>
-    ''' <param name="sBID"></param>
-    ''' <param name="sKNr"></param>
-    ''' <param name="sZID"></param>
-    ''' <param name="sOID"></param>
-    ''' <param name="arT"></param>
+    ''' <param name="sBID">Die übergeordnete Buchungs-ID.</param>
+    ''' <param name="sKNr">Die Kundennummer / Gast-ID.</param>
+    ''' <param name="sZID">Die ID des zugewiesenen Zimmers.</param>
+    ''' <param name="sOID">Die ID des Objekts.</param>
+    ''' <param name="arT">Das Array mit den aktuellen Buchungsdaten.</param>
+    ''' <param name="id">Die eindeutige ID dieses Buchungsdatensatzes.</param>
     ''' <remarks>
-    ''' 25.02.2012 Create
+    ''' 25.02.2012 - Create
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Veraltete VB6-Befehle (DateAdd, Split, Call) entfernt.
+    ''' - 'StringBuilder' und 'Split'-Logik durch ein direktes, typsicheres String-Array ersetzt (verhindert Indexfehler bei Sonderzeichen).
+    ''' - Fehleranfällige String-Verkettung bei der SQL-Bedingung auf String-Interpolation umgestellt.
+    ''' - XML-Dokumentation vervollständigt.
     ''' </remarks>
-    Private Sub prSaveNewReservierung(ByVal sBID As String, ByVal sKNr As String,
-                                      ByVal sZID As String, ByVal sOID As String,
-                                      ByVal arT() As String, ByVal ID As String)
-        Dim sPauch As String = "0"
-        If cbPausch.Checked = True Then sPauch = "1"
-        Dim sDatum As Date = arT(22)
-        Dim sADatum As Date = DateAdd(DateInterval.Day, -1, sDatum)
-        Dim sb2 As New StringBuilder
-        Dim arFields(), arValue() As String
-        Dim sqlText As String = ""
-        sqlText = "ID,BID,Von,Bis,ObjID,ZimID,Variable,KunID,Kunde,Name1,Name2,Personen,Tiere,Art,Frueh,Kategorie,Preis,Anzahlung,Werbung,Info,Rechnung,BuchDatum,Sprache,BText,MText,RID,RDatum,FPreis,GPreis,MwstU,MwstS,MwstG,GKU,GKS,GKG,RDSenden,BIDIndex,IDRef,RAID,RADatum,Storno,Summe,Pausch,Code,InternetNr,VonZeit,BisZeit"
-        arFields = Split(sqlText, ",")
-        If sKNr = "" Then sKNr = "0"
-        sb2.Append(ID & "°")  'ID
-        sb2.Append(sgRBID & "°")  'BID
-        sb2.Append(fcUmDatum(arT(21)) & "°")    'VON 'art(21)
-        sb2.Append(fcUmDatum(sADatum) & "°")   'BIS
-        sb2.Append(sOID & "°") 'Objekt
-        sb2.Append(sZID & "°") 'zimmerID
-        sb2.Append("0" & "°")  'Variabel
-        sb2.Append(sKNr & "°") 'kunde_ID
-        sb2.Append(tbName1.Text & "°") 'kunde
-        sb2.Append(tbName1Z.Text & "°") 'kunde
-        sb2.Append(tbName2Z.Text & "°") 'kunde
-        sb2.Append("0" & "°")   'Person
-        sb2.Append("0" & "°")  'Tiere
-        sb2.Append(" " & "°")  'Art
-        sb2.Append(" " & "°")  'Frü
-        sb2.Append(" " & "°")  'kato
-        sb2.Append("0" & "°")  'Preis
-        sb2.Append("0" & "°")  'anzahlung
-        sb2.Append(arT(20) & "°") 'werbung
-        sb2.Append(" " & "°") 'Info
-        sb2.Append("0" & "°") 'rechnung
-        sb2.Append(fcUmDatum(Date.Today) & "°") 'buchdatum
-        sb2.Append("0" & "°") 'sprache
-        sb2.Append(" " & "°") 'Buchungstext ID
-        sb2.Append(arT(24) & "°") 'Makrotext
-        sb2.Append(" " & "°") 'R-ID
-        sb2.Append(" " & "°") 'Rechnungsnummer
-        sb2.Append("0" & "°") 'FPreis
-        sb2.Append("0" & "°") 'GPreis
-        sb2.Append("0" & "°") 'MwstU
-        sb2.Append("0" & "°") 'MwstS
-        sb2.Append("0" & "°") 'MwstG
-        sb2.Append("0" & "°") 'GKU
-        sb2.Append("0" & "°") 'GKS
-        sb2.Append("0" & "°") 'GKG
-        sb2.Append(tbRechSend.Text & "°")    'RD Send
-        sb2.Append("0" & "°")    'bidIndex
-        sb2.Append(sgRBID & "°")  'Referrens ID
-        sb2.Append(" " & "°")     'RA ID
-        sb2.Append(" " & "°")   'RA Datum
-        sb2.Append("100" & "°")  'Storno
-        sb2.Append("0" & "°")    'Summe
-        sb2.Append(sPauch & "°") 'Pausch
-        sb2.Append(sCode & "°")        'Code key
-        sb2.Append(tbInternetNr.Text & "°")
-        sb2.Append(fcUmZeit(tbAnZeit.Text) & "°")    'Summe
-        sb2.Append(fcUmZeit(tbAbZeit.Text))        'Code key
-        arValue = Split(sb2.ToString, "°")
-        '   Call fcInsertCommand("Buchung", arFields, arValue)
-        Dim cBedingung As String = " WHERE ID='" & ID & "'"
-        Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
-        '   ngIDB += 1
+    Private Sub prSaveNewReservierung(sBID As String, sKNr As String,
+                                  sZID As String, sOID As String,
+                                  arT() As String, id As String)
 
+        Dim sPauch As String = If(cbPausch.Checked, "1", "0")
 
-        Call prLadeGastDaten(sKNr)
+        ' Typsichere Datumsberechnung (1 Tag vor Abreise)
+        Dim abreiseDatum As Date = DateTime.Parse(arT(22))
+        Dim bisDatum As Date = abreiseDatum.AddDays(-1)
+
+        ' Felder-Definition über ein sauberes String-Array statt String-Splitting
+        Dim arFields() As String = {
+        "ID", "BID", "Von", "Bis", "ObjID", "ZimID", "Variable", "KunID", "Kunde", "Name1", "Name2",
+        "Personen", "Tiere", "Art", "Frueh", "Kategorie", "Preis", "Anzahlung", "Werbung", "Info",
+        "Rechnung", "BuchDatum", "Sprache", "BText", "MText", "RID", "RDatum", "FPreis", "GPreis",
+        "MwstU", "MwstS", "MwstG", "GKU", "GKS", "GKG", "RDSenden", "BIDIndex", "IDRef", "RAID",
+        "RADatum", "Storno", "Summe", "Pausch", "Code", "InternetNr", "VonZeit", "BisZeit"
+    }
+
+        Dim kundenNummer As String = If(String.IsNullOrEmpty(sKNr), "0", sKNr)
+
+        ' Werte direkt und index-sicher dem Array zuweisen (verhindert Fehler durch das '°'-Zeichen in Textboxen)
+        Dim arValue() As String = {
+        id,
+        sgRBID,
+        fcUmDatum(arT(21)),
+        fcUmDatum(bisDatum.ToString("yyyy-MM-dd")),
+        sOID,
+        sZID,
+        "0",
+        kundenNummer,
+        tbName1.Text,
+        tbName1Z.Text,
+        tbName2Z.Text,
+        "0",
+        "0",
+        " ",
+        " ",
+        " ",
+        "0",
+        "0",
+        arT(20),
+        " ",
+        "0",
+        fcUmDatum(Date.Today.ToString("yyyy-MM-dd")),
+        "0",
+        " ",
+        arT(24),
+        " ",
+        " ",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        tbRechSend.Text,
+        "0",
+        sgRBID,
+        " ",
+        " ",
+        "100",
+        "0",
+        sPauch,
+        sCode,
+        tbInternetNr.Text,
+        fcUmZeit(tbAnZeit.Text),
+        fcUmZeit(tbAbZeit.Text)
+    }
+
+        ' Datensatz aktualisieren
+        Dim cBedingung As String = $" WHERE ID='{id}'"
+        fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+
+        ' Gastdaten aktualisieren
+        prLadeGastDaten(kundenNummer)
     End Sub
+
 
     ''' <summary>
     ''' Steuerung des Menüs in Abhängigkeit des Rechnungsstatus.
@@ -2064,9 +1996,6 @@ Public Class frmReservierungDest
         ' 5. Code an den Webserver senden
         PHP.Data(C, cgIPWeb)
     End Sub
-
-
-
 
 #End Region
 
@@ -2730,35 +2659,48 @@ Public Class frmReservierungDest
         fcUpdateTable(dtBuc, arFields, arValue, cBedingungTable)
     End Sub
 
-
     ''' <summary>
-    ''' Bei Erstanlage einer Buchung alle Zimmer aktualisieren
+    ''' Aktualisiert die Grid-Anzeige für alle Zimmer einer Buchung bei der Erstanlage oder einer Änderung.
     ''' </summary>
-    ''' <param name="sBID"></param>
+    ''' <param name="sBID">Die betroffene Buchungs-ID.</param>
     ''' <remarks>
-    ''' 26.02.2012 Create
+    ''' 26.02.2012 - Create
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Veraltete 'Call'-Syntax bei Methodenaufrufen entfernt.
+    ''' - 'Date.TryParse' für eine absturzsichere Konvertierung der Datumsfelder implementiert.
+    ''' - Klassische Index-Schleife durch eine sauberere 'For Each'-Schleife über 'DataRow' ersetzt.
+    ''' - String-Interpolation ($"...") für die SQL-Abfrage angewendet.
     ''' </remarks>
-    Private Sub prRefreshDataAll(ByVal sBID As String)
-        Dim sBO As Date = lbAnreise.Text
-        Dim sDatum As Date = lbAbreise.Text
-        Dim sEO As Date = lbAbreise.Text 'DateAdd(DateInterval.Day, -1, sDatum)
+    Private Sub prRefreshDataAll(sBID As String)
+        Dim sBO As Date
+        Dim sEO As Date
+
+        ' Typsichere Konvertierung der Datumsanzeigen aus der UI
+        If Not Date.TryParse(lbAnreise.Text, sBO) OrElse Not Date.TryParse(lbAbreise.Text, sEO) Then
+            ' Falls die UI ungültige Daten enthält, wird die Bearbeitung abgebrochen
+            Exit Sub
+        End If
 
         Dim sP As String = tbAnzPer.Text
-        Dim sID As String
         Dim sName As String = tbName1.Text
         Dim sFr As String = coArt.Text
-        Dim sSQL As String = "Select * From Buchung Where BID='" & sBID & "'"
-        Dim dt As DataTable = fcReadDataTable(sSQL)
-        If dt.Rows.Count > 0 Then
 
-            Dim nMax As Integer = dt.Rows.Count - 1
-            For i As Integer = 0 To nMax
-                sID = dt.Rows(i).Item("ZimID").ToString.Trim()
-                Call prDeleteReservierungInDataGrid(sBO, sEO, sID)
-                Call prSetReservierungInDataGrid(sBO, sEO, sID, sP, sName, sBID, sFr)
+        ' SQL-Abfrage lesbar aufbauen
+        Dim sSQL As String = $"Select ZimID From Buchung Where BID='{sBID}'"
+        Dim dt As DataTable = fcReadDataTable(sSQL)
+
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            ' Effiziente und sichere Iteration durch alle Datensätze
+            For Each row As DataRow In dt.Rows
+                Dim sID As String = row("ZimID").ToString().Trim()
+
+                ' Alte Reservierungen im Grid entfernen und neu setzen
+                prDeleteReservierungInDataGrid(sBO, sEO, sID)
+                prSetReservierungInDataGrid(sBO, sEO, sID, sP, sName, sBID, sFr)
             Next
         End If
     End Sub
+
 
     ''' <summary>
     ''' Löscht eine alte Reservierung visuell aus dem Belegungs-DataGrid des Hauptfensters,
@@ -3501,56 +3443,8 @@ RefactorCell:
         End If
     End Sub
 
-    Private Sub tsmKopie_Click(sender As Object, e As EventArgs)
-
-    End Sub
 
 
 #End Region
-
-
-
-
-
-
-
-    'Private Function fcGetObjID(ByVal sZim As String) As String
-    '    fcGetObjID = " "
-    '    Dim nMax As Integer = dtZim.Rows.Count - 1
-    '    For i As Integer = 0 To nMax
-    '        If dtZim.Rows(i).Item("ID") = sZim Then
-    '            fcGetObjID = dtZim.Rows(i).Item("IDObjekte")
-    '            Exit For
-    '        End If
-    '    Next
-    'End Function
-
-    'Private Sub PreisToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PreisToolStripMenuItem.Click
-    '    Dim P As String = fcGetZimPreis(sgRZID, tbAnzPer.Text, lbAbreise.Text, lbAnreise.Text)
-    'End Sub
-
-    'Private Sub prCheckinMail(ByRef sNummer As String)
-
-    '    Dim sb As New StringBuilder
-    '    Dim sqlText As String = ""
-    '    Dim arFields(0), arValue(0) As String
-    '    Dim cBedingung As String
-    '    Try
-    '        cBedingung = " WHERE BID ='" & sgRBID & "'"
-    '        sqlText = "SendMailZugang"
-    '        arFields = Split(sqlText, ",")
-    '        sqlText = sNummer
-    '        arValue = Split(sqlText, "°")
-    '        Call fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
-    '    Catch ex As Exception
-    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
-    '    Finally
-
-
-    '    End Try
-    'End Sub
-
-
-
 
 End Class

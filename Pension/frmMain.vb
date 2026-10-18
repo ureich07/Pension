@@ -754,12 +754,12 @@ Public Class frmMain
     ''' <param name="sBNr">Die ID der Buchung (Buchungsnummer).</param>
     ''' <returns>Den Namen des Kunden oder einen Status ("Gesperrt", "Unbekannt").</returns>
     ''' <remarks>
-    ''' Optimiert am: 24.09.2026
-    ''' Autor: Uwe
+    ''' 24.09.2026 - Optimiert: SQL-Abfrage kombiniert, um KunID und Name in einem Schritt zu holen, und Rückgabewerte für Sonderfälle verbessert.
+    ''' 18.10.2026 - Optimiert: Vorabprüfung auf globale Sperre entfernt
     ''' </remarks>
     Private Function fcGetName(ByVal sBNr As String) As String
         ' 1. Vorabprüfung: Wenn global gesperrt, sofort abbrechen
-        If lGesp Then Return "Gesperrt"
+        'If lGesp Then Return "Gesperrt"
 
         Try
             ' 2. Kombinierte Abfrage: Holt KunID und den dazugehörigen Namen in einem Schritt
@@ -1181,6 +1181,39 @@ Public Class frmMain
 #Region "Buchungen / Reservierungen................................................................"
 
     ''' <summary>
+    ''' Verarbeitet den Klick auf den Menüeintrag "Gesperrt".
+    ''' Validiert die Auswahl und vermerkt eine entsprechende Reservierung im System.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses (z. B. das ToolStripMenuItem).</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 18.10.2026 - Code-Optimierung:
+    ''' - Array-Längenprüfung korrigiert, um IndexOutOfRangeException bei Zugriff auf Index 6 zu verhindern.
+    ''' - Temporäre Variablen eingeführt, um die magischen Array-Indizes (arX) lesbar zu machen.
+    ''' - Strukturierte XML-Dokumentation gemäß Vorgabe hinzugefügt.
+    ''' </remarks>
+    Private Sub tsmGesperrt_Click(sender As Object, e As EventArgs) Handles tsmGesperrt.Click
+        ' Validierung: Sicherstellen, dass das Array existiert und mindestens 7 Elemente (Indizes 0 bis 6) enthält
+        If arX Is Nothing OrElse arX.Length < 7 Then Exit Sub
+
+        lGesp = True
+
+        ' Werte für bessere Lesbarkeit aus dem Array auslesen
+        Dim startDatum As Object = arX(4)
+        Dim erstesZimmer As Object = arX(5)
+        Dim endDatum As Object = arX(6)
+        Dim letztesZimmer As Object = arX(5)
+
+        ' Reservierung im Grid/System vormerken
+        prReservierung(startDatum, erstesZimmer, endDatum, letztesZimmer)
+
+        ' Statusvariablen zurücksetzen
+        lBuc = False
+        lGesp = False
+    End Sub
+
+
+    ''' <summary>
     ''' Erstellt eine neue Buchung im ausgewählten Zeitraum, prüft auf Zimmerüberschneidungen über das PHP-Web-Backend und öffnet das passende Reservierungsformular.
     ''' </summary>
     ''' <param name="sender">Das auslösende Steuerelement (System.Object).</param>
@@ -1316,34 +1349,32 @@ Public Class frmMain
     ''' <remarks>
     ''' 12.01.2012 Create
     ''' 23.09.2026 Code optimiert, Spalten-/Zeilendreher korrigiert und Header-Klick abgesichert
+    ''' 18.10.2026 automatische Reservierung deaktiviert (Pkt. 4 und 5), da die Logik nun über tsmNew und tsmGesperrt gesteuert wird
     ''' </remarks>
     Private Sub dgBuchung_CellMouseUp(ByVal sender As Object,
                                   ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) _
                                   Handles dgBuchung.CellMouseUp
 
-        '' 1. Nur auf den Linksklick reagieren
-        'If e.Button <> Windows.Forms.MouseButtons.Left Then Exit Sub
-
-        ' 2. Klicks auf Spalten- oder Zeilenüberschriften abfangen (-1 verhindern)
+        ' 1. Klicks auf Spalten- oder Zeilenüberschriften abfangen (-1 verhindern)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Exit Sub
 
-        ' 3. Koordinaten sauber zuweisen
+        ' 2. Koordinaten sauber zuweisen
         ' Wichtig: ColumnIndex = X (Zeile), RowIndex = Y (Spalte)
 
-        arX(2) = e.RowIndex
-        arX(3) = e.ColumnIndex
+        arX(2) = e.RowIndex     ' endDatum
+        arX(3) = e.ColumnIndex  ' letztes Zimmer
 
         arX(6) = arX(2)
         arX(7) = arX(3)
 
-        ' 4. Koordinaten sortieren (Nutzt die optimierte Funktion aus Schritt 1)
+        ' 3. Koordinaten sortieren (Nutzt die optimierte Funktion aus Schritt 1)
         arX = fcSetKoordinaten(arX)
 
-        ' 5. Logische Bedingungen prüfen
-        If Not lBuc AndAlso Not lGesp Then Exit Sub
+        ' 4. Logische Bedingungen prüfen
+        'If Not lBuc AndAlso Not lGesp Then Exit Sub
 
-        ' 6. Reservierung aufrufen mit den sortierten Werten
-        Call prReservierung(arX(0), arX(1), arX(2), arX(3))
+        ' 5. Reservierung aufrufen mit den sortierten Werten
+        'Call prReservierung(arX(0), arX(1), arX(2), arX(3))
     End Sub
 
     ''' <summary>
@@ -2416,7 +2447,4 @@ Public Class frmMain
         tiWait.Enabled = False
     End Sub
 
-    Private Sub dgBuchung_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgBuchung.CellContentClick
-
-    End Sub
 End Class

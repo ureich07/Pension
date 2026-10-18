@@ -34,6 +34,8 @@ Partial Class frmMain
         Me.tscBuchnung = New System.Windows.Forms.ToolStripComboBox()
         Me.tsmInset = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator15 = New System.Windows.Forms.ToolStripSeparator()
+        Me.tsmGesperrt = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsmDelete = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsmInfo = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator17 = New System.Windows.Forms.ToolStripSeparator()
@@ -148,9 +150,9 @@ Partial Class frmMain
         'cmMain
         '
         Me.cmMain.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.cmMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmNew, Me.tsS1, Me.tsmEdit, Me.tsS2, Me.tsmCopy, Me.tscBuchnung, Me.tsmInset, Me.ToolStripSeparator15, Me.tsmDelete, Me.tsmInfo, Me.ToolStripSeparator17, Me.tstAnreise, Me.tstEnd, Me.tsS3, Me.ToolStripSeparator16, Me.tsmDruckAnAb, Me.ToolStripSeparator4, Me.tscCheckin, Me.ToolStripSeparator11, Me.tsmChekin1, Me.tsmCheckin2, Me.tsmCheckin3, Me.tsmCheckin4, Me.tsmCheckin5, Me.tsmChekinNew})
+        Me.cmMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmNew, Me.tsS1, Me.tsmEdit, Me.tsS2, Me.tsmCopy, Me.tscBuchnung, Me.tsmInset, Me.ToolStripSeparator15, Me.tsmGesperrt, Me.ToolStripSeparator13, Me.tsmDelete, Me.tsmInfo, Me.ToolStripSeparator17, Me.tstAnreise, Me.tstEnd, Me.tsS3, Me.ToolStripSeparator16, Me.tsmDruckAnAb, Me.ToolStripSeparator4, Me.tscCheckin, Me.ToolStripSeparator11, Me.tsmChekin1, Me.tsmCheckin2, Me.tsmCheckin3, Me.tsmCheckin4, Me.tsmCheckin5, Me.tsmChekinNew})
         Me.cmMain.Name = "cmMain"
-        Me.cmMain.Size = New System.Drawing.Size(261, 437)
+        Me.cmMain.Size = New System.Drawing.Size(261, 465)
         '
         'tsmNew
         '
@@ -197,6 +199,17 @@ Partial Class frmMain
         '
         Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
         Me.ToolStripSeparator15.Size = New System.Drawing.Size(257, 6)
+        '
+        'tsmGesperrt
+        '
+        Me.tsmGesperrt.Name = "tsmGesperrt"
+        Me.tsmGesperrt.Size = New System.Drawing.Size(260, 22)
+        Me.tsmGesperrt.Text = "Gesperrt"
+        '
+        'ToolStripSeparator13
+        '
+        Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
+        Me.ToolStripSeparator13.Size = New System.Drawing.Size(257, 6)
         '
         'tsmDelete
         '
@@ -1043,4 +1056,6 @@ Partial Class frmMain
     Friend WithEvents lvBuchError As ListView
     Friend WithEvents tsmChekinNew As ToolStripMenuItem
     Friend WithEvents tsbPersonen As ToolStripButton
+    Friend WithEvents tsmGesperrt As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator13 As ToolStripSeparator
 End Class
