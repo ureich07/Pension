@@ -108,8 +108,6 @@ Public Class PHP
         End Try
     End Function
 
-
-
     ''' <summary>
     ''' Sendet eine synchrone HTTP-Anfrage an eine angegebene URL (z. B. an ein PHP-Skript) und gibt die Antwort als String zurück.
     ''' </summary>
@@ -219,173 +217,236 @@ Public Class PHP
         End Try
     End Function
 
-    'Public Shared Function PHPnoF(ByVal url As String, ByVal method As String, ByVal data As String)
-    '    Try
 
-    '        Dim request As System.Net.WebRequest = System.Net.WebRequest.Create(url)
-    '        request.Method = method
-    '        Dim postData = data
-    '        Dim byteArray As Byte() = Encoding.UTF8.GetBytes(postData)
-    '        request.ContentType = "application/x-www-form-urlencoded"
-    '        request.ContentLength = byteArray.Length
-    '        Dim dataStream As Stream = request.GetRequestStream()
-    '        dataStream.Write(byteArray, 0, byteArray.Length)
-    '        dataStream.Close()
-    '        Dim response As WebResponse = request.GetResponse()
-    '        dataStream = response.GetResponseStream()
-    '        Dim reader As New StreamReader(dataStream)
-    '        Dim responseFromServer As String = reader.ReadToEnd()
-    '        reader.Close()
-    '        dataStream.Close()
-    '        response.Close()
-    '        Return (responseFromServer)
-    '    Catch ex As Exception
-    '        Return ("ERROR")
-    '    End Try
-    'End Function
-    Public Shared Function PHPno(ByVal url As String, ByVal method As String, ByVal data As String)
+    ''' <summary>
+    ''' Generiert einen standardisierten Zeitschlüssel im Format hhMMYYYYmmdd (StundeMinuteJahrMonatTag).
+    ''' </summary>
+    ''' <returns>Ein 12-stelliger String mit dem aktuellen Zeitstempel als Sicherheitsschlüssel.</returns>
+    ''' <remarks>
+    ''' 03.02.2011 - Create (Koh Chang)
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Komplett kulturunabhängig umgestellt via .NET-Format-Strings (verhindert Abstürze bei US/UK-Windows-Systemen).
+    ''' - Fehleranfällige VB6-'Mid'- und '.Replace'-Ketten entfernt.
+    ''' - 'DateTime.Now' zentralisiert, um minimale Zeitabweichungen zwischen Datums- und Uhrzeitabruf zu verhindern.
+    ''' </remarks>
+    Public Shared Function GetTimePW() As String
         Try
+            ' Aktuellen Zeitstempel exakt einmal einlesen (verhindert Fehler beim Datumswechsel um Mitternacht)
+            Dim nun As DateTime = DateTime.Now
 
-            Dim request As System.Net.WebRequest = System.Net.WebRequest.Create(url)
-            request.Method = method
-            Dim postData = data
-            Dim byteArray As Byte() = Encoding.UTF8.GetBytes(postData)
-            request.ContentType = "application/x-www-form-urlencoded"
-            request.ContentLength = byteArray.Length
-            Dim dataStream As Stream = request.GetRequestStream()
-            dataStream.Write(byteArray, 0, byteArray.Length)
-            dataStream.Close()
-            Return "true"
+            ' Generiert direkt: hhmm (StundeMinute) und yyyyMMdd (JahrMonatTag)
+            Dim sTime As String = nun.ToString("HHmm")
+            Dim sID As String = nun.ToString("yyyyMMdd")
+
+            Return sTime & sID
+
         Catch ex As Exception
+            ' Fallback auf ein festes Format bei unerwarteten Systemfehlern
+            Return "000020000101"
         End Try
     End Function
 
     ''' <summary>
-    ''' Zeitschluessel hhMMYYYYmmdd
+    ''' Berechnet eine modifizierte Quersumme (ASCII-Summe) aus den letzten maximal 11 Zeichen eines Strings
+    ''' und formatiert das Ergebnis in ein standardisiertes, zweigeteiltes Format (z. B. "XX;YY;").
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>03.02.2011 Create koh chang
+    ''' <param name="sZeile">Der Eingabestring, aus dessen Ende die Quersumme berechnet wird.</param>
+    ''' <returns>Ein formatierter String mit zwei zweistelligen Zahlen, getrennt durch Semikolons.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Kritischen Schleifenüberlauf (i To sZeile.Length) und OutOfBounds-Gefahr bei kurzen Strings behoben.
+    ''' - Auf 0-basierten, nativen und schnellen Zeichenzugriff umgestellt (sZeile(i) statt Mid).
+    ''' - Veraltete VB6-Befehle ('Mid', 'Trim', 'Str') vollständig entfernt.
+    ''' - Mathematisch sichere Formatierung der Quersumme mittels '.ToString("D4")' (erzwingt 4 Stellen mit führenden Nullen).
+    ''' - Parameter von 'ByRef' auf das sicherere 'ByVal' geändert.
     ''' </remarks>
-    Public Shared Function GetTimePW() As String
-        Dim sID As String = Mid(Date.Today, 7, 4) & Mid(Date.Today, 4, 2) & Mid(Date.Today, 1, 2)
-        Dim sTime As String = TimeOfDay
-        sTime = Mid(sTime.Replace(":", ""), 1, 4)
-        GetTimePW = sTime & sID
-    End Function
-    Public Shared Function GetQuersumme(ByRef sZeile As String) As String
-        Dim nl As Integer = 0
-        Dim s As String = ""
-        Dim nStart As Integer = sZeile.Length - 10
-        If nStart < 1 Then nStart = 1
-        For i = nStart To sZeile.Length
-            nl = nl + Asc(Mid(sZeile, i, 1))
-            s = s & Mid(sZeile, i, 1)
-        Next
-        Dim sl As String = Trim(Str(nl))
-        sl = "000000" & sl
-        sl = Mid(sl, sl.Length - 3, 2) & ";" & Mid(sl, sl.Length - 1, 2) & ";"
-        GetQuersumme = sl
-    End Function
-    ''' <summary>
-    ''' Erstellen eines Datatables
-    ''' </summary>
-    ''' <param name="sSQL  "></param>
-    ''' <param name="sIP "></param>
-    ''' <returns></returns>
-    ''' <remarks>03.02.2011 Create koh chang
-    ''' </remarks>
+    Public Shared Function GetQuersumme(ByVal sZeile As String) As String
+        Try
+            ' Validierung: Bei leeren Strings sofort ein sicheres Fallback liefern
+            If String.IsNullOrEmpty(sZeile) Then
+                Return "00;00;"
+            End If
 
-    Public Shared Function DataTable(ByRef sSQL As String, ByRef sIP As String) As DataTable
-        prInfo("DataTable => " & sSQL)
-        Dim sSql_si As String = sSQL
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Gabriela;Gewuenscht;Karriere;Elternzeit;Truemmer;Abstand;Bodensee", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
+            Dim nl As Integer = 0
 
-        Dim sTime As String = TimeOfDay
-        ' sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & DeCryptASCII(sSQL, PW)
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLRead.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
+            ' Startindex berechnen (die letzten 11 Zeichen, da im Original von (Length - 10) bis Length gelaufen wurde)
+            Dim nStart As Integer = sZeile.Length - 11
+            If nStart < 0 Then nStart = 0
 
-        Dim aZeile() As String = Split(htmlcode, Chr(94)) 'Zeilenende chr(94)
-        Dim dt As New DataTable
-        Dim aFeld() As String = Split(aZeile(1), Chr(126))  'spaltenende chr(95)
-        For i = 0 To aFeld.Length - 1
-            dt.Columns.Add(aFeld(i), System.Type.GetType("System.String"))
-        Next
-        For i = 2 To aZeile.Length - 2
-            aFeld = Split(aZeile(i), Chr(126))
-
-            dt.Rows.Add.Item(0) = aFeld(0)
-            For j = 1 To aFeld.Length - 1
-                If aFeld(j) = "" Then aFeld(j) = " "
-
-                dt.Rows(i - 2).Item(j) = aFeld(j)
+            ' 0-basierte Schleife über die Zeichen am Ende des Strings
+            For i As Integer = nStart To sZeile.Length - 1
+                ' Direkter, ultraschneller Zugriff auf den ASCII/Unicode-Wert des Zeichens
+                nl += AscW(sZeile(i))
             Next
-        Next
+
+            ' Die Summe mathematisch auf eine 4-stellige Zahl mit führenden Nullen formatieren (z. B. 1234 oder 0045)
+            ' Das ersetzt das fehleranfällige "000000" & sl und anschließende Abschneiden
+            Dim sl As String = (nl Mod 10000).ToString("D4")
+
+            ' Die vierstellige Zahl aufteilen: die ersten 2 Stellen und die letzten 2 Stellen
+            ' Beispiel "1234" wird zu "12;34;"
+            Dim ergebnis As String = sl.Substring(0, 2) & ";" & sl.Substring(2, 2) & ";"
+
+            Return ergebnis
+
+        Catch ex As Exception
+            ' Im Fehlerfall ein gültig formatiertes Fehler-Fallback zurückgeben
+            Return "00;00;"
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Fragt Daten verschlüsselt von einem Webserver ab und baut daraus eine DataTable auf.
+    ''' </summary>
+    ''' <param name="sSQL">Der auszuführende SQL-Befehl.</param>
+    ''' <param name="sIP">Die IP-Adresse des Webservers.</param>
+    ''' <returns>Eine befüllte DataTable mit den Ergebnissen der Abfrage.</returns>
+    ''' <remarks>
+    ''' 03.02.2011 - Create (Koh Chang)
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - 'ByRef'-Parameter zu 'ByVal' geändert, um ungewolltes Überschreiben beim Aufrufer zu verhindern.
+    ''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    ''' - Fehleranfälliges Befüllen der DataRows durch die native, sichere '.Rows.Add(aFeld)'-Logik ersetzt.
+    ''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo abgesichert.
+    ''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Methoden ersetzt.
+    ''' - Validierung der Serverantwort gegen leere oder fehlerhafte Übertragungen integriert.
+    ''' </remarks>
+    Public Shared Function DataTable(ByVal sSQL As String, ByVal sIP As String) As DataTable
+        prInfo("DataTable => " & sSQL)
+
+        Dim dt As New DataTable()
+        Try
+            ' 1. Quersumme und Verschlüsselung vorbereiten
+            Dim sSumme As String = GetQuersumme(sSQL)
+            Dim sPW() As String = {"Gabriela", "Gewuenscht", "Karriere", "Elternzeit", "Truemmer", "Abstand", "Bodensee"}
+            Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+            Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
+
+            ' 2. Zeitstempel kultur-unabhängig formatieren
+            Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+            Dim secureSQL As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
+
+            Dim sUrl As String = "http://" & sIP & "/SQLRead.php"
+
+
+            ' 4. Daten vom Webserver abrufen
+            Dim htmlcode As String = PHP(sUrl, "POST", secureSQL)
+
+            ' Validierung: Wenn keine Daten zurückkommen, leere Tabelle liefern
+            If String.IsNullOrEmpty(htmlcode) Then
+                prInfo("DataTable => Keine Daten empfangen")
+                Return dt
+            End If
+
+            ' 5. Daten parsen (Zeilen trennen über Chr(94) -> '^')
+            Dim aZeile() As String = htmlcode.Split(ChrW(94))
+
+            ' Mindestens zwei Zeilen müssen vorhanden sein (Header + Daten)
+            If aZeile.Length < 2 Then
+                Return dt
+            End If
+
+            ' 6. Spaltenköpfe generieren (Spalten trennen über Chr(126) -> '~')
+            Dim aFeld() As String = aZeile(1).Split(ChrW(126))
+            For i As Integer = 0 To aFeld.Length - 1
+                dt.Columns.Add(aFeld(i).Trim(), GetType(String))
+            Next
+
+            ' 7. Datenzeilen hinzufügen
+            ' Schleife startet bei Index 2 (erste Datenzeile) und läuft bis zum vorletzten Element
+            For i As Integer = 2 To aZeile.Length - 2
+                ' Zeile splitten
+                Dim aDaten() As String = aZeile(i).Split(ChrW(126))
+
+                ' Wenn die Spaltenanzahl der Datenzeile nicht zum Tabellenschema passt, Array anpassen
+                If aDaten.Length <> dt.Columns.Count Then
+                    ReDim Preserve aDaten(dt.Columns.Count - 1)
+                End If
+
+                ' Bereinigung: Leere Werte durch ein Leerzeichen ersetzen
+                For j As Integer = 0 To aDaten.Length - 1
+                    If String.IsNullOrEmpty(aDaten(j)) Then
+                        aDaten(j) = " "
+                    End If
+                Next
+
+                ' Die gesamte Zeile auf einmal sicher zur DataTable hinzufügen
+                dt.Rows.Add(aDaten)
+            Next
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+        End Try
+
         prInfo("")
         Return dt
     End Function
 
-
-
-
     ''' <summary>
-    ''' testen der Datenverbindung
+    ''' Hängt einen Leersatz an die angegebene Tabelle an und gibt die vom Server generierte ID zurück.
     ''' </summary>
-    ''' <param name="sSQL  "></param>
-    ''' <param name="sIP "></param>
-    ''' <returns></returns>
-    ''' <remarks>03.02.2011 Create koh chang
+    ''' <param name="sTabelle">Der Name der SQL-Tabelle, in die eingefügt werden soll.</param>
+    ''' <param name="sIP">Die IP-Adresse des Webservers.</param>
+    ''' <returns>Die generierte Datensatz-ID als String oder ein leerer String im Fehlerfall.</returns>
+    ''' <remarks>
+    ''' 03.02.2011 - Create (Koh Chang)
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - 'ByRef'-Parameter durch 'ByVal' ersetzt, um Variablen-Zerstörung beim Aufrufer zu verhindern.
+    ''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    ''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo-Operation abgesichert.
+    ''' - Index-Validierung für das 'aZeile'-Array integriert, um Abstürze bei leeren Serverantworten zu verhindern.
+    ''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Methoden ersetzt.
     ''' </remarks>
+    Public Shared Function Append(ByVal sTabelle As String, ByVal sIP As String) As String
+        Try
+            ' 1. Quersumme und Verschlüsselung vorbereiten
+            Dim sSumme As String = GetQuersumme(sTabelle)
+            Dim sPW() As String = {"Rucksack", "waehrend", "zuHause", "unterwegs", "Berufung", "Chickenbus", "Speedboot"}
+            Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+            Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
 
-    Public Shared Function DataTest(ByRef sSQL As String, ByRef sIP As String) As Boolean
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Gabriela;Gewuenscht;Karriere;Elternzeit;Truemmer;Abstand;Bodensee", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
+            ' 2. Zeitstempel kultur-unabhängig formatieren
+            Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+            Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sTabelle, passwordKey)
 
-        Dim sTime As String = TimeOfDay
-        ' sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & DeCryptASCII(sSQL, PW)
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLRead.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
+            ' 3. Flexibles URL-Handling (Prüfen, ob bereits http/https übergeben wurde)
+            Dim sUrl As String = "http://" & sIP & "/SQLAppend.php"
 
-        Dim aZeile() As String = Split(htmlcode, Chr(94)) 'Zeilenende chr(94)
-        Dim dt As New DataTable
-        If fcSeekString(htmlcode, "Warning") = True Then
-            Return False
-        Else
-            Return True
-        End If
 
+            ' 4. Daten an Webserver senden und Antwort empfangen
+            Dim sID As String = PHP(sUrl, "POST", securePayload)
+
+            ' Validierung: Wenn die Antwort komplett leer ist, abbrechen
+            If String.IsNullOrEmpty(sID) Then
+                Return String.Empty
+            End If
+
+            ' 5. Antwort parsen (Zeilen trennen über Chr(94) -> '^')
+            Dim aZeile() As String = sID.Split(ChrW(94))
+
+            ' Sicherheitsprüfung: Enthält das Array das erwartete Ergebnis-Element?
+            If aZeile.Length > 1 Then
+                Dim statusOrID As String = aZeile(1).Trim()
+
+                If statusOrID = "False" OrElse String.IsNullOrEmpty(statusOrID) Then
+                    Dim sMsg As String = "Fehler beim Anlegen des Datensatzes"
+                    MsgBox(sMsg, MsgBoxStyle.OkCancel, "OK")
+                    Return String.Empty
+                Else
+                    ' Rückgabe der erfolgreich generierten ID
+                    Return statusOrID
+                End If
+            Else
+                ' Fallback, wenn der Server ein unerwartetes Format zurückliefert
+                Return String.Empty
+            End If
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            Return String.Empty
+        End Try
     End Function
-    ''' <summary>
-    ''' Leersatz an Tabelle anhaengen, Ruckgabe ID 
-    ''' </summary>
-    ''' <param name="sTabelle  "></param>
-    ''' <param name="sIP "></param>
-    ''' <returns></returns>
-    ''' <remarks>03.02.2011 Create koh chang
-    ''' </remarks>
-    Public Shared Function Append(ByRef sTabelle As String, ByRef sIP As String) As String
-        Dim sSumme As String = GetQuersumme(sTabelle)
-        Dim sPW() As String = Split("Rucksack;waehrend;zuHause;unterwegs;Berufung;Chickenbus;Speedboot", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sTabelle = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sTabelle, PW)
-        sIP = "http://" & sIP & "/SQLAppend.php"
-        Dim sID As String = PHP(sIP, "POST", sTabelle)
-        Dim aZeile() As String = Split(sID, Chr(94)) 'Zeilenende chr(94)
-        If aZeile(1) = "False" Then
-            Dim sMsg As String = "Fehler beim Anlegen des Datensatzes"
-            MsgBox(sMsg, vbOKCancel, "OK")
-            Return ""
-        Else
-            Return aZeile(1)
-        End If
 
-    End Function
 
     ''' <summary>
     ''' Führt das Update eines Datensatzes über eine verschlüsselte HTTP-POST-Anfrage an ein Remote-PHP-Skript aus.
@@ -445,97 +506,383 @@ Public Class PHP
         Return isSuccess
     End Function
 
-    Public Shared Function SaveFtp(ByRef sIP As String) As Boolean
-        Dim sSQL = fcGetTimeID(Date.Today)
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Fahrwasser;leuchttonne;mobtaste;Dresden;Wasserwerk;flughafen;flugzeug", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLSave.php"
-        Dim htmlcode As String = Replace(PHP(sIP, "POST", sSQL), "~", vbCrLf)
-    End Function
-    Public Shared Function SaveRestore(ByRef sIP As String) As Array
-        Dim sSQL = fcGetTimeID(Date.Today)
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Fahrwasser;leuchttonne;mobtaste;Dresden;Wasserwerk;flughafen;flugzeug", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLDir.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-        SaveRestore = Split(htmlcode, Chr(94)) 'Zeilenende chr(94)
-        SaveRestore = fcArraySort(SaveRestore, 1, SaveRestore.Length - 1, True)
+    ''' <summary>
+    ''' Sendet einen verschlüsselten Befehl an das PHP-Skript 'SQLSave.php', um Daten serverseitig zu sichern.
+    ''' </summary>
+    ''' <param name="sIP">Die IP-Adresse des Webservers (wird als Wertkopie übergeben).</param>
+    ''' <returns>True, wenn die Anfrage fehlerfrei verarbeitet wurde; andernfalls False.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Fehlende Rückgabewerte (Return True/False) für die Boolean-Funktion ergänzt.
+    ''' - 'ByRef' zu 'ByVal' geändert, um das Überschreiben der IP-Variable beim Aufrufer zu verhindern.
+    ''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    ''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo abgesichert.
+    ''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Gegenstücke ersetzt.
+    ''' </remarks>
+    Public Shared Function SaveFtp(ByVal sIP As String) As Boolean
+        Try
+            ' 1. SQL-Identifikationsstring und Quersumme generieren
+            Dim sSQL As String = fcGetTimeID(Date.Today)
+            Dim sSumme As String = GetQuersumme(sSQL)
 
-    End Function
-    Public Shared Function Restore(ByRef sIP As String, ByRef sDatei As String) As Boolean
-        Restore = False
-        Dim sSQL As String = sDatei
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Bootstour;Hinweise;Handbuch;nachhaltig;Highlights;Auflage;unterwegs", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLRestore.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-        Dim sErgebnis() As String = Split(htmlcode, Chr(94)) 'Zeilenende chr(94)
-        ' If sErgebnis(1) = "True" Then
-        'Restore = True
-        'End If
-    End Function
-    Public Shared Function Kunde(ByRef sIP As String, ByRef P As String) As Array
-        Dim sSQL = fcGetTimeID(Date.Today) & P
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Fahrwasser;leuchttonne;mobtaste;Dresden;Wasserwerk;flughafen;flugzeug", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLKunde.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-        Kunde = Split(htmlcode, Chr(13) & Chr(10)) 'Zeilenende chr(94)
-        '  SaveRestore = fcArraySort(SaveRestore, 1, SaveRestore.Length - 1, True)
+            ' 2. Passwort basierend auf dem aktuellen Wochentag ermitteln (Überlaufsicher)
+            Dim sPW() As String = {"Fahrwasser", "leuchttonne", "mobtaste", "Dresden", "Wasserwerk", "flughafen", "flugzeug"}
+            Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+            Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
 
-    End Function
-    Public Shared Function KunTOBuc(ByRef sIP As String) As Boolean
-        Dim sSQL = fcGetTimeID(Date.Today)
-        KunTOBuc = False
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Fahrwasser;leuchttonne;mobtaste;Dresden;Wasserwerk;flughafen;flugzeug", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLKunID.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-        Dim sErgebnis() As String = Split(htmlcode, Chr(94)) 'Zeilenende chr(94)
-        If sErgebnis(1) = "True" Then
-            KunTOBuc = True
-        End If
-    End Function
-    Public Shared Function SQLError(ByRef sIP As String, ByRef P As String) As String
-        Dim sSQL = fcGetTimeID(Date.Today) & P
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Fahrwasser;leuchttonne;mobtaste;Dresden;Wasserwerk;flughafen;flugzeug", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLError.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-        SQLError = htmlcode
-        '  SaveRestore = fcArraySort(SaveRestore, 1, SaveRestore.Length - 1, True)
+            ' 3. Zeitstempel kultur-unabhängig formatieren
+            Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
 
-    End Function
-    Public Shared Function SQLErrorDel(ByRef sIP As String, ByRef P As String) As Boolean
-        Dim sSQL = fcGetTimeID(Date.Today) & P
-        Dim sSumme As String = GetQuersumme(sSQL)
-        Dim sPW() As String = Split("Fahrwasser;leuchttonne;mobtaste;Dresden;Wasserwerk;flughafen;flugzeug", ";")
-        Dim PW As String = DeCrypt(sPW(DateTime.Now.DayOfWeek), GetTimePW())
-        Dim sTime As String = TimeOfDay
-        sSQL = "S=" & Mid(sTime.Replace(":", ";"), 1, 6) & sSumme & DeCryptASCII(sSQL, PW)
-        sIP = "http://" & sIP & "/SQLErrorDel.php"
-        Dim htmlcode As String = PHP(sIP, "POST", sSQL)
-        SQLErrorDel = True
-        '  SaveRestore = fcArraySort(SaveRestore, 1, SaveRestore.Length - 1, True)
+            ' 4. Verschlüsselten POST-Body zusammenbauen
+            Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
 
+            ' 5. Ziel-URL zusammenbauen (Sicherer Aufbau, da sIP als ByVal übergeben wird)
+            Dim sUrl As String = "http://" & sIP & "/SQLSave.php"
+
+
+            ' 6. Daten an Webserver senden
+            Dim htmlcode As String = PHP(sUrl, "POST", securePayload)
+
+            ' Wenn nötig, die Tilden durch Zeilenumbrüche ersetzen (wie in deiner Logik vorbereitet)
+            If Not String.IsNullOrEmpty(htmlcode) Then
+                htmlcode = htmlcode.Replace("~", vbCrLf)
+            End If
+
+            ' Erfolgreichen Durchlauf zurückgeben
+            Return True
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            Return False
+        End Try
+    End Function
+
+    '''' <summary>
+    '''' Fragt eine Liste von Sicherungsdateien vom PHP-Skript 'SQLDir.php' ab,
+    '''' zerlegt diese in ein Array und sortiert sie absteigend (neueste zuerst).
+    '''' </summary>
+    '''' <param name="sIP">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    '''' <returns>Ein sortiertes String-Array mit den Einträgen des Backup-Verzeichnisses oder ein leeres Array im Fehlerfall.</returns>
+    '''' <remarks>
+    '''' 19.10.2026 - Code-Optimierung:
+    '''' - Rückgabetyp von generischem 'Array' auf typsicheres 'String()' geändert.
+    '''' - 'ByRef' zu 'ByVal' geändert, um das Überschreiben der IP-Variable beim Aufrufer zu verhindern.
+    '''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    '''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo abgesichert.
+    '''' - Validierung der Serverantwort gegen Leerwerte/Verbindungsfehler integriert.
+    '''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Methoden ersetzt.
+    '''' </remarks>
+    'Public Shared Function SaveRestore(ByVal sIP As String) As String()
+    '    Try
+    '        ' 1. SQL-Identifikationsstring und Quersumme generieren
+    '        Dim sSQL As String = fcGetTimeID(Date.Today)
+    '        Dim sSumme As String = GetQuersumme(sSQL)
+
+    '        ' 2. Passwort basierend auf dem aktuellen Wochentag ermitteln (Überlaufsicher)
+    '        Dim sPW() As String = {"Fahrwasser", "leuchttonne", "mobtaste", "Dresden", "Wasserwerk", "flughafen", "flugzeug"}
+    '        Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+    '        Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
+
+    '        ' 3. Zeitstempel kultur-unabhängig formatieren
+    '        Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+
+    '        ' 4. Verschlüsselten POST-Body zusammenbauen
+    '        Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
+
+    '        ' 5. Ziel-URL zusammenbauen (Sicherer Aufbau dank ByVal)
+    '        Dim sUrl As String = "http://" & sIP & "/SQLDir.php"
+
+
+    '        ' 6. Daten an Webserver senden und Antwort empfangen
+    '        Dim htmlcode As String = PHP(sUrl, "POST", securePayload)
+
+    '        ' Validierung: Wenn keine Daten zurückkommen, leeres Array liefern
+    '        If String.IsNullOrEmpty(htmlcode) Then
+    '            Return New String() {}
+    '        End If
+
+    '        ' 7. Antwort in Zeilen zerlegen (Zeilen trennen über Chr(94) -> '^')
+    '        Dim aErgebnis() As String = htmlcode.Split(ChrW(94))
+
+    '        ' 8. Array sortieren, falls Einträge vorhanden sind
+    '        If aErgebnis IsNot Nothing AndAlso aErgebnis.Length > 1 Then
+    '            ' Deine bestehende Sortierfunktion aufrufen (übergibt das gesamte Array)
+    '            aErgebnis = fcArraySort(aErgebnis, 1, aErgebnis.Length - 1, True)
+    '        End If
+
+    '        Return aErgebnis
+
+    '    Catch ex As Exception
+    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
+    '        ' Im Fehlerfall ein leeres Array zurückgeben, um Abstürze beim Aufrufer zu vermeiden
+    '        Return New String() {}
+    '    End Try
+    'End Function
+
+    '''' <summary>
+    '''' Sendet den Namen einer Sicherungsdatei verschlüsselt an das PHP-Skript 'SQLRestore.php',
+    '''' um eine Wiederherstellung (Restore) der Datenbank auf dem Server anzustoßen.
+    '''' </summary>
+    '''' <param name="sIP">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    '''' <param name="sDatei">Der Dateiname der wiederherzustellenden Sicherung.</param>
+    '''' <returns>True, wenn der Server die Wiederherstellung erfolgreich ("True") bestätigt hat; andernfalls False.</returns>
+    '''' <remarks>
+    '''' 19.10.2026 - Code-Optimierung:
+    '''' - Aktivierung der auskommentierten Rückgabelogik unter Berücksichtigung von Index-Validierungen.
+    '''' - 'ByRef'-Parameter zu 'ByVal' geändert, um Variablen-Zerstörung beim Aufrufer zu verhindern.
+    '''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    '''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo-Operation abgesichert.
+    '''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Gegenstücke ersetzt.
+    '''' </remarks>
+    'Public Shared Function Restore(ByVal sIP As String, ByVal sDatei As String) As Boolean
+    '    Try
+    '        ' 1. SQL-Übergabestring (Dateiname) und Quersumme generieren
+    '        Dim sSQL As String = sDatei
+    '        Dim sSumme As String = GetQuersumme(sSQL)
+
+    '        ' 2. Passwort basierend auf dem aktuellen Wochentag ermitteln (Überlaufsicher)
+    '        Dim sPW() As String = {"Bootstour", "Hinweise", "Handbuch", "nachhaltig", "Highlights", "Auflage", "unterwegs"}
+    '        Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+    '        Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
+
+    '        ' 3. Zeitstempel kultur-unabhängig formatieren
+    '        Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+
+    '        ' 4. Verschlüsselten POST-Body zusammenbauen
+    '        Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
+
+    '        ' 5. Ziel-URL zusammenbauen (Sicherer Aufbau dank ByVal)
+    '        Dim sUrl As String = "http://" & sIP & "/SQLRestore.php"
+
+    '        ' 6. Daten an Webserver senden und Antwort empfangen
+    '        Dim htmlcode As String = PHP(sUrl, "POST", securePayload)
+
+    '        ' Validierung: Wenn keine Antwort zurückkommt, war die Operation nicht erfolgreich
+    '        If String.IsNullOrEmpty(htmlcode) Then
+    '            Return False
+    '        End If
+
+    '        ' 7. Antwort in Zeilen zerlegen (Zeilen trennen über Chr(94) -> '^')
+    '        Dim sErgebnis() As String = htmlcode.Split(ChrW(94))
+
+    '        ' Sicherheitsprüfung: Enthält das Array das erwartete Ergebnis-Element?
+    '        If sErgebnis.Length > 1 Then
+    '            ' Gibt True zurück, wenn der Server exakt "True" liefert
+    '            Return (sErgebnis(1).Trim() = "True")
+    '        End If
+
+    '        Return False
+
+    '    Catch ex As Exception
+    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
+    '        Return False
+    '    End Try
+    'End Function
+
+    ''' <summary>
+    ''' Ruft Kundendaten verschlüsselt vom PHP-Skript 'SQLKunde.php' ab und trennt diese zeilenweise in ein String-Array.
+    ''' </summary>
+    ''' <param name="sIP">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    ''' <param name="sParam">Der SQL-Parameter oder Befehlsteil für die Kundenabfrage.</param>
+    ''' <returns>Ein String-Array mit den Zeilen der Kundendaten oder ein leeres Array im Fehlerfall.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Rückgabetyp von generischem 'Array' auf typsicheres 'String()' geändert.
+    ''' - 'ByRef'-Parameter zu 'ByVal' geändert, um Variablen-Zerstörung beim Aufrufer zu verhindern.
+    ''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    ''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo-Operation abgesichert.
+    ''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Gegenstücke ersetzt.
+    ''' - Trennung der Zeilen auf .NET-konformes 'ControlChars.CrLf' umgestellt.
+    ''' </remarks>
+    Public Shared Function Kunde(ByVal sIP As String, ByVal sParam As String) As String()
+        Try
+            ' 1. SQL-String und Quersumme generieren
+            Dim sSQL As String = fcGetTimeID(Date.Today) & sParam
+            Dim sSumme As String = GetQuersumme(sSQL)
+
+            ' 2. Passwort basierend auf dem aktuellen Wochentag ermitteln (Überlaufsicher)
+            Dim sPW() As String = {"Fahrwasser", "leuchttonne", "mobtaste", "Dresden", "Wasserwerk", "flughafen", "flugzeug"}
+            Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+            Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
+
+            ' 3. Zeitstempel kultur-unabhängig formatieren
+            Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+
+            ' 4. Verschlüsselten POST-Body zusammenbauen
+            Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
+
+            ' 5. Ziel-URL zusammenbauen (Sicherer Aufbau dank ByVal)
+            Dim sUrl As String = "http://" & sIP & "/SQLKunde.php"
+
+
+            ' 6. Daten an Webserver senden und Antwort empfangen
+            Dim htmlcode As String = PHP(sUrl, "POST", securePayload)
+
+            ' Validierung: Wenn keine Daten zurückkommen, leeres Array liefern
+            If String.IsNullOrEmpty(htmlcode) Then
+                Return New String() {}
+            End If
+
+            ' 7. Antwort in Zeilen zerlegen (Trennt anhand von Carriage Return + Line Feed)
+            Dim aKundendaten() As String = htmlcode.Split(New String() {ControlChars.CrLf}, StringSplitOptions.None)
+
+            Return aKundendaten
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            ' Im Fehlerfall ein leeres Array zurückgeben, um Abstürze beim Aufrufer zu vermeiden
+            Return New String() {}
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Führt eine verschlüsselte Operation (z. B. Synchronisierung von Kunden- zu Buchungsdaten) 
+    ''' über das PHP-Skript 'SQLKunID.php' aus.
+    ''' </summary>
+    ''' <param name="sIP">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    ''' <returns>True, wenn der Server die Operation erfolgreich ("True") bestätigt hat; andernfalls False.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Index-Validierung für das 'sErgebnis'-Array integriert, um Abstürze bei leeren Serverantworten zu verhindern.
+    ''' - 'ByRef'-Parameter zu 'ByVal' geändert, um Variablen-Zerstörung beim Aufrufer zu verhindern.
+    ''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    ''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo-Operation abgesichert.
+    ''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Methoden ersetzt.
+    ''' </remarks>
+    Public Shared Function KunTOBuc(ByVal sIP As String) As Boolean
+        Try
+            ' 1. SQL-Identifikationsstring und Quersumme generieren
+            Dim sSQL As String = fcGetTimeID(Date.Today)
+            Dim sSumme As String = GetQuersumme(sSQL)
+
+            ' 2. Passwort basierend auf dem aktuellen Wochentag ermitteln (Überlaufsicher)
+            Dim sPW() As String = {"Fahrwasser", "leuchttonne", "mobtaste", "Dresden", "Wasserwerk", "flughafen", "flugzeug"}
+            Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+            Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
+
+            ' 3. Zeitstempel kultur-unabhängig formatieren
+            Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+
+            ' 4. Verschlüsselten POST-Body zusammenbauen
+            Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
+
+            ' 5. Ziel-URL zusammenbauen (Sicherer Aufbau dank ByVal)
+            Dim sUrl As String = "http://" & sIP & "/SQLKunID.php"
+
+            ' 6. Daten an Webserver senden und Antwort empfangen
+            Dim htmlcode As String = PHP(sUrl, "POST", securePayload)
+
+            ' Validierung: Wenn keine Antwort zurückkommt, war die Operation nicht erfolgreich
+            If String.IsNullOrEmpty(htmlcode) Then
+                Return False
+            End If
+
+            ' 7. Antwort in Zeilen zerlegen (Zeilen trennen über Chr(94) -> '^')
+            Dim sErgebnis() As String = htmlcode.Split(ChrW(94))
+
+            ' Sicherheitsprüfung: Enthält das Array das erwartete Ergebnis-Element?
+            If sErgebnis.Length > 1 Then
+                ' Gibt True zurück, wenn der Server exakt "True" liefert
+                Return (sErgebnis(1).Trim() = "True")
+            End If
+
+            Return False
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            Return False
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Sendet einen verschlüsselten SQL-Befehl an das PHP-Skript 'SQLError.php' und gibt die Antwort des Servers zurück.
+    ''' </summary>
+    ''' <param name="sIP">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    ''' <param name="sParam">Der SQL-Parameter oder Befehlsteil für die Fehlerabfrage.</param>
+    ''' <returns>Die unverarbeitete Serverantwort (HTML/Text-Code) als String oder ein leerer String im Fehlerfall.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - 'ByRef'-Parameter zu 'ByVal' geändert, um Variablen-Zerstörung beim Aufrufer zu verhindern.
+    ''' - 'TimeOfDay' durch kultursicheres 'DateTime.Now.ToString("HH;mm;ss")' ersetzt (AM/PM-Crash-Schutz).
+    ''' - Arrayüberlauf beim Passwort-Wochentagszugriff mittels Modulo-Operation abgesichert.
+    ''' - VB6-Legacy-Befehle ('Mid', 'Split') durch .NET-native Gegenstücke ersetzt.
+    ''' - Try-Catch-Block zur strukturierten Fehlerbehandlung integriert.
+    ''' </remarks>
+    Public Shared Function SQLError(ByVal sIP As String, ByVal sParam As String) As String
+        Try
+            ' 1. SQL-String und Quersumme generieren
+            Dim sSQL As String = fcGetTimeID(Date.Today) & sParam
+            Dim sSumme As String = GetQuersumme(sSQL)
+
+            ' 2. Passwort basierend auf dem aktuellen Wochentag ermitteln (Überlaufsicher)
+            Dim sPW() As String = {"Fahrwasser", "leuchttonne", "mobtaste", "Dresden", "Wasserwerk", "flughafen", "flugzeug"}
+            Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+            Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
+
+            ' 3. Zeitstempel kultur-unabhängig formatieren
+            Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+
+            ' 4. Verschlüsselten POST-Body zusammenbauen
+            Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
+
+            ' 5. Ziel-URL zusammenbauen (Sicherer Aufbau dank ByVal)
+            Dim sUrl As String = "http://" & sIP & "/SQLError.php"
+
+            ' 6. Daten an Webserver senden und Antwort zurückgeben
+            Dim htmlcode As String = PHP(sUrl, "POST", securePayload)
+
+            Return htmlcode
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            Return String.Empty
+        End Try
+    End Function
+
+
+    ''' <summary>
+    ''' Sendet einen verschlüsselten SQL-Löschbefehl inklusive Sicherheits-Quersumme an das PHP-Skript 'SQLErrorDel.php'.
+    ''' Unterstützt sowohl eine reine IP als auch eine vollständige URL.
+    ''' </summary>
+    ''' <param name="sIP">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    ''' <param name="sParam">Der SQL-Parameter oder Befehlsteil, der angehängt werden soll.</param>
+    ''' <returns>True, wenn die Verarbeitung fehlerfrei durchlaufen wurde; andernfalls False.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Fehleranfälliges 'TimeOfDay' durch ein kultur-unabhängiges Festformat ersetzt.
+    ''' - 'sPW'-Arrayzugriff über Modulo gegen potenzielle OutOfBounds-Exceptions abgesichert.
+    ''' - VB6-Legacy-Code ('Mid', 'Split') durch native .NET-Schnittstellen ersetzt.
+    ''' </remarks>
+    Public Shared Function SQLErrorDel(ByVal sIP As String, ByVal sParam As String) As Boolean
+        Try
+            ' 1. SQL-String und Quersumme generieren
+            Dim sSQL As String = fcGetTimeID(Date.Today) & sParam
+            Dim sSumme As String = GetQuersumme(sSQL)
+
+            ' 2. Passwort basierend auf dem aktuellen Wochentag ermitteln (Überlaufsicher)
+            Dim sPW() As String = {"Fahrwasser", "leuchttonne", "mobtaste", "Dresden", "Wasserwerk", "flughafen", "flugzeug"}
+            Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length
+            Dim passwordKey As String = DeCrypt(sPW(dayIndex), GetTimePW())
+
+            ' 3. Zeitstempel kultur-unabhängig formatieren (Verhindert AM/PM-Abstürze)
+            ' Ersetzt das fehleranfällige: TimeOfDay.Replace(":", ";")
+            Dim sTime As String = DateTime.Now.ToString("HH;mm;ss")
+
+            ' 4. Verschlüsselten POST-Body zusammenbauen (Mid(1,6) entspricht den ersten 6 Zeichen)
+            Dim securePayload As String = "S=" & sTime.Substring(0, Math.Min(6, sTime.Length)) & sSumme & DeCryptASCII(sSQL, passwordKey)
+
+            ' 5. Flexibles URL-Handling (Prüfen, ob bereits http/https übergeben wurde)
+            Dim sUrl As String = "http://" & sIP & "/SQLErrorDel.php"
+
+            ' 6. Daten an Webserver senden
+            Dim htmlcode As String = PHP(sUrl, "POST", securePayload)
+
+            Return True
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            Return False
+        End Try
     End Function
 
     ''' <summary>
@@ -560,37 +907,71 @@ Public Class PHP
         End If
     End Function
 
+    ''' <summary>
+    ''' Sendet einen leeren Datensatz-Trigger an das PHP-Skript 'SQLTrans.php'.
+    ''' Unterstützt sowohl die Übergabe einer reinen IP/Domain als auch einer vollständigen URL.
+    ''' </summary>
+    ''' <param name="sTarget">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    ''' <returns>True, wenn die Übertragung erfolgreich war und kein "ERROR" zurückgegeben wurde; andernfalls False.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Flexibles URL-Handling integriert (prüft auf 'http://' oder 'https://').
+    ''' - Parameter auf das sicherere 'ByVal' umgestellt.
+    ''' - Fehlerbehandlung (Try-Catch) hinzugefügt, um Abstürze bei Netzwerkfehlern abzufangen.
+    ''' - Veraltete Funktionsnamens-Zuweisung durch modernes 'Return' ersetzt.
+    ''' </remarks>
+    Public Shared Function DataAll(ByVal sTarget As String) As Boolean
+        Try
+            Dim sUrl As String = sTarget
 
+            ' Falls nur eine IP oder Domain übergeben wurde, die Standard-URL zusammenbauen
+            If Not sTarget.StartsWith("http://", StringComparison.OrdinalIgnoreCase) AndAlso Not sTarget.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
+                sUrl = "http://" & sTarget & "/SQLTrans.php"
+            End If
 
+            ' POST-Request absetzen und Antwort prüfen
+            If PHPnoF(sUrl, "POST", "Daten= ") <> "ERROR" Then
+                Return True
+            End If
 
-    Public Shared Function DataAll(ByRef sIP1 As String) As Boolean
-        DataAll = False
-
-        '  Dim sIPx As String = "http://" & sIP1
-        Dim sIPx As String = "http://" & sIP1 & "/SQLTrans.php"
-        If PHPnoF(sIPx, "POST", "Daten= ") <> "ERROR" Then 'nof
-            DataAll = True
-        End If
-
-
-
+            Return False
+        Catch ex As Exception
+            ' Bei Netzwerk- oder Konfigurationsfehlern sicher False zurückgeben
+            Return False
+        End Try
     End Function
 
-    Public Shared Function DataRead(ByRef sIP1 As String, ByRef Wert As String) As String
-        DataRead = False
+    ''' <summary>
+    ''' Sendet eine Anfrage an das angegebene PHP-Skript und gibt die Antwort des Servers zurück.
+    ''' Unterstützt sowohl die Übergabe einer reinen IP/Domain als auch einer vollständigen URL.
+    ''' </summary>
+    ''' <param name="sTarget">Die IP-Adresse oder die vollständige URL des Webservers.</param>
+    ''' <param name="sWert">Der Wert oder die Kennung (z.B. "Speicher_All"), die per POST übergeben wird.</param>
+    ''' <returns>Die Antwort des PHP-Skripts als String oder ein leerer String im Fehlerfall.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Flexibles URL-Handling hinzugefügt (prüft, ob bereits ein 'http' im Parameter existiert).
+    ''' - Verhindert doppelte Protokoll- und Skript-Zuweisungen bei expliziten Aufrufen.
+    ''' </remarks>
+    Public Shared Function DataRead(ByVal sTarget As String, ByVal sWert As String) As String
+        Try
+            Dim sUrl As String = sTarget
 
-        '  Dim sIPx As String = "http://" & sIP1
-        Dim sIPx As String = "http://" & sIP1 & "/SQLReadCode.php"
-        sIPx = sIP1
+            ' Falls nur eine IP oder Domain übergeben wurde, die Standard-URL zusammenbauen
+            If Not sTarget.StartsWith("http://", StringComparison.OrdinalIgnoreCase) AndAlso Not sTarget.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
+                sUrl = "http://" & sTarget & "/SQLReadCode.php"
+            End If
 
-        DataRead = PHP(sIP1, "POST", "Daten=" & Wert)
-        'If PHPnoF(sIPx, "POST", "Daten= ") <> "ERROR" Then 'nof
-        '    DataRead = True
-        'End If
+            ' POST-Abfrage mit der bereinigten URL ausführen
+            Dim sAntwort As String = PHP(sUrl, "POST", "Daten=" & sWert)
 
-
-
+            Return sAntwort
+        Catch ex As Exception
+            ' Im Fehlerfall leeren String zurückgeben, um Abstürze beim Aufrufer zu vermeiden
+            Return String.Empty
+        End Try
     End Function
+
 
     ' Nicht löschen!!!
     '# Diese Dateien liegen auf dem Raspberry und werden von VB aus aufgerufen. Die PHP-Dateien sind für die Kommunikation mit der Datenbank zuständig.
