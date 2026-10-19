@@ -3,62 +3,111 @@ Imports System.Net.Http
 Imports System.Text
 Imports System.IO
 
-Imports System.Threading.Tasks
-
-
-Imports System.Net.NetworkInformation
-Imports System.Net
 Public Class PHP
-    'Alle SQLfubgtionen nur mit PHPdateien auf Webserver!
-    'Passwoerter in der function und PHPdatei müssen übereinstimmen
-
+    'Alle SQL Funktionen nur mit PHPdateien auf Webserver!
+    'Passwoerter in der Funktion und PHPdatei müssen übereinstimmen
 
 
     ''' <summary>
-    ''' Verschluesseln von passwortern
+    ''' Führt eine symmetrische XOR-Verschlüsselung oder -Entschlüsselung auf einem String aus.
+    ''' Da es sich um eine XOR-Operation handelt, führt das erneute Anwenden mit demselben Schlüssel zum Originaltext.
     ''' </summary>
-    ''' <param name="sString "></param>
-    ''' <param name="sSecurityValue"></param>
-    ''' <returns></returns>
-    ''' <remarks>03.02.2011 Create koh chang
+    ''' <param name="sString">Der zu ver- oder entschlüsselnde Text.</param>
+    ''' <param name="sSecurityValue">Der geheime Schlüssel für die XOR-Operation.</param>
+    ''' <returns>Der bearbeitete Text als String.</returns>
+    ''' <remarks>
+    ''' 03.02.2011 - Create (Koh Chang)
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Den extrem langsamen String-Verkettungsoperator (&amp;) in der Schleife durch 'StringBuilder' ersetzt.
+    ''' - VB6-Altlasten (Len, Mid$, Asc, Chr) vollständig entfernt.
+    ''' - Direkten, performanten 0-basierten Zeichenzugriff implementiert.
+    ''' - Null- und Leer-Validierung für Eingabestrings hinzugefügt, um Abstürze zu verhindern.
+    ''' - Schleifen-Index auf standardmäßige 0-basierte Logik umgestellt.
     ''' </remarks>
-    Public Shared Function DeCrypt(ByVal sString As String,
-                         ByVal sSecurityValue As String) As String
-        Dim n, x, nMax As Integer
-        nMax = Len(sString)
-        Dim nMaxS = Len(sSecurityValue)
-        DeCrypt = ""
-        For n = 1 To nMax
-            x = n Mod nMaxS
-            If x = 0 Then x = nMaxS
-            DeCrypt = DeCrypt & Chr(Asc(Mid$(sSecurityValue, x, 1)) Xor Asc(Mid$(sString, n, 1)))
-        Next
+    Public Shared Function DeCrypt(ByVal sString As String, ByVal sSecurityValue As String) As String
+        Try
+            ' Validierung: Wenn einer der Strings leer ist, gibt es nichts zu verarbeiten
+            If String.IsNullOrEmpty(sString) OrElse String.IsNullOrEmpty(sSecurityValue) Then
+                Return sString
+            End If
+
+            Dim nMax As Integer = sString.Length
+            Dim nMaxS As Integer = sSecurityValue.Length
+            Dim sb As New System.Text.StringBuilder(nMax)
+
+            ' 0-basierte Schleife über alle Zeichen des Eingabestrings
+            For n As Integer = 0 To nMax - 1
+                ' Bestimmung des passenden Schlüsselzeichens per Modulo-Operation
+                Dim x As Integer = n Mod nMaxS
+
+                ' Direkte XOR-Verknüpfung der Zeichen-Codes
+                Dim charCode As Integer = AscW(sSecurityValue(x)) Xor AscW(sString(n))
+
+                ' Zeichen an den StringBuilder anhängen
+                sb.Append(ChrW(charCode))
+            Next
+
+            Return sb.ToString()
+
+        Catch ex As Exception
+            ' Hinweis: In produktiven Krypto-Funktionen sollte hier je nach Architektur 
+            ' ein Log-Eintrag erfolgen oder der Fehler weitergeworfen werden.
+            Return String.Empty
+        End Try
     End Function
+
     ''' <summary>
-    ''' Verschluesseln von passwortern rueckgabe wert in ASCII 
+    ''' Verschlüsselt einen String per XOR und gibt das Ergebnis als semikolon-getrennte Kette von ASCII/Unicode-Zahlenwerten zurück.
     ''' </summary>
-    ''' <param name="sString "></param>
-    ''' <param name="sSecurityValue"></param>
-    ''' <returns></returns>
-    ''' <remarks>03.02.2011 Create koh chang
+    ''' <param name="sString">Der zu verschlüsselnde Text.</param>
+    ''' <param name="sSecurityValue">Der geheime Schlüssel für die XOR-Operation.</param>
+    ''' <returns>Ein String aus numerischen Werten, getrennt durch Semikolons (z.B. "72;101;108;108;111").</returns>
+    ''' <remarks>
+    ''' 03.02.2011 - Create (Koh Chang)
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Den speicherintensiven Verkettungsoperator (&amp;) und 'Str().Trim' durch 'StringBuilder' ersetzt.
+    ''' - VB6-Legacy-Funktionen (Len, Mid, Asc, Str) vollständig entfernt.
+    ''' - Das Entfernen des letzten Semikolons optimiert (sb.Length -= 1).
+    ''' - Fehlerbehandlung (Try-Catch) und Null-Validierung hinzugefügt.
     ''' </remarks>
+    Public Shared Function DeCryptASCII(ByVal sString As String, ByVal sSecurityValue As String) As String
+        Try
+            ' Validierung: Wenn einer der Strings leer ist, sofort abbrechen
+            If String.IsNullOrEmpty(sString) OrElse String.IsNullOrEmpty(sSecurityValue) Then
+                Return String.Empty
+            End If
 
+            Dim nMax As Integer = sString.Length
+            Dim nMaxS As Integer = sSecurityValue.Length
 
-    Public Shared Function DeCryptASCII(ByVal sString As String,
-                       ByVal sSecurityValue As String) As String
-        Dim n, x, nMax As Integer
-        Dim c As Integer
-        nMax = Len(sString)
-        Dim nMaxS = Len(sSecurityValue)
-        DeCryptASCII = ""
-        For n = 1 To nMax
-            x = n Mod nMaxS
-            If x = 0 Then x = nMaxS
-            c = Str(Asc(Mid(sSecurityValue, x, 1)) Xor Asc(Mid(sString, n, 1))).Trim
-            DeCryptASCII = DeCryptASCII & c & ";"
-        Next
-        DeCryptASCII = Mid(DeCryptASCII, 1, DeCryptASCII.Length - 1)
+            ' StringBuilder initialisieren (Kapazität grob geschätzt: ca. 4 Zeichen pro Buchstabe)
+            Dim sb As New System.Text.StringBuilder(nMax * 4)
+
+            ' 0-basierte Schleife über alle Zeichen des Eingabestrings
+            For n As Integer = 0 To nMax - 1
+                ' Bestimmung des passenden Schlüsselzeichens per Modulo-Operation
+                Dim x As Integer = n Mod nMaxS
+
+                ' Direkte XOR-Verknüpfung der Zeichen-Codes (AscW ist das .NET-native Gegenstück zu Asc)
+                Dim charCode As Integer = AscW(sSecurityValue(x)) Xor AscW(sString(n))
+
+                ' Zahl direkt anfügen, gefolgt vom Trennzeichen (kein Str() oder Trim mehr nötig)
+                sb.Append(charCode).Append(";")
+            Next
+
+            ' Das letzte überflüssige Semikolon entfernen, falls Daten vorhanden sind
+            If sb.Length > 0 Then
+                sb.Length -= 1
+            End If
+
+            Return sb.ToString()
+
+        Catch ex As Exception
+            ErrReport(ex.Message, ex.Source, ex.StackTrace)
+            Return String.Empty
+        End Try
     End Function
+
 
 
     ''' <summary>

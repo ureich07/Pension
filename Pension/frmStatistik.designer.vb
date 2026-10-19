@@ -22,42 +22,42 @@ Partial Class frmStatistik
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim ChartArea13 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend13 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series13 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea14 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend14 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series14 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea15 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend15 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series15 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea16 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend16 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series16 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea17 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend17 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series17 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea18 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend18 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series18 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea19 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend19 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series19 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea20 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend20 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series20 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea21 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend21 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series21 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea22 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend22 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series22 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea23 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend23 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series23 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea24 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend24 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series24 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series3 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea4 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend4 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series4 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea5 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend5 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series5 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea6 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend6 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series6 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea7 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend7 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series7 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea8 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend8 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series8 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea9 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend9 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series9 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea10 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend10 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series10 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea11 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend11 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series11 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea12 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend12 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series12 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.chUmsatz = New System.Windows.Forms.DataVisualization.Charting.Chart()
         Me.tcStatistik = New System.Windows.Forms.TabControl()
         Me.tpUmsatzJahr = New System.Windows.Forms.TabPage()
@@ -103,8 +103,8 @@ Partial Class frmStatistik
         Me.tstbVon = New System.Windows.Forms.ToolStripTextBox()
         Me.ToolStripLabel5 = New System.Windows.Forms.ToolStripLabel()
         Me.tstbBis = New System.Windows.Forms.ToolStripTextBox()
-        Me.tscbDruckmonat = New System.Windows.Forms.ToolStripComboBox()
         Me.tslDruckmonat = New System.Windows.Forms.ToolStripLabel()
+        Me.tscbDruckmonat = New System.Windows.Forms.ToolStripComboBox()
         CType(Me.chUmsatz, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tcStatistik.SuspendLayout()
         Me.tpUmsatzJahr.SuspendLayout()
@@ -137,16 +137,16 @@ Partial Class frmStatistik
         '
         'chUmsatz
         '
-        ChartArea13.Name = "ChartArea1"
-        Me.chUmsatz.ChartAreas.Add(ChartArea13)
-        Legend13.Name = "Legend1"
-        Me.chUmsatz.Legends.Add(Legend13)
+        ChartArea1.Name = "ChartArea1"
+        Me.chUmsatz.ChartAreas.Add(ChartArea1)
+        Legend1.Name = "Legend1"
+        Me.chUmsatz.Legends.Add(Legend1)
         Me.chUmsatz.Location = New System.Drawing.Point(6, 0)
         Me.chUmsatz.Name = "chUmsatz"
-        Series13.ChartArea = "ChartArea1"
-        Series13.Legend = "Legend1"
-        Series13.Name = "Series1"
-        Me.chUmsatz.Series.Add(Series13)
+        Series1.ChartArea = "ChartArea1"
+        Series1.Legend = "Legend1"
+        Series1.Name = "Series1"
+        Me.chUmsatz.Series.Add(Series1)
         Me.chUmsatz.Size = New System.Drawing.Size(976, 349)
         Me.chUmsatz.TabIndex = 0
         Me.chUmsatz.Text = "Umsatz"
@@ -196,16 +196,16 @@ Partial Class frmStatistik
         '
         'chGaeste
         '
-        ChartArea14.Name = "ChartArea1"
-        Me.chGaeste.ChartAreas.Add(ChartArea14)
-        Legend14.Name = "Legend1"
-        Me.chGaeste.Legends.Add(Legend14)
+        ChartArea2.Name = "ChartArea1"
+        Me.chGaeste.ChartAreas.Add(ChartArea2)
+        Legend2.Name = "Legend1"
+        Me.chGaeste.Legends.Add(Legend2)
         Me.chGaeste.Location = New System.Drawing.Point(6, 3)
         Me.chGaeste.Name = "chGaeste"
-        Series14.ChartArea = "ChartArea1"
-        Series14.Legend = "Legend1"
-        Series14.Name = "Series1"
-        Me.chGaeste.Series.Add(Series14)
+        Series2.ChartArea = "ChartArea1"
+        Series2.Legend = "Legend1"
+        Series2.Name = "Series1"
+        Me.chGaeste.Series.Add(Series2)
         Me.chGaeste.Size = New System.Drawing.Size(777, 342)
         Me.chGaeste.TabIndex = 0
         Me.chGaeste.Text = "Chart1"
@@ -222,16 +222,16 @@ Partial Class frmStatistik
         '
         'chUmsatz1
         '
-        ChartArea15.Name = "ChartArea1"
-        Me.chUmsatz1.ChartAreas.Add(ChartArea15)
-        Legend15.Name = "Legend1"
-        Me.chUmsatz1.Legends.Add(Legend15)
+        ChartArea3.Name = "ChartArea1"
+        Me.chUmsatz1.ChartAreas.Add(ChartArea3)
+        Legend3.Name = "Legend1"
+        Me.chUmsatz1.Legends.Add(Legend3)
         Me.chUmsatz1.Location = New System.Drawing.Point(3, 3)
         Me.chUmsatz1.Name = "chUmsatz1"
-        Series15.ChartArea = "ChartArea1"
-        Series15.Legend = "Legend1"
-        Series15.Name = "Series1"
-        Me.chUmsatz1.Series.Add(Series15)
+        Series3.ChartArea = "ChartArea1"
+        Series3.Legend = "Legend1"
+        Series3.Name = "Series1"
+        Me.chUmsatz1.Series.Add(Series3)
         Me.chUmsatz1.Size = New System.Drawing.Size(810, 327)
         Me.chUmsatz1.TabIndex = 0
         Me.chUmsatz1.Text = "Chart1"
@@ -248,16 +248,16 @@ Partial Class frmStatistik
         '
         'chDauer
         '
-        ChartArea16.Name = "ChartArea1"
-        Me.chDauer.ChartAreas.Add(ChartArea16)
-        Legend16.Name = "Legend1"
-        Me.chDauer.Legends.Add(Legend16)
+        ChartArea4.Name = "ChartArea1"
+        Me.chDauer.ChartAreas.Add(ChartArea4)
+        Legend4.Name = "Legend1"
+        Me.chDauer.Legends.Add(Legend4)
         Me.chDauer.Location = New System.Drawing.Point(3, 3)
         Me.chDauer.Name = "chDauer"
-        Series16.ChartArea = "ChartArea1"
-        Series16.Legend = "Legend1"
-        Series16.Name = "Series1"
-        Me.chDauer.Series.Add(Series16)
+        Series4.ChartArea = "ChartArea1"
+        Series4.Legend = "Legend1"
+        Series4.Name = "Series1"
+        Me.chDauer.Series.Add(Series4)
         Me.chDauer.Size = New System.Drawing.Size(813, 324)
         Me.chDauer.TabIndex = 0
         Me.chDauer.Text = "Chart1"
@@ -274,16 +274,16 @@ Partial Class frmStatistik
         '
         'chUmsatzMonat
         '
-        ChartArea17.Name = "ChartArea1"
-        Me.chUmsatzMonat.ChartAreas.Add(ChartArea17)
-        Legend17.Name = "Legend1"
-        Me.chUmsatzMonat.Legends.Add(Legend17)
+        ChartArea5.Name = "ChartArea1"
+        Me.chUmsatzMonat.ChartAreas.Add(ChartArea5)
+        Legend5.Name = "Legend1"
+        Me.chUmsatzMonat.Legends.Add(Legend5)
         Me.chUmsatzMonat.Location = New System.Drawing.Point(3, 3)
         Me.chUmsatzMonat.Name = "chUmsatzMonat"
-        Series17.ChartArea = "ChartArea1"
-        Series17.Legend = "Legend1"
-        Series17.Name = "Series1"
-        Me.chUmsatzMonat.Series.Add(Series17)
+        Series5.ChartArea = "ChartArea1"
+        Series5.Legend = "Legend1"
+        Series5.Name = "Series1"
+        Me.chUmsatzMonat.Series.Add(Series5)
         Me.chUmsatzMonat.Size = New System.Drawing.Size(714, 322)
         Me.chUmsatzMonat.TabIndex = 0
         Me.chUmsatzMonat.Text = "Chart1"
@@ -300,16 +300,16 @@ Partial Class frmStatistik
         '
         'chUmsatzZimmer
         '
-        ChartArea18.Name = "ChartArea1"
-        Me.chUmsatzZimmer.ChartAreas.Add(ChartArea18)
-        Legend18.Name = "Legend1"
-        Me.chUmsatzZimmer.Legends.Add(Legend18)
+        ChartArea6.Name = "ChartArea1"
+        Me.chUmsatzZimmer.ChartAreas.Add(ChartArea6)
+        Legend6.Name = "Legend1"
+        Me.chUmsatzZimmer.Legends.Add(Legend6)
         Me.chUmsatzZimmer.Location = New System.Drawing.Point(3, 3)
         Me.chUmsatzZimmer.Name = "chUmsatzZimmer"
-        Series18.ChartArea = "ChartArea1"
-        Series18.Legend = "Legend1"
-        Series18.Name = "Series1"
-        Me.chUmsatzZimmer.Series.Add(Series18)
+        Series6.ChartArea = "ChartArea1"
+        Series6.Legend = "Legend1"
+        Series6.Name = "Series1"
+        Me.chUmsatzZimmer.Series.Add(Series6)
         Me.chUmsatzZimmer.Size = New System.Drawing.Size(791, 328)
         Me.chUmsatzZimmer.TabIndex = 0
         Me.chUmsatzZimmer.Text = "Chart1"
@@ -326,16 +326,16 @@ Partial Class frmStatistik
         '
         'chObjekt
         '
-        ChartArea19.Name = "ChartArea1"
-        Me.chObjekt.ChartAreas.Add(ChartArea19)
-        Legend19.Name = "Legend1"
-        Me.chObjekt.Legends.Add(Legend19)
+        ChartArea7.Name = "ChartArea1"
+        Me.chObjekt.ChartAreas.Add(ChartArea7)
+        Legend7.Name = "Legend1"
+        Me.chObjekt.Legends.Add(Legend7)
         Me.chObjekt.Location = New System.Drawing.Point(3, 32)
         Me.chObjekt.Name = "chObjekt"
-        Series19.ChartArea = "ChartArea1"
-        Series19.Legend = "Legend1"
-        Series19.Name = "Series1"
-        Me.chObjekt.Series.Add(Series19)
+        Series7.ChartArea = "ChartArea1"
+        Series7.Legend = "Legend1"
+        Series7.Name = "Series1"
+        Me.chObjekt.Series.Add(Series7)
         Me.chObjekt.Size = New System.Drawing.Size(817, 297)
         Me.chObjekt.TabIndex = 1
         Me.chObjekt.Text = "Chart1"
@@ -398,16 +398,16 @@ Partial Class frmStatistik
         '
         'chWerbung
         '
-        ChartArea20.Name = "ChartArea1"
-        Me.chWerbung.ChartAreas.Add(ChartArea20)
-        Legend20.Name = "Legend1"
-        Me.chWerbung.Legends.Add(Legend20)
+        ChartArea8.Name = "ChartArea1"
+        Me.chWerbung.ChartAreas.Add(ChartArea8)
+        Legend8.Name = "Legend1"
+        Me.chWerbung.Legends.Add(Legend8)
         Me.chWerbung.Location = New System.Drawing.Point(15, 26)
         Me.chWerbung.Name = "chWerbung"
-        Series20.ChartArea = "ChartArea1"
-        Series20.Legend = "Legend1"
-        Series20.Name = "Series1"
-        Me.chWerbung.Series.Add(Series20)
+        Series8.ChartArea = "ChartArea1"
+        Series8.Legend = "Legend1"
+        Series8.Name = "Series1"
+        Me.chWerbung.Series.Add(Series8)
         Me.chWerbung.Size = New System.Drawing.Size(920, 301)
         Me.chWerbung.TabIndex = 0
         Me.chWerbung.Text = "Chart1"
@@ -426,32 +426,32 @@ Partial Class frmStatistik
         '
         'chSollZimmer
         '
-        ChartArea21.Name = "ChartArea1"
-        Me.chSollZimmer.ChartAreas.Add(ChartArea21)
-        Legend21.Name = "Legend1"
-        Me.chSollZimmer.Legends.Add(Legend21)
+        ChartArea9.Name = "ChartArea1"
+        Me.chSollZimmer.ChartAreas.Add(ChartArea9)
+        Legend9.Name = "Legend1"
+        Me.chSollZimmer.Legends.Add(Legend9)
         Me.chSollZimmer.Location = New System.Drawing.Point(30, 184)
         Me.chSollZimmer.Name = "chSollZimmer"
-        Series21.ChartArea = "ChartArea1"
-        Series21.Legend = "Legend1"
-        Series21.Name = "Series1"
-        Me.chSollZimmer.Series.Add(Series21)
+        Series9.ChartArea = "ChartArea1"
+        Series9.Legend = "Legend1"
+        Series9.Name = "Series1"
+        Me.chSollZimmer.Series.Add(Series9)
         Me.chSollZimmer.Size = New System.Drawing.Size(945, 133)
         Me.chSollZimmer.TabIndex = 1
         Me.chSollZimmer.Text = "Chart1"
         '
         'chAuslastung
         '
-        ChartArea22.Name = "ChartArea1"
-        Me.chAuslastung.ChartAreas.Add(ChartArea22)
-        Legend22.Name = "Legend1"
-        Me.chAuslastung.Legends.Add(Legend22)
+        ChartArea10.Name = "ChartArea1"
+        Me.chAuslastung.ChartAreas.Add(ChartArea10)
+        Legend10.Name = "Legend1"
+        Me.chAuslastung.Legends.Add(Legend10)
         Me.chAuslastung.Location = New System.Drawing.Point(6, 6)
         Me.chAuslastung.Name = "chAuslastung"
-        Series22.ChartArea = "ChartArea1"
-        Series22.Legend = "Legend1"
-        Series22.Name = "Series1"
-        Me.chAuslastung.Series.Add(Series22)
+        Series10.ChartArea = "ChartArea1"
+        Series10.Legend = "Legend1"
+        Series10.Name = "Series1"
+        Me.chAuslastung.Series.Add(Series10)
         Me.chAuslastung.Size = New System.Drawing.Size(945, 172)
         Me.chAuslastung.TabIndex = 0
         Me.chAuslastung.Text = "Chart1"
@@ -469,16 +469,16 @@ Partial Class frmStatistik
         '
         'chBuchMonat
         '
-        ChartArea23.Name = "ChartArea1"
-        Me.chBuchMonat.ChartAreas.Add(ChartArea23)
-        Legend23.Name = "Legend1"
-        Me.chBuchMonat.Legends.Add(Legend23)
+        ChartArea11.Name = "ChartArea1"
+        Me.chBuchMonat.ChartAreas.Add(ChartArea11)
+        Legend11.Name = "Legend1"
+        Me.chBuchMonat.Legends.Add(Legend11)
         Me.chBuchMonat.Location = New System.Drawing.Point(3, 6)
         Me.chBuchMonat.Name = "chBuchMonat"
-        Series23.ChartArea = "ChartArea1"
-        Series23.Legend = "Legend1"
-        Series23.Name = "Series1"
-        Me.chBuchMonat.Series.Add(Series23)
+        Series11.ChartArea = "ChartArea1"
+        Series11.Legend = "Legend1"
+        Series11.Name = "Series1"
+        Me.chBuchMonat.Series.Add(Series11)
         Me.chBuchMonat.Size = New System.Drawing.Size(991, 332)
         Me.chBuchMonat.TabIndex = 0
         Me.chBuchMonat.Text = "Chart1"
@@ -496,16 +496,16 @@ Partial Class frmStatistik
         '
         'chBuchungJahr
         '
-        ChartArea24.Name = "ChartArea1"
-        Me.chBuchungJahr.ChartAreas.Add(ChartArea24)
-        Legend24.Name = "Legend1"
-        Me.chBuchungJahr.Legends.Add(Legend24)
+        ChartArea12.Name = "ChartArea1"
+        Me.chBuchungJahr.ChartAreas.Add(ChartArea12)
+        Legend12.Name = "Legend1"
+        Me.chBuchungJahr.Legends.Add(Legend12)
         Me.chBuchungJahr.Location = New System.Drawing.Point(6, 3)
         Me.chBuchungJahr.Name = "chBuchungJahr"
-        Series24.ChartArea = "ChartArea1"
-        Series24.Legend = "Legend1"
-        Series24.Name = "Series1"
-        Me.chBuchungJahr.Series.Add(Series24)
+        Series12.ChartArea = "ChartArea1"
+        Series12.Legend = "Legend1"
+        Series12.Name = "Series1"
+        Me.chBuchungJahr.Series.Add(Series12)
         Me.chBuchungJahr.Size = New System.Drawing.Size(991, 335)
         Me.chBuchungJahr.TabIndex = 0
         Me.chBuchungJahr.Text = "Chart1"
@@ -610,17 +610,17 @@ Partial Class frmStatistik
         Me.tstbBis.Name = "tstbBis"
         Me.tstbBis.Size = New System.Drawing.Size(76, 27)
         '
-        'tscbDruckmonat
-        '
-        Me.tscbDruckmonat.Items.AddRange(New Object() {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"})
-        Me.tscbDruckmonat.Name = "tscbDruckmonat"
-        Me.tscbDruckmonat.Size = New System.Drawing.Size(92, 23)
-        '
         'tslDruckmonat
         '
         Me.tslDruckmonat.Name = "tslDruckmonat"
         Me.tslDruckmonat.Size = New System.Drawing.Size(73, 15)
         Me.tslDruckmonat.Text = "Druckmonat"
+        '
+        'tscbDruckmonat
+        '
+        Me.tscbDruckmonat.Items.AddRange(New Object() {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"})
+        Me.tscbDruckmonat.Name = "tscbDruckmonat"
+        Me.tscbDruckmonat.Size = New System.Drawing.Size(92, 23)
         '
         'frmStatistik
         '

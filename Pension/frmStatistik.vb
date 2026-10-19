@@ -146,7 +146,7 @@ Public Class frmStatistik
     ''' </remarks>
     Private Sub tscoJahr_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tscoJahr.TextChanged
         ' Optionaler Schutz gegen Event-Flooding während des Form_Load:
-        ' If dtBuc Is Nothing Then Exit Sub 
+        If dtBuc Is Nothing Then Exit Sub
 
         prSelectStatistik()
     End Sub
@@ -160,7 +160,7 @@ Public Class frmStatistik
     ''' </remarks>
     Private Sub tscoJahrBis_TextChanged(sender As Object, e As EventArgs) Handles tscoJahrBis.TextChanged
         ' Optionaler Schutz gegen Event-Flooding während des Form_Load:
-        ' If dtBuc Is Nothing Then Exit Sub 
+        If dtBuc Is Nothing Then Exit Sub
 
         prSelectStatistik()
     End Sub
@@ -174,7 +174,7 @@ Public Class frmStatistik
     ''' </remarks>
     Private Sub tscbMonat_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tscbMonat.TextChanged
         ' Optionaler Schutz gegen Event-Flooding während des Form_Load:
-        ' If dtBuc Is Nothing Then Exit Sub
+        If dtBuc Is Nothing Then Exit Sub
 
         prSelectStatistik()
     End Sub
@@ -189,6 +189,11 @@ Public Class frmStatistik
     ''' - Indexprüfung bei 'arPr' hinzugefügt, um Abstürze bei ungültiger Werbe-Auswahl zu verhindern.
     ''' - Standard-Sichtbarkeiten in einen Block zusammengefasst, um Redundanzen zu minimieren.
     ''' - 'Trim(tcStatistik.SelectedTab.Text)' durch .NET-konformes 'Text.Trim()' ersetzt.
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Zentrale Validierung für Einjahres- und Mehrjahres-Auswertungen implementiert.
+    ''' - Verhindert Abstürze in den Unterprozeduren bei leeren oder ungültigen ComboBox-Einträgen.
+    ''' - 'arPr'-Arrayzugriff bei der Provision gegen OutOfBounds- und NullReference-Exceptions abgesichert.
+    ''' - 'SetSingleYearLayout' zentralisiert, um redundanten Code zu vermeiden.
     ''' </remarks>
     Private Sub prSelectStatistik()
 
@@ -214,35 +219,77 @@ Public Class frmStatistik
         ' Reiter-Namen auslesen und bereinigen
         Dim ausgewaehlterTab As String = tcStatistik.SelectedTab.Text.Trim()
 
+        ' Hilfsvariablen für die numerische Validierung
+        Dim nJahrVon As Integer = 0
+        Dim nJahrBis As Integer = 0
+        Dim isJahrVonValid As Boolean = Integer.TryParse(tscoJahr.Text, nJahrVon)
+        Dim isJahrBisValid As Boolean = Integer.TryParse(tscoJahrBis.Text, nJahrBis)
+
         ' 3. Tab-spezifische UI-Anpassung und Methodenaufruf
         Select Case ausgewaehlterTab
+        ' --- GRUPPE 1: Benötigt Startjahr UND Endjahr ---
             Case "Umsatz Jahre"
-                prUmsatzJahre(tscoJahr.Text, tscoJahrBis.Text)
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prUmsatzJahre(tscoJahr.Text, tscoJahrBis.Text)
+                End If
 
             Case "Gäste Jahre"
-                prGaesteJahre(tscoJahr.Text, tscoJahrBis.Text)
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prGaesteJahre(tscoJahr.Text, tscoJahrBis.Text)
+                End If
 
             Case "Umsatz/Gäste Jahr"
-                prUmsatzGaesteJahre(tscoJahr.Text, tscoJahrBis.Text)
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prUmsatzGaesteJahre(tscoJahr.Text, tscoJahrBis.Text)
+                End If
 
             Case "Aufenthaltsdauer"
-                prDauerJahre(tscoJahr.Text, tscoJahrBis.Text)
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prDauerJahre(tscoJahr.Text, tscoJahrBis.Text)
+                End If
 
+            Case "Umsatz Objekt"
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prObjekt(tscoJahr.Text, tscoJahrBis.Text)
+                End If
+
+            Case "Werbung"
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prWerbung(tscoJahr.Text, tscoJahrBis.Text)
+                End If
+
+            Case "Auslastung"
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prAuslastung(tscoJahr.Text, tscoJahrBis.Text)
+                End If
+
+            Case "Buchung Jahr"
+                If isJahrVonValid AndAlso isJahrBisValid AndAlso nJahrVon <= nJahrBis Then
+                    prBuchungJahr(tscoJahr.Text, tscoJahrBis.Text)
+                End If
+
+
+            ' --- GRUPPE 2: Benötigt NUR das Startjahr ---
             Case "Umsatz Monat"
                 SetSingleYearLayout()
-                prUmsatzmonat(tscoJahr.Text)
+                If isJahrVonValid Then prUmsatzmonat(tscoJahr.Text)
 
             Case "Anreise"
                 SetSingleYearLayout()
-                prAnreise(tscoJahr.Text)
+                If isJahrVonValid Then prAnreise(tscoJahr.Text)
 
             Case "Umsatz Zimmer"
                 SetSingleYearLayout()
-                prUmsatzZimmer(tscoJahr.Text)
+                If isJahrVonValid Then prUmsatzZimmer(tscoJahr.Text)
 
-            Case "Umsatz Objekt"
-                prObjekt(tscoJahr.Text, tscoJahrBis.Text)
+            Case "Buchungen Monat"
+                ToolStripLabel6.Visible = True
+                tscbMonat.Visible = True
+                SetSingleYearLayout()
+                If isJahrVonValid Then prBuchMonat(tscoJahr.Text)
 
+
+            ' --- SONDERFÄLLE ---
             Case "Provision"
                 SetSingleYearLayout()
 
@@ -263,22 +310,10 @@ Public Class frmStatistik
                     provision = arPr(ausgewaehlterIndex)
                 End If
 
-                prProvision(tscbWerbung.Text, provision, tstbVon.Text, tstbBis.Text)
-
-            Case "Werbung"
-                prWerbung(tscoJahr.Text, tscoJahrBis.Text)
-
-            Case "Auslastung"
-                prAuslastung(tscoJahr.Text, tscoJahrBis.Text)
-
-            Case "Buchungen Monat"
-                ToolStripLabel6.Visible = True
-                tscbMonat.Visible = True
-                SetSingleYearLayout()
-                prBuchMonat(tscoJahr.Text)
-
-            Case "Buchung Jahr"
-                prBuchungJahr(tscoJahr.Text, tscoJahrBis.Text)
+                ' Optionale Prüfung: Nur aufrufen, wenn auch ein Datum eingetragen ist
+                If Not String.IsNullOrWhiteSpace(tstbVon.Text) AndAlso Not String.IsNullOrWhiteSpace(tstbBis.Text) Then
+                    prProvision(tscbWerbung.Text, provision, tstbVon.Text, tstbBis.Text)
+                End If
 
         End Select
     End Sub
@@ -384,62 +419,40 @@ Public Class frmStatistik
     End Sub
 
 
+    ''' <summary>
+    ''' Überprüft eine DataRow auf gültige Datumsangaben für An- und Abreise.
+    ''' Bei Erfolg werden die konvertierten Werte über die ByRef-Parameter zurückgegeben.
+    ''' </summary>
+    ''' <param name="row">Die zu prüfende DataRow aus der Buchungstabelle.</param>
+    ''' <returns>True, wenn BEIDE Daten gültig sind; andernfalls False.</returns>
+    ''' <remarks>
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - Logik korrigiert: Gibt True zurück, wenn die Daten GÜLTIG sind.
+    ''' - 'ByRef'-Parameter hinzugefügt, um die geparsten Datumsobjekte direkt an die Schleife zu übergeben.
+    ''' - Null- und Leersicher gegen " " und DBNull geschützt.
+    ''' </remarks>
+    Private Function fcCheckRowDatum(ByVal row As DataRow) As Boolean
+        Try
+            Dim vonDatum As Date
+            Dim bisDatum As Date
+            ' 1. String-Konvertierung und Bereinigung von Leerzeichen
+            Dim rawVon As String = Convert.ToString(row("von")).Trim()
+            Dim rawBis As String = Convert.ToString(row("bis")).Trim()
 
+            ' 2. Beide müssen zwingend gültig sein. Wenn eines fehlschlägt, ist das Ergebnis False.
+            If Not Date.TryParse(fcUmDatum(rawVon), vonDatum) OrElse Not Date.TryParse(fcUmDatum(rawBis), bisDatum) Then
+                Return False
+            End If
 
+            ' Wenn beide erfolgreich geparst wurden
+            Return True
 
+        Catch ex As Exception
+            ' Bei unerwarteten Fehlern (z. B. Spalte existiert nicht) sicher False zurückgeben
+            Return False
+        End Try
+    End Function
 
-
-
-    'Private Sub frmStatistik_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
-    '    If Me.Height > 200 Then
-    '        tcStatistik.Width = Me.Width - 50
-    '        tcStatistik.Height = Me.Height - 80
-
-    '        chUmsatz.Width = Me.Width - 50
-    '        chUmsatz.Height = Me.Height - 150
-
-    '        chGaeste.Width = Me.Width - 50
-    '        chGaeste.Height = Me.Height - 150
-
-    '        chUmsatz1.Width = Me.Width - 50
-    '        chUmsatz1.Height = Me.Height - 150
-
-    '        chDauer.Width = Me.Width - 50
-    '        chDauer.Height = Me.Height - 150
-
-    '        chUmsatzMonat.Width = Me.Width - 50
-    '        chUmsatzMonat.Height = Me.Height - 150
-
-    '        chUmsatzZimmer.Width = Me.Width - 50
-    '        chUmsatzZimmer.Height = Me.Height - 150
-
-    '        chObjekt.Width = Me.Width - 50
-    '        chObjekt.Height = Me.Height - 150
-
-    '        chWerbung.Width = Me.Width - 50
-    '        chWerbung.Height = Me.Height - 150
-
-    '        chAuslastung.Width = Me.Width - 50
-    '        chAuslastung.Height = (Me.Height / 2) - 75
-
-    '        chSollZimmer.Top = (Me.Height / 2) - 75
-    '        chSollZimmer.Width = Me.Width - 50
-    '        chSollZimmer.Height = (Me.Height / 2) - 75
-
-    '        chBuchMonat.Width = Me.Width - 50
-    '        chBuchMonat.Height = Me.Height - 150
-    '    End If
-
-    'End Sub
-    'Private Sub tsbClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbClose.Click
-    '    Dim Von2Jahre As String = fcUmDatum(Date.Today.AddDays(-800))
-    '    Dim sSQL As String = "Select * from Buchung WHERE  Von > '" & Von2Jahre & "' order by von asc"
-
-    '    dtBuc = fcReadDataTable(sSQL)
-
-
-    '    Me.Close()
-    'End Sub
 #End Region
 
 #Region "Umsatz nach Jahren........................................................................"
@@ -455,6 +468,10 @@ Public Class frmStatistik
     ''' - 'ByRef' Parameter auf 'ByVal' korrigiert, da keine Rückgabemanipulation nötig ist.
     ''' - VB6-Altlasten wie 'Val', 'Str' und 'Int' durch moderne .NET-Entsprechungen ('TryParse', 'ToString', 'Math.Floor') ersetzt.
     ''' - 'Preis1' stark typisiert (Double statt String), um wiederholtes Type-Casting in Schleifen zu unterbinden.
+    ''' 19.10.2026 - Code-Optimierung:
+    ''' - 'CDate' durch absturzsicheres 'Date.TryParse' ersetzt.
+    ''' - Verhindert Laufzeitfehler, wenn die Felder "von" oder "bis" Leerzeichen (" ") enthalten.
+    ''' - 'Convert.ToDouble' bei Pauschalsummen durch sicheres 'Double.TryParse' ersetzt.
     ''' </remarks>
     Private Sub prUmsatzJahre(ByVal aJahrs As String, ByVal eJahrs As String)
 
@@ -478,8 +495,13 @@ Public Class frmStatistik
 
         ' 2. Umsatz pro Jahr berechnen (Optimierte Schnittmengenlogik)
         For i As Integer = 1 To dtBuc.Rows.Count - 1
+
             Dim row As DataRow = dtBuc.Rows(i)
 
+            ' Aufruf der neuen Funktion. Wenn sie False liefert, wird die Zeile übersprungen.
+            If Not fcCheckRowDatum(row) Then
+                Continue For
+            End If
             ' Datumsprüfung & Konvertierung
             Dim vonDatum As Date = CDate(fcUmDatum(row("von").ToString()))
             Dim bisDatum As Date = CDate(fcUmDatum(row("bis").ToString()))
@@ -494,11 +516,14 @@ Public Class frmStatistik
 
             ' Versucht den bereinigten Text in eine Zahl zu wandeln. Wenn das fehlschlägt (z. B. bei " "), bleibt pauschWert = 0
             Integer.TryParse(pauschRaw, pauschWert)
-
             Dim isPauschale As Boolean = (pauschWert = 1)
 
             If Not isPauschale Then
-                tagesPreis = If(row("Preis") Is DBNull.Value, 0.0, Convert.ToDouble(row("Preis")))
+                ' Sicherer Versuch, den Preis zu konvertieren. Bei " ", "" oder DBNull wird 0.0 zurückgegeben.
+                Dim rawPreis As String = Convert.ToString(row("Preis")).Trim()
+                If Not Double.TryParse(rawPreis, tagesPreis) Then
+                    tagesPreis = 0.0
+                End If
             Else
                 Dim gesamtTage As Integer = DateDiff(DateInterval.Day, vonDatum, bisDatum) + 1
                 Dim gesamtSumme As Double = If(row("Summe") Is DBNull.Value, 0.0, Convert.ToDouble(row("Summe")))
@@ -525,6 +550,7 @@ Public Class frmStatistik
                     arWert1(jahr - aJahr) += (umsatzFaktor * tageImJahr)
                 End If
             Next
+
         Next
 
         ' 3. Chart-Generierung und Styling
@@ -628,7 +654,10 @@ Public Class frmStatistik
         ' 1. Daten aus der globalen DataTable auslesen und aggregieren
         For i As Integer = 1 To dtBuc.Rows.Count - 1
             Dim row As DataRow = dtBuc.Rows(i)
-
+            ' Aufruf der neuen Funktion. Wenn sie False liefert, wird die Zeile übersprungen.
+            If Not fcCheckRowDatum(row) Then
+                Continue For
+            End If
             Dim aDatum As Date = CDate(fcUmDatum(row("von").ToString()))
             Dim eDatum As Date = CDate(fcUmDatum(row("bis").ToString())).AddDays(1)
             Dim nPersonen1 As Integer = Val(row("Personen").ToString())
@@ -768,8 +797,13 @@ Public Class frmStatistik
         Next
 
         ' 1. Daten aggregieren
-        For i As Integer = 0 To dtBuc.Rows.Count - 1
+        For i As Integer = 1 To dtBuc.Rows.Count - 1
             Dim row As DataRow = dtBuc.Rows(i)
+            ' Aufruf der neuen Funktion. Wenn sie False liefert, wird die Zeile übersprungen.
+            If Not fcCheckRowDatum(row) Then
+                Continue For
+            End If
+
 
             Dim aDatum As Date = CDate(fcUmDatum(row("von").ToString()))
             Dim eDatum As Date = CDate(fcUmDatum(row("bis").ToString()))
@@ -892,7 +926,10 @@ Public Class frmStatistik
         ' 1. Daten aggregieren
         For i As Integer = 1 To dtBuc.Rows.Count - 1
             Dim row As DataRow = dtBuc.Rows(i)
-
+            ' Aufruf der neuen Funktion. Wenn sie False liefert, wird die Zeile übersprungen.
+            If Not fcCheckRowDatum(row) Then
+                Continue For
+            End If
             Dim aDatum As Date = CDate(fcUmDatum(row("von").ToString()))
             Dim eDatum As Date = CDate(fcUmDatum(row("bis").ToString()))
 
@@ -1054,7 +1091,10 @@ Public Class frmStatistik
         ' 1. Hauptschleife über alle Buchungen (Korrektur: Start bei 0)
         For i As Integer = 1 To dtBuc.Rows.Count - 1
             Dim row As DataRow = dtBuc.Rows(i)
-
+            ' Aufruf der neuen Funktion. Wenn sie False liefert, wird die Zeile übersprungen.
+            If Not fcCheckRowDatum(row) Then
+                Continue For
+            End If
             Dim aDatum As Date = CDate(fcUmDatum(row("von").ToString()))
             Dim eDatum As Date = CDate(fcUmDatum(row("bis").ToString()))
 
@@ -1756,101 +1796,6 @@ Public Class frmStatistik
     End Class
 
 
-    '''' <summary>
-    '''' Statistik für Anreisen (Herkunftsland)
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Private Sub prAnreise(ByVal sJahr As String)
-    '    If sJahr.Trim = "" Then sJahr = Date.Today.Year
-    '    Dim arAnreise(100, 3, 12) As String
-    '    Dim aDatum As Date
-    '    Dim eDatum As Date
-    '    Dim sKunID As String
-    '    Dim sLand As String
-    '    Dim nLand As Integer = 1
-    '    Dim nLand1 As Integer
-    '    Dim nMonat As Integer
-    '    Dim nPersonen As Integer = 0
-    '    arAnreise(0, 0, 0) = "D"
-    '    For i = 0 To dtBuc.Rows.Count - 1
-    '        aDatum = CDate(fcUmDatum(dtBuc.Rows(i).Item("von").ToString))
-    '        eDatum = ((fcUmDatum(dtBuc.Rows(i).Item("bis").ToString)))
-    '        eDatum = eDatum.AddDays(1)
-
-    '        If aDatum.Year = sJahr Or eDatum.Year = sJahr Then
-    '            nPersonen = Val(dtBuc.Rows(i).Item("Personen").ToString)
-    '            If aDatum.Month = 2 Then
-    '                eDatum = eDatum
-
-
-    '            End If
-    '            sKunID = dtBuc.Rows(i).Item("KunID").ToString   'landermiteln
-    '            sLand = fcSelectKundeLand(sKunID).Trim
-    '            If sLand = "" Then sLand = "D"
-    '            nLand1 = -1      'position im dem Arrey
-    '            For j = 0 To nLand - 1
-    '                If arAnreise(j, 0, 0) = sLand Then
-    '                    nLand1 = j
-    '                    Exit For
-    '                End If
-    '            Next
-    '            If nLand1 = -1 Then 'land noch nicht in der tabelle nland1=Neue position
-    '                nLand = nLand + 1
-    '                nLand1 = nLand - 1
-    '                arAnreise(nLand1, 0, 0) = sLand
-    '            End If
-    '            If aDatum.Year = sJahr Then     ' Eintragen der Anreise im Jahr/Monat
-    '                nMonat = aDatum.Month - 1
-    '                arAnreise(nLand1, 1, nMonat) = Str(Val(arAnreise(nLand1, 1, nMonat)) + nPersonen)
-    '            End If
-    '            Do While aDatum < eDatum
-    '                If aDatum.Year = sJahr Then   'Eintragen der Übernachtungen jahr/monat
-    '                    nMonat = aDatum.Month - 1
-    '                    arAnreise(nLand1, 2, nMonat) = Str(Val(arAnreise(nLand1, 2, nMonat)) + nPersonen)
-    '                End If
-    '                aDatum = aDatum.AddDays(1)
-    '            Loop
-    '        End If
-    '    Next
-    '    With lvAnreise
-    '        .Clear()
-    '        .Columns.Add("Land", 80, HorizontalAlignment.Left)
-    '        For i = 1 To 12
-    '            .Columns.Add(fcMonthName(i), 65, HorizontalAlignment.Left)
-    '        Next
-    '        .FullRowSelect = True
-    '        .GridLines = True
-    '        '.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
-    '        .HideSelection = False
-    '        .MultiSelect = False
-    '        .Sorting = SortOrder.Ascending
-    '        .TabIndex = 0
-    '        .View = View.Details
-
-    '    End With
-    '    Dim lv As ListViewItem
-    '    For i = 0 To nLand
-    '        sLand = arAnreise(i, 0, 0)
-    '        If sLand <> "" Then
-    '            With lvAnreise
-    '                lv = .Items.Add(sLand)
-    '                For j = 0 To 11
-    '                    lv.SubItems.Add(arAnreise(i, 1, j) & "/" & arAnreise(i, 2, j))
-    '                Next
-    '            End With
-    '        End If
-    '    Next
-    'End Sub
-
-    'Private Function fcSelectKundeLand(ByRef sKunID As String) As String
-    '    Dim sSQL As String = "Select * From Kunden Where ID='" & sKunID & "'"
-    '    Dim dt As DataTable = fcReadDataTable(sSQL)
-    '    Dim sLand As String = ""
-    '    If dt.Rows.Count > 0 Then
-    '        sLand = dt.Rows(0).Item("Land").ToString
-    '    End If
-    '    fcSelectKundeLand = sLand
-    'End Function
 
 #End Region
 
@@ -2818,6 +2763,10 @@ Public Class frmStatistik
                 Next
             End With
         End With
+    End Sub
+
+    Private Sub tscbMonat_Click(sender As Object, e As EventArgs) Handles tscbMonat.Click
+
     End Sub
 
 

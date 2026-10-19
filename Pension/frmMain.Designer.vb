@@ -774,43 +774,43 @@ Partial Class frmMain
         'tsmSystem
         '
         Me.tsmSystem.Name = "tsmSystem"
-        Me.tsmSystem.Size = New System.Drawing.Size(125, 22)
+        Me.tsmSystem.Size = New System.Drawing.Size(180, 22)
         Me.tsmSystem.Text = "Anpassen"
         '
         'ToolStripSeparator12
         '
         Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
-        Me.ToolStripSeparator12.Size = New System.Drawing.Size(122, 6)
+        Me.ToolStripSeparator12.Size = New System.Drawing.Size(177, 6)
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DatenKontrolleToolStripMenuItem, Me.IDKundeBuchung, Me.ServerFehlerToolStripMenuItem, Me.IniToolStripMenuItem})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(125, 22)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem1.Text = "Database"
         '
         'DatenKontrolleToolStripMenuItem
         '
         Me.DatenKontrolleToolStripMenuItem.Name = "DatenKontrolleToolStripMenuItem"
-        Me.DatenKontrolleToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+        Me.DatenKontrolleToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.DatenKontrolleToolStripMenuItem.Text = "Kunden doppelt"
         '
         'IDKundeBuchung
         '
         Me.IDKundeBuchung.Name = "IDKundeBuchung"
-        Me.IDKundeBuchung.Size = New System.Drawing.Size(169, 22)
+        Me.IDKundeBuchung.Size = New System.Drawing.Size(180, 22)
         Me.IDKundeBuchung.Text = "Kunde->Buchung"
         '
         'ServerFehlerToolStripMenuItem
         '
         Me.ServerFehlerToolStripMenuItem.Name = "ServerFehlerToolStripMenuItem"
-        Me.ServerFehlerToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+        Me.ServerFehlerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ServerFehlerToolStripMenuItem.Text = "Server Fehler"
         '
         'IniToolStripMenuItem
         '
         Me.IniToolStripMenuItem.Name = "IniToolStripMenuItem"
-        Me.IniToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+        Me.IniToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.IniToolStripMenuItem.Text = "INI-Datei"
         '
         'tsVersion

@@ -685,24 +685,73 @@ Public Class frmMain
         Return sKunID
     End Function
 
+    '''' <summary>
+    '''' Stellt die Daten des Gastes anhand der Kundennummer in den UI-Labels dar.
+    '''' </summary>
+    '''' <param name="sKNr">Die Kundennummer (ID), nach der gesucht werden soll.</param>
+    '''' <remarks>
+    '''' 27.12.2011 - Erstellt<br/>
+    '''' 24.09.2026 - Optimiert: Performance durch DataRow-Referenz verbessert, Null-Safety erhöht und UI-Fallback (Clear) hinzugefügt.
+    '''' </remarks>
+    'Private Sub prDisplayGast(ByVal sKNr As String)
+    '    Try
+    '        ' Validierung der globalen/Klassen-DataTable vor dem Zugriff
+    '        If dtKun IsNot Nothing AndAlso dtKun.Rows.Count > 0 Then
+
+    '            Dim index As Integer = fcTableFind(dtKun, "ID", sKNr)
+
+    '            If index > -1 Then
+    '                ' Referenz auf die Zeile zwischenspeichern (verhindert 12-faches dtKun.Rows(index))
+    '                Dim row As DataRow = dtKun.Rows(index)
+
+    '                ' Zuweisung der Felder unter Berücksichtigung potenzieller DBNull-Werte
+    '                lbAnrede.Text = row("Anrede").ToString()
+    '                lbName.Text = row("Name1").ToString()
+    '                lbName2.Text = row("Name2").ToString()
+    '                lbVorname.Text = row("Vorname").ToString()
+    '                lbStr.Text = row("Strasse").ToString()
+    '                lbPLZ.Text = row("PLZ").ToString()
+    '                lbOrt.Text = row("Ort").ToString()
+    '                lbLand.Text = row("Land").ToString()
+    '                lbTel.Text = row("Telefon").ToString()
+    '                lbFax.Text = row("Telefax").ToString()
+    '                lbFunk.Text = row("Funk").ToString()
+    '                lbEMail.Text = row("EMail").ToString()
+    '                Exit Sub ' Erfolgreich beendet
+    '            End If
+    '        End If
+
+    '        ' Fallback/Else: Wenn kein Gast gefunden wurde oder dtKun leer ist, Labels leeren
+    '        prClearGastFields()
+
+    '    Catch ex As Exception
+    '        ErrReport(ex.Message, ex.Source, ex.StackTrace)
+    '    End Try
+    'End Sub
+
     ''' <summary>
     ''' Stellt die Daten des Gastes anhand der Kundennummer in den UI-Labels dar.
     ''' </summary>
     ''' <param name="sKNr">Die Kundennummer (ID), nach der gesucht werden soll.</param>
     ''' <remarks>
     ''' 27.12.2011 - Erstellt<br/>
-    ''' 24.09.2026 - Optimiert: Performance durch DataRow-Referenz verbessert, Null-Safety erhöht und UI-Fallback (Clear) hinzugefügt.
+    ''' 24.09.2026 - Optimierung: Performance durch DataRow-Referenz verbessert, Null-Safety erhöht und UI-Fallback (Clear) hinzugefügt.
+    ''' 19.10.2026 - Optimierung: Die rechenintensive For-Schleife wurde durch die native <see cref="DataTable.Select"/>-Methode ersetzt. 
+    ''' Zudem wird zum Schutz vor Syntaxfehlern ein Hochkomma-Escaping auf den Suchstring angewendet.
     ''' </remarks>
     Private Sub prDisplayGast(ByVal sKNr As String)
         Try
             ' Validierung der globalen/Klassen-DataTable vor dem Zugriff
             If dtKun IsNot Nothing AndAlso dtKun.Rows.Count > 0 Then
 
-                Dim index As Integer = fcTableFind(dtKun, "ID", sKNr)
+                ' Schnelle, native Suche statt einer For-Schleife (Escaping schützt vor Sonderzeichen)
+                Dim filter As String = String.Format("[ID] = '{0}'", sKNr.Replace("'", "''"))
+                Dim foundRows() As DataRow = dtKun.Select(filter)
 
-                If index > -1 Then
-                    ' Referenz auf die Zeile zwischenspeichern (verhindert 12-faches dtKun.Rows(index))
-                    Dim row As DataRow = dtKun.Rows(index)
+                ' Wenn mindestens eine passende Zeile gefunden wurde
+                If foundRows.Length > 0 Then
+                    ' Referenz auf die gefundene Zeile zwischenspeichern
+                    Dim row As DataRow = foundRows(0)
 
                     ' Zuweisung der Felder unter Berücksichtigung potenzieller DBNull-Werte
                     lbAnrede.Text = row("Anrede").ToString()
@@ -721,13 +770,14 @@ Public Class frmMain
                 End If
             End If
 
-            ' Fallback/Else: Wenn kein Gast gefunden wurde oder dtKun leer ist, Labels leeren
+            ' Fallback: Wenn kein Gast gefunden wurde oder dtKun leer ist, Labels leeren
             prClearGastFields()
 
         Catch ex As Exception
             ErrReport(ex.Message, ex.Source, ex.StackTrace)
         End Try
     End Sub
+
 
     ''' <summary>
     ''' Leert alle gastbezogenen UI-Labels.

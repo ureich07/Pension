@@ -1093,8 +1093,8 @@ Public Class frmReservierungDest
                 If Not ValidierungsPruefungErfolgreich() Then Exit Sub
 
                 prSaveZimmerReservierung()
-                tsbVorAnreise.Visible = True
-                tsbNachAbreise.Visible = True
+                'tsbVorAnreise.Visible = True
+                'tsbNachAbreise.Visible = True
 
             Case "Weiteres Zimmer"
                 tscoFreiZim.Visible = True
@@ -1632,150 +1632,150 @@ Public Class frmReservierungDest
         arNew = fcCollectDataInArray(arNew)
     End Sub
 
-    ''' <summary>
-    ''' Erstellt eine neue Buchung für das aktuelle Zimmer direkt vor dem aktuellen Anreisedatum, sofern das Zimmer frei ist.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 18.10.2026 - Code-Optimierung:
-    ''' - Veraltete VB6-Funktionen (CDate, DateAdd, Space, Call, MsgBox) durch .NET-Standard ersetzt.
-    ''' - 'Date.TryParse' zur fehlerfreien Datumskonvertierung eingeführt.
-    ''' - Ungenutzte lokale Variable 'sZim' am Ende entfernt.
-    ''' </remarks>
-    Private Sub tsbVorAnreise_Click(sender As Object, e As EventArgs) Handles tsbVorAnreise.Click
-        Dim aktuellesAnreiseDatum As Date
-        If Not Date.TryParse(lbAnreise.Text, aktuellesAnreiseDatum) Then
-            MessageBox.Show("Das aktuelle Anreisedatum ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
+    '''' <summary>
+    '''' Erstellt eine neue Buchung für das aktuelle Zimmer direkt vor dem aktuellen Anreisedatum, sofern das Zimmer frei ist.
+    '''' </summary>
+    '''' <param name="sender">Die Quelle des Ereignisses.</param>
+    '''' <param name="e">Die Ereignisdaten.</param>
+    '''' <remarks>
+    '''' 18.10.2026 - Code-Optimierung:
+    '''' - Veraltete VB6-Funktionen (CDate, DateAdd, Space, Call, MsgBox) durch .NET-Standard ersetzt.
+    '''' - 'Date.TryParse' zur fehlerfreien Datumskonvertierung eingeführt.
+    '''' - Ungenutzte lokale Variable 'sZim' am Ende entfernt.
+    '''' </remarks>
+    'Private Sub tsbVorAnreise_Click(sender As Object, e As EventArgs) Handles tsbVorAnreise.Click
+    '    Dim aktuellesAnreiseDatum As Date
+    '    If Not Date.TryParse(lbAnreise.Text, aktuellesAnreiseDatum) Then
+    '        MessageBox.Show("Das aktuelle Anreisedatum ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    '        Exit Sub
+    '    End If
 
-        ' Neues Abreisedatum ist das alte Anreisedatum. Neues Anreisedatum ist 1 Tag davor.
-        Dim sAb As String = aktuellesAnreiseDatum.ToString("dd.MM.yyyy")
-        Dim sAn As String = aktuellesAnreiseDatum.AddDays(-1).ToString("dd.MM.yyyy")
-        Dim zimmerNr As String = lbZimNr.Text
+    '    ' Neues Abreisedatum ist das alte Anreisedatum. Neues Anreisedatum ist 1 Tag davor.
+    '    Dim sAb As String = aktuellesAnreiseDatum.ToString("dd.MM.yyyy")
+    '    Dim sAn As String = aktuellesAnreiseDatum.AddDays(-1).ToString("dd.MM.yyyy")
+    '    Dim zimmerNr As String = lbZimNr.Text
 
-        If frControlFreeZimmer(zimmerNr, sAn, sAb) Then
-            Dim id As String = fcAppendBlank("Buchung")
-            Dim arFields() As String = {"SendMailZugang"}
-            Dim arValue() As String = {"Y"}
-            Dim cBedingung As String = $" WHERE ID='{id}'"
+    '    If frControlFreeZimmer(zimmerNr, sAn, sAb) Then
+    '        Dim id As String = fcAppendBlank("Buchung")
+    '        Dim arFields() As String = {"SendMailZugang"}
+    '        Dim arValue() As String = {"Y"}
+    '        Dim cBedingung As String = $" WHERE ID='{id}'"
 
-            fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+    '        fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
 
-            sBID = id
+    '        sBID = id
 
-            ' Formatierung des ComboBox-Eintrags mit moderner String-Interpolation und PadRight
-            Dim eintragText As String = $"{zimmerNr.PadRight(37)}[{id}]"
-            tscoZim.Items.Add(eintragText)
+    '        ' Formatierung des ComboBox-Eintrags mit moderner String-Interpolation und PadRight
+    '        Dim eintragText As String = $"{zimmerNr.PadRight(37)}[{id}]"
+    '        tscoZim.Items.Add(eintragText)
 
-            lbAnreise.Text = sAn
-            lbAbreise.Text = sAb
+    '        lbAnreise.Text = sAn
+    '        lbAbreise.Text = sAb
 
-            arNew(21) = sAn
-            arNew(22) = sAb
-            arNew = fcCollectDataInArray(arNew)
+    '        arNew(21) = sAn
+    '        arNew(22) = sAb
+    '        arNew = fcCollectDataInArray(arNew)
 
-            prAddNewZimmer(zimmerNr, arNew, id)
-            tscoZim.Text = eintragText
-        Else
-            MessageBox.Show("Zimmer schon vermietet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Question)
-        End If
+    '        prAddNewZimmer(zimmerNr, arNew, id)
+    '        tscoZim.Text = eintragText
+    '    Else
+    '        MessageBox.Show("Zimmer schon vermietet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Question)
+    '    End If
 
-        tsbVorAnreise.Visible = False
-        tsbNachAbreise.Visible = False
-    End Sub
+    '    tsbVorAnreise.Visible = False
+    '    tsbNachAbreise.Visible = False
+    'End Sub
 
-    ''' <summary>
-    ''' Erstellt eine neue Buchung für das aktuelle Zimmer direkt nach dem aktuellen Abreisedatum, sofern das Zimmer frei ist.
-    ''' </summary>
-    ''' <param name="sender">Die Quelle des Ereignisses.</param>
-    ''' <param name="e">Die Ereignisdaten.</param>
-    ''' <remarks>
-    ''' 18.10.2026 - Code-Optimierung:
-    ''' - Veraltete VB6-Befehle entfernt (Call, Space, MsgBox, DateAdd, CDate).
-    ''' - String-Verkettung auf moderne Interpolation ($"...") umgestellt.
-    ''' - Array-Zuweisung analog zur 'VorAnreise'-Logik vereinheitlicht.
-    ''' </remarks>
-    Private Sub tsbNachAbreise_Click(sender As Object, e As EventArgs) Handles tsbNachAbreise.Click
-        Dim aktuellesAbreiseDatum As Date
-        If Not Date.TryParse(lbAbreise.Text, aktuellesAbreiseDatum) Then
-            MessageBox.Show("Das aktuelle Abreisedatum ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
+    '''' <summary>
+    '''' Erstellt eine neue Buchung für das aktuelle Zimmer direkt nach dem aktuellen Abreisedatum, sofern das Zimmer frei ist.
+    '''' </summary>
+    '''' <param name="sender">Die Quelle des Ereignisses.</param>
+    '''' <param name="e">Die Ereignisdaten.</param>
+    '''' <remarks>
+    '''' 18.10.2026 - Code-Optimierung:
+    '''' - Veraltete VB6-Befehle entfernt (Call, Space, MsgBox, DateAdd, CDate).
+    '''' - String-Verkettung auf moderne Interpolation ($"...") umgestellt.
+    '''' - Array-Zuweisung analog zur 'VorAnreise'-Logik vereinheitlicht.
+    '''' </remarks>
+    'Private Sub tsbNachAbreise_Click(sender As Object, e As EventArgs) Handles tsbNachAbreise.Click
+    '    Dim aktuellesAbreiseDatum As Date
+    '    If Not Date.TryParse(lbAbreise.Text, aktuellesAbreiseDatum) Then
+    '        MessageBox.Show("Das aktuelle Abreisedatum ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    '        Exit Sub
+    '    End If
 
-        ' Neues Anreisedatum ist das alte Abreisedatum. Neues Abreisedatum ist 1 Tag danach.
-        Dim sAn As String = aktuellesAbreiseDatum.ToString("dd.MM.yyyy")
-        Dim sAb As String = aktuellesAbreiseDatum.AddDays(1).ToString("dd.MM.yyyy")
-        Dim zimmerNr As String = lbZimNr.Text
+    '    ' Neues Anreisedatum ist das alte Abreisedatum. Neues Abreisedatum ist 1 Tag danach.
+    '    Dim sAn As String = aktuellesAbreiseDatum.ToString("dd.MM.yyyy")
+    '    Dim sAb As String = aktuellesAbreiseDatum.AddDays(1).ToString("dd.MM.yyyy")
+    '    Dim zimmerNr As String = lbZimNr.Text
 
-        If frControlFreeZimmer(zimmerNr, sAn, sAb) Then
-            Dim id As String = fcAppendBlank("Buchung")
-            Dim arFields() As String = {"SendMailZugang"}
-            Dim arValue() As String = {"Y"}
-            Dim cBedingung As String = $" WHERE ID='{id}'"
+    '    If frControlFreeZimmer(zimmerNr, sAn, sAb) Then
+    '        Dim id As String = fcAppendBlank("Buchung")
+    '        Dim arFields() As String = {"SendMailZugang"}
+    '        Dim arValue() As String = {"Y"}
+    '        Dim cBedingung As String = $" WHERE ID='{id}'"
 
-            fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
+    '        fcUpdateCommand("Buchung", arFields, arValue, cBedingung)
 
-            sBID = id
+    '        sBID = id
 
-            Dim eintragText As String = $"{zimmerNr.PadRight(37)}[{id}]"
-            tscoZim.Items.Add(eintragText)
+    '        Dim eintragText As String = $"{zimmerNr.PadRight(37)}[{id}]"
+    '        tscoZim.Items.Add(eintragText)
 
-            lbAnreise.Text = sAn
-            lbAbreise.Text = sAb
+    '        lbAnreise.Text = sAn
+    '        lbAbreise.Text = sAb
 
-            arNew(21) = sAn
-            arNew(22) = sAb
+    '        arNew(21) = sAn
+    '        arNew(22) = sAb
 
-            prAddNewZimmer(zimmerNr, arNew, id)
-            tscoZim.Text = eintragText
-        Else
-            MessageBox.Show("Zimmer schon vermietet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Question)
-        End If
+    '        prAddNewZimmer(zimmerNr, arNew, id)
+    '        tscoZim.Text = eintragText
+    '    Else
+    '        MessageBox.Show("Zimmer schon vermietet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Question)
+    '    End If
 
-        tsbVorAnreise.Visible = False
-        tsbNachAbreise.Visible = False
-    End Sub
+    '    tsbVorAnreise.Visible = False
+    '    tsbNachAbreise.Visible = False
+    'End Sub
 
-    ''' <summary>
-    ''' Prüft, ob ein bestimmtes Zimmer im angegebenen Zeitraum frei und nicht durch eine andere Buchung belegt ist.
-    ''' </summary>
-    ''' <param name="zimmerName">Der Name oder die Bezeichnung des Zimmers.</param>
-    ''' <param name="vonDatum">Das geplante Anreisedatum (als String).</param>
-    ''' <param name="bisDatum">Das geplante Abreisedatum (als String).</param>
-    ''' <returns>True, wenn das Zimmer im Zeitraum frei ist; andernfalls False.</returns>
-    ''' <remarks>
-    ''' 18.10.2026 - Code-Optimierung:
-    ''' - Parameter auf standardmäßiges 'ByVal' umgestellt und sprechend benannt.
-    ''' - Veraltete Datumsfunktionen (CDate, DateAdd) durch typsicheres '.AddDays(-1)' ersetzt.
-    ''' - Explizite 'Return'-Anweisungen für sauberen Kontrollfluss eingeführt.
-    ''' - String-Interpolation ($"...") für die SQL-Generierung angewendet.
-    ''' </remarks>
-    Private Function frControlFreeZimmer(zimmerName As String, vonDatum As String, bisDatum As String) As Boolean
-        Dim abreiseDatum As Date
+    '''' <summary>
+    '''' Prüft, ob ein bestimmtes Zimmer im angegebenen Zeitraum frei und nicht durch eine andere Buchung belegt ist.
+    '''' </summary>
+    '''' <param name="zimmerName">Der Name oder die Bezeichnung des Zimmers.</param>
+    '''' <param name="vonDatum">Das geplante Anreisedatum (als String).</param>
+    '''' <param name="bisDatum">Das geplante Abreisedatum (als String).</param>
+    '''' <returns>True, wenn das Zimmer im Zeitraum frei ist; andernfalls False.</returns>
+    '''' <remarks>
+    '''' 18.10.2026 - Code-Optimierung:
+    '''' - Parameter auf standardmäßiges 'ByVal' umgestellt und sprechend benannt.
+    '''' - Veraltete Datumsfunktionen (CDate, DateAdd) durch typsicheres '.AddDays(-1)' ersetzt.
+    '''' - Explizite 'Return'-Anweisungen für sauberen Kontrollfluss eingeführt.
+    '''' - String-Interpolation ($"...") für die SQL-Generierung angewendet.
+    '''' </remarks>
+    'Private Function frControlFreeZimmer(zimmerName As String, vonDatum As String, bisDatum As String) As Boolean
+    '    Dim abreiseDatum As Date
 
-        ' Typsichere Konvertierung des Bis-Datums
-        If Not Date.TryParse(bisDatum, abreiseDatum) Then
-            Return False
-        End If
+    '    ' Typsichere Konvertierung des Bis-Datums
+    '    If Not Date.TryParse(bisDatum, abreiseDatum) Then
+    '        Return False
+    '    End If
 
-        ' Den letzten Aufenthaltstag berechnen (Tag vor der Abreise)
-        Dim letzterTag As Date = abreiseDatum.AddDays(-1)
-        Dim bisFormatted As String = letzterTag.ToString("dd.MM.yyyy")
+    '    ' Den letzten Aufenthaltstag berechnen (Tag vor der Abreise)
+    '    Dim letzterTag As Date = abreiseDatum.AddDays(-1)
+    '    Dim bisFormatted As String = letzterTag.ToString("dd.MM.yyyy")
 
-        ' Zimmer-ID über die bestehende Hilfsfunktion ermitteln
-        Dim zimmerID As String = fcGetObjektZimmerID(dtZim, zimmerName, "ID")
+    '    ' Zimmer-ID über die bestehende Hilfsfunktion ermitteln
+    '    Dim zimmerID As String = fcGetObjektZimmerID(dtZim, zimmerName, "ID")
 
-        ' SQL-Abfrage mit String-Interpolation aufbauen
-        Dim sSql As String = $"Select * From Buchung Where ZimID='{zimmerID}' And Von<='{fcUmDatum(vonDatum)}' And Bis>='{fcUmDatum(bisFormatted)}'"
+    '    ' SQL-Abfrage mit String-Interpolation aufbauen
+    '    Dim sSql As String = $"Select * From Buchung Where ZimID='{zimmerID}' And Von<='{fcUmDatum(vonDatum)}' And Bis>='{fcUmDatum(bisFormatted)}'"
 
-        ' DataTable abfragen
-        Dim dt As DataTable = fcReadDataTable(sSql)
+    '    ' DataTable abfragen
+    '    Dim dt As DataTable = fcReadDataTable(sSql)
 
-        ' Wenn keine überschneidende Buchung gefunden wurde, ist das Zimmer frei
-        Return (dt IsNot Nothing AndAlso dt.Rows.Count = 0)
-    End Function
+    '    ' Wenn keine überschneidende Buchung gefunden wurde, ist das Zimmer frei
+    '    Return (dt IsNot Nothing AndAlso dt.Rows.Count = 0)
+    'End Function
 
     ''' <summary>
     ''' Fügt der aktuellen Buchung ein neues, zusätzliches Zimmer hinzu und aktualisiert die Benutzeroberfläche.
@@ -3441,6 +3441,10 @@ RefactorCell:
             'frmCheckin = New frmCheckin()
             frmCheckin.Show()
         End If
+    End Sub
+
+    Private Sub tscoFreiZim_Click(sender As Object, e As EventArgs) Handles tscoFreiZim.Click
+
     End Sub
 
 
