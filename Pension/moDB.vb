@@ -82,7 +82,6 @@ Module moDB
         End Try
     End Function
 
-
     ''' <summary>
     ''' Aktualisiert Datensätze in einer spezifischen Datenbanktabelle anhand übergebener Feld- und Wert-Arrays.
     ''' </summary>
@@ -210,8 +209,6 @@ Module moDB
         End Try
     End Function
 
-
-
     ''' <summary>
     ''' Aktualisiert Werte in einer DataTable für Zeilen, die der angegebenen Bedingung entsprechen.
     ''' Die zu aktualisierenden Felder und deren neue Werte werden als Arrays übergeben.
@@ -270,7 +267,6 @@ Module moDB
         End Try
     End Function
 
-
     ''' <summary>
     ''' Löscht alle Datensätze aus einer DataTable, die der angegebenen Bedingung entsprechen.
     ''' </summary>
@@ -307,7 +303,6 @@ Module moDB
             Return False
         End Try
     End Function
-
 
     ''' <summary>
     ''' Führt eine aktualisierende oder löschende SQL-Anweisung (z. B. INSERT, UPDATE, DELETE) 
@@ -421,7 +416,6 @@ Module moDB
         Return arResult
     End Function
 
-
     ''' <summary>
     ''' Sucht einen Datensatz anhand des SQL-Befehls und gibt die gewünschten Feldwerte als Array zurück.
     ''' Bei Nichtauffinden enthält das erste Element (Index 0) ein Leerzeichen " ".
@@ -469,8 +463,6 @@ Module moDB
             Return New String() {" "}
         End Try
     End Function
-
-
 
     ''' <summary>
     ''' Liest Daten aus einer SQL-Tabelle und formatiert diese als ausgerichteten Text-String.
@@ -547,7 +539,6 @@ Module moDB
             Return ""
         End Try
     End Function
-
 
     ''' <summary>
     ''' Hängt einen leeren Datensatz (Blank) an die angegebene Datei/Tabelle an.

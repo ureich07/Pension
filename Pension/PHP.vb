@@ -163,7 +163,6 @@ Public Class PHP
         End Using
     End Function
 
-
     ''' <summary>
     ''' Sendet eine HTTP-Anfrage (z. B. POST oder GET) an ein PHP-Skript und gibt die Serverantwort zurück.
     ''' </summary>
@@ -216,7 +215,6 @@ Public Class PHP
             Return "ERROR"
         End Try
     End Function
-
 
     ''' <summary>
     ''' Generiert einen standardisierten Zeitschlüssel im Format hhMMYYYYmmdd (StundeMinuteJahrMonatTag).
@@ -446,7 +444,6 @@ Public Class PHP
             Return String.Empty
         End Try
     End Function
-
 
     ''' <summary>
     ''' Führt das Update eines Datensatzes über eine verschlüsselte HTTP-POST-Anfrage an ein Remote-PHP-Skript aus.
@@ -839,7 +836,6 @@ Public Class PHP
         End Try
     End Function
 
-
     ''' <summary>
     ''' Sendet einen verschlüsselten SQL-Löschbefehl inklusive Sicherheits-Quersumme an das PHP-Skript 'SQLErrorDel.php'.
     ''' Unterstützt sowohl eine reine IP als auch eine vollständige URL.
@@ -971,7 +967,6 @@ Public Class PHP
             Return String.Empty
         End Try
     End Function
-
 
     ' Nicht löschen!!!
     '# Diese Dateien liegen auf dem Raspberry und werden von VB aus aufgerufen. Die PHP-Dateien sind für die Kommunikation mit der Datenbank zuständig.

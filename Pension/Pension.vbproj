@@ -187,12 +187,6 @@
     <Compile Include="frmPensionIni.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmCorona.Designer.vb">
-      <DependentUpon>frmCorona.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmCorona.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmReservierungDest.designer.vb">
       <DependentUpon>frmReservierungDest.vb</DependentUpon>
     </Compile>
@@ -343,9 +337,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmWasser.resx">
       <DependentUpon>frmWasser.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmCorona.resx">
-      <DependentUpon>frmCorona.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmRFID.resx">
       <DependentUpon>frmRFID.vb</DependentUpon>

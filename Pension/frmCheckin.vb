@@ -78,59 +78,15 @@
         End Try
     End Sub
 
-
-    'Private Sub frmCheckin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-    '    Dim sText As String = fcTabelView("Checkin", "BID='" & sgRBID & "'", "ZID;Name;Vorname;Straße;PLZ;Ort;GDatum", "Zimmer;Name;Vorname;Straße;PLZ;Ort;E-Mail")
-    '    Dim aText() As String = Split(sText, vbCrLf)
-    '    Dim aLangth() As String = Split(aText(0), "|")
-    '    Dim aName() As String = Split(aText(1), "|")
-    '    Dim sZim As String
-    '    Dim N As Integer
-    '    With lvTabel
-    '        .Clear()
-    '        For i = 0 To aName.Length - 1
-    '            N = Val(aLangth(i)) * 9
-    '            .Columns.Add(aName(i), N, HorizontalAlignment.Left)
-    '        Next
-    '        .FullRowSelect = True
-    '        .GridLines = True
-    '        .HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
-    '        .HideSelection = False
-    '        .MultiSelect = False
-    '        '.Sorting = SortOrder.Ascending
-    '        .TabIndex = 0
-    '        .View = View.Details
-    '    End With
-    '    For i = 2 To aText.Length - 1
-    '        Dim lv As ListViewItem
-    '        With lvTabel
-    '            aName = Split(aText(i), "|")
-    '            sZim = fcGetObjektZimmerName(dtZim, aName(0))
-    '            If sZim.Trim = "" Then sZim = aName(0)
-    '            lv = .Items.Add(sZim)
-    '            'lv = .Items.Add(aName(0))
-    '            For j = 1 To aName.Length - 1
-    '                lv.SubItems.Add(aName(j))
-    '            Next
-    '            ' lv.SubItems.Add(fcUmDatum(StrTrim(aName(aName.Length - 1), "-")))
-    '        End With
-    '    Next
-
-
-
-
-    'End Sub
-
-
-
-    '    If j = 0 Then aDT(j, i + 1) = fcGetObjektZimmerName(dtZim, dt.Rows(i).Item(aFeld(j)))
-
-
-
-
-
-
-
+    ''' <summary>
+    ''' Schließt das aktuelle Formular.
+    ''' </summary>
+    ''' <param name="sender">Die Quelle des Ereignisses.</param>
+    ''' <param name="e">Die Ereignisdaten.</param>
+    ''' <remarks>
+    ''' 09.10.2026 - Code-Optimierung:
+    ''' - Standard-Event-Handler dokumentiert.
+    ''' </remarks>
     Private Sub buClose_Click(sender As Object, e As EventArgs) Handles buClose.Click
         Me.Close()
     End Sub
