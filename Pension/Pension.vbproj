@@ -157,6 +157,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="frmAnzahlung.Designer.vb">
+      <DependentUpon>frmAnzahlung.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAnzahlung.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmCheckin.Designer.vb">
       <DependentUpon>frmCheckin.vb</DependentUpon>
     </Compile>
@@ -197,12 +203,6 @@
       <DependentUpon>frmSQLError.vb</DependentUpon>
     </Compile>
     <Compile Include="frmSQLError.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmAnzahlung.designer.vb">
-      <DependentUpon>frmAnzahlung.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmAnzahlung.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="moGlobals.vb" />

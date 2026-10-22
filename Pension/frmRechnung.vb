@@ -1677,8 +1677,8 @@ Public Class frmRechnung
 
         Dim sDateiPDF As String = Path.Combine(cgPfad, "Ablage\Rechnung.PDF")
         Dim sDateiCII As String = Path.Combine(cgPfad, "Ablage\Rechnung.xml")
-        Dim sDateiZug As String = Path.Combine(cgPfad, "Rechnung_" & tbRNr.Text & ".pdf")
-        'Dim sDateiZug As String = Path.Combine(sZielPfad , "Rechnung_" & tbRNr.Text & ".pdf")
+        'Dim sDateiZug As String = Path.Combine(cgPfad, "Rechnung_" & tbRNr.Text & ".pdf")
+        Dim sDateiZug As String = Path.Combine(sZielPfad, "Rechnung_" & tbRNr.Text & ".pdf")
         EmbedXmlInPdf(sDateiPDF, sDateiCII, sDateiZug)
     End Sub
 
