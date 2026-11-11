@@ -68,83 +68,83 @@
     End Sub
 
 
-    ''' <summary>
-    ''' Zeilen höhe festlegen
-    ''' </summary>
-    ''' <param name="nNr"></param>
-    ''' <param name="nZahl"></param>
-    ''' <remarks>
-    ''' 13.01.2012 Create
-    ''' </remarks>
-    Public Sub prTableRowsHeigth(ByRef nNr As Integer, ByRef nZahl As Integer)
-        Dim ro As Double
-        Dim wi As Double
-        Dim anz As Integer = 0
-        'ReDim arTableColumns(zahl - 1)
-        arTableRows(nNr) = nZahl * -1
-        wi = arTableDim(2)
-        For i_ro = 0 To arTableRows.Count - 1
-            If arTableRows(i_ro) < 0 Then
-                wi = wi + arTableRows(i_ro)
-            Else
-                anz = anz + 1
-            End If
-        Next
-        ro = wi / anz
-        For i_ro = 0 To arTableRows.Count - 1
-            If arTableRows(i_ro) >= 0 Then
-                arTableRows(i_ro) = ro
-            End If
-        Next
-    End Sub
+    '''' <summary>
+    '''' Zeilen höhe festlegen
+    '''' </summary>
+    '''' <param name="nNr"></param>
+    '''' <param name="nZahl"></param>
+    '''' <remarks>
+    '''' 13.01.2012 Create
+    '''' </remarks>
+    'Public Sub prTableRowsHeigth(ByRef nNr As Integer, ByRef nZahl As Integer)
+    '    Dim ro As Double
+    '    Dim wi As Double
+    '    Dim anz As Integer = 0
+    '    'ReDim arTableColumns(zahl - 1)
+    '    arTableRows(nNr) = nZahl * -1
+    '    wi = arTableDim(2)
+    '    For i_ro = 0 To arTableRows.Count - 1
+    '        If arTableRows(i_ro) < 0 Then
+    '            wi = wi + arTableRows(i_ro)
+    '        Else
+    '            anz = anz + 1
+    '        End If
+    '    Next
+    '    ro = wi / anz
+    '    For i_ro = 0 To arTableRows.Count - 1
+    '        If arTableRows(i_ro) >= 0 Then
+    '            arTableRows(i_ro) = ro
+    '        End If
+    '    Next
+    'End Sub
 
-    ''' <summary>
-    ''' Legt die feste Höhe einer bestimmten Tabellenzeile fest und berechnet die Höhen der verbleibenden flexiblen Zeilen automatisch neu.
-    ''' </summary>
-    ''' <param name="nNr">Die nullbasierte Index-Nummer der Zeile.</param>
-    ''' <param name="nHeight">Die gewünschte feste Höhe für diese Zeile in mm.</param>
-    ''' <remarks>
-    ''' 13.01.2012 - Create
-    ''' 26.09.2026 - Code-Optimierung:
-    ''' - Parameter von 'ByRef' auf 'ByVal' geändert.
-    ''' - Falsche Schreibweise im Methodennamen und Parameternamen korrigiert ('Heigth' zu 'Height').
-    ''' - Schleifenvariablen ('i_ro') explizit als Integer typisiert.
-    ''' - Variable 'ro' in 'remainingRowHeight' und 'wi' in 'availableHeight' umbenannt für bessere Lesbarkeit.
-    ''' - Absicherung gegen Division durch Null hinzugefügt, falls keine flexiblen Zeilen übrig bleiben.
-    ''' - Toten, auskommentierten Code entfernt.
-    ''' </remarks>
-    Public Sub prTableRowsHeight(ByVal nNr As Integer, ByVal nHeight As Integer)
-        ' Sicherheitsprüfung für den Array-Index
-        If nNr < 0 OrElse nNr >= arTableRows.Count Then Exit Sub
+    '''' <summary>
+    '''' Legt die feste Höhe einer bestimmten Tabellenzeile fest und berechnet die Höhen der verbleibenden flexiblen Zeilen automatisch neu.
+    '''' </summary>
+    '''' <param name="nNr">Die nullbasierte Index-Nummer der Zeile.</param>
+    '''' <param name="nHeight">Die gewünschte feste Höhe für diese Zeile in mm.</param>
+    '''' <remarks>
+    '''' 13.01.2012 - Create
+    '''' 26.09.2026 - Code-Optimierung:
+    '''' - Parameter von 'ByRef' auf 'ByVal' geändert.
+    '''' - Falsche Schreibweise im Methodennamen und Parameternamen korrigiert ('Heigth' zu 'Height').
+    '''' - Schleifenvariablen ('i_ro') explizit als Integer typisiert.
+    '''' - Variable 'ro' in 'remainingRowHeight' und 'wi' in 'availableHeight' umbenannt für bessere Lesbarkeit.
+    '''' - Absicherung gegen Division durch Null hinzugefügt, falls keine flexiblen Zeilen übrig bleiben.
+    '''' - Toten, auskommentierten Code entfernt.
+    '''' </remarks>
+    'Public Sub prTableRowsHeight(ByVal nNr As Integer, ByVal nHeight As Integer)
+    '    ' Sicherheitsprüfung für den Array-Index
+    '    If nNr < 0 OrElse nNr >= arTableRows.Count Then Exit Sub
 
-        ' Festen Wert als negativen Indikator im Array hinterlegen
-        arTableRows(nNr) = nHeight * -1
+    '    ' Festen Wert als negativen Indikator im Array hinterlegen
+    '    arTableRows(nNr) = nHeight * -1
 
-        Dim availableHeight As Double = arTableDim(2)
-        Dim flexibleRowsCount As Integer = 0
+    '    Dim availableHeight As Double = arTableDim(2)
+    '    Dim flexibleRowsCount As Integer = 0
 
-        ' Verfügbare Resthöhe ermitteln und flexible Zeilen zählen
-        For i_ro As Integer = 0 To arTableRows.Count - 1
-            If arTableRows(i_ro) < 0 Then
-                ' Negative Werte (feste Höhen) abziehen (da Wert negativ ist, wird addiert)
-                availableHeight += arTableRows(i_ro)
-            Else
-                flexibleRowsCount += 1
-            End If
-        Next
+    '    ' Verfügbare Resthöhe ermitteln und flexible Zeilen zählen
+    '    For i_ro As Integer = 0 To arTableRows.Count - 1
+    '        If arTableRows(i_ro) < 0 Then
+    '            ' Negative Werte (feste Höhen) abziehen (da Wert negativ ist, wird addiert)
+    '            availableHeight += arTableRows(i_ro)
+    '        Else
+    '            flexibleRowsCount += 1
+    '        End If
+    '    Next
 
-        ' Nur neu berechnen, wenn überhaupt noch flexible Zeilen vorhanden sind
-        If flexibleRowsCount > 0 Then
-            Dim remainingRowHeight As Double = availableHeight / flexibleRowsCount
+    '    ' Nur neu berechnen, wenn überhaupt noch flexible Zeilen vorhanden sind
+    '    If flexibleRowsCount > 0 Then
+    '        Dim remainingRowHeight As Double = availableHeight / flexibleRowsCount
 
-            ' Die verbleibende Höhe gleichmäßig auf die flexiblen Zeilen aufteilen
-            For i_ro As Integer = 0 To arTableRows.Count - 1
-                If arTableRows(i_ro) >= 0 Then
-                    arTableRows(i_ro) = remainingRowHeight
-                End If
-            Next
-        End If
-    End Sub
+    '        ' Die verbleibende Höhe gleichmäßig auf die flexiblen Zeilen aufteilen
+    '        For i_ro As Integer = 0 To arTableRows.Count - 1
+    '            If arTableRows(i_ro) >= 0 Then
+    '                arTableRows(i_ro) = remainingRowHeight
+    '            End If
+    '        Next
+    '    End If
+    'End Sub
 
     ''' <summary>
     ''' Legt die feste Breite einer bestimmten Tabellenspalte fest und berechnet die Breiten der verbleibenden flexiblen Spalten automatisch neu.
@@ -290,55 +290,55 @@
         arTableValue(nCol, nRow, 0) = processedText
     End Sub
 
-    ''' <summary>
-    ''' Legt die Schriftfarbe (Vordergrundfarbe) für eine bestimmte Tabellenzelle fest.
-    ''' </summary>
-    ''' <param name="nCol">Die nullbasierte Spaltennummer der Zelle.</param>
-    ''' <param name="nRow">Die nullbasierte Zeilennummer der Zelle.</param>
-    ''' <param name="oColor">Die gewünschte Schriftfarbe (bei 'Color.Empty' wird standardmäßig 'Color.Black' verwendet).</param>
-    ''' <remarks>
-    ''' 13.01.2012 - Create
-    ''' 26.09.2026 - Code-Optimierung:
-    ''' - Parameterübergabe von 'ByRef' auf 'ByVal' geändert, um unerwünschte Änderungen an der Originalfarbe zu verhindern.
-    ''' - Lokale Hilfsvariable eingeführt, um den Standardwert sauber zu setzen.
-    ''' - Index-Validierung für das Farb-Array integriert, um Laufzeitfehler zu vermeiden.
-    ''' - Großschreibung im XML-Kommentar korrigiert ("tabellenfeld" zu "Tabellenfeld").
-    ''' </remarks>
-    Public Sub prTabelCellForeColor(ByVal nCol As Integer, ByVal nRow As Integer, ByVal oColor As Color)
-        ' Sicherheitsprüfung für die Array-Grenzen
-        If nCol < 0 OrElse nCol >= arTableColor.GetLength(0) OrElse
-       nRow < 0 OrElse nRow >= arTableColor.GetLength(1) Then Exit Sub
+    '''' <summary>
+    '''' Legt die Schriftfarbe (Vordergrundfarbe) für eine bestimmte Tabellenzelle fest.
+    '''' </summary>
+    '''' <param name="nCol">Die nullbasierte Spaltennummer der Zelle.</param>
+    '''' <param name="nRow">Die nullbasierte Zeilennummer der Zelle.</param>
+    '''' <param name="oColor">Die gewünschte Schriftfarbe (bei 'Color.Empty' wird standardmäßig 'Color.Black' verwendet).</param>
+    '''' <remarks>
+    '''' 13.01.2012 - Create
+    '''' 26.09.2026 - Code-Optimierung:
+    '''' - Parameterübergabe von 'ByRef' auf 'ByVal' geändert, um unerwünschte Änderungen an der Originalfarbe zu verhindern.
+    '''' - Lokale Hilfsvariable eingeführt, um den Standardwert sauber zu setzen.
+    '''' - Index-Validierung für das Farb-Array integriert, um Laufzeitfehler zu vermeiden.
+    '''' - Großschreibung im XML-Kommentar korrigiert ("tabellenfeld" zu "Tabellenfeld").
+    '''' </remarks>
+    'Public Sub prTabelCellForeColor(ByVal nCol As Integer, ByVal nRow As Integer, ByVal oColor As Color)
+    '    ' Sicherheitsprüfung für die Array-Grenzen
+    '    If nCol < 0 OrElse nCol >= arTableColor.GetLength(0) OrElse
+    '   nRow < 0 OrElse nRow >= arTableColor.GetLength(1) Then Exit Sub
 
-        ' Wenn keine Farbe definiert ist, Schwarz als Standard wählen
-        Dim chosenColor As Color = If(oColor = Color.Empty, Color.Black, oColor)
+    '    ' Wenn keine Farbe definiert ist, Schwarz als Standard wählen
+    '    Dim chosenColor As Color = If(oColor = Color.Empty, Color.Black, oColor)
 
-        arTableColor(nCol, nRow, 0) = chosenColor
-    End Sub
+    '    arTableColor(nCol, nRow, 0) = chosenColor
+    'End Sub
 
-    ''' <summary>
-    ''' Legt die Hintergrundfarbe für eine bestimmte Tabellenzelle fest.
-    ''' </summary>
-    ''' <param name="nCol">Die nullbasierte Spaltennummer der Zelle.</param>
-    ''' <param name="nRow">Die nullbasierte Zeilennummer der Zelle.</param>
-    ''' <param name="oColor">Die gewünschte Hintergrundfarbe (bei 'Color.Empty' wird standardmäßig 'Color.White' verwendet).</param>
-    ''' <remarks>
-    ''' 13.01.2012 - Create
-    ''' 26.09.2026 - Code-Optimierung:
-    ''' - Parameterübergabe von 'ByRef' auf 'ByVal' geändert.
-    ''' - Seiteneffekte durch Nutzung einer lokalen Hilfsvariable eliminiert.
-    ''' - Index-Validierung für das mehrdimensionale Array hinzugefügt.
-    ''' - Grammatik im XML-Kommentar für bessere Lesbarkeit angepasst.
-    ''' </remarks>
-    Public Sub prTabelCellBackColor(ByVal nCol As Integer, ByVal nRow As Integer, ByVal oColor As Color)
-        ' Sicherheitsprüfung für die Array-Grenzen
-        If nCol < 0 OrElse nCol >= arTableColor.GetLength(0) OrElse
-       nRow < 0 OrElse nRow >= arTableColor.GetLength(1) Then Exit Sub
+    '''' <summary>
+    '''' Legt die Hintergrundfarbe für eine bestimmte Tabellenzelle fest.
+    '''' </summary>
+    '''' <param name="nCol">Die nullbasierte Spaltennummer der Zelle.</param>
+    '''' <param name="nRow">Die nullbasierte Zeilennummer der Zelle.</param>
+    '''' <param name="oColor">Die gewünschte Hintergrundfarbe (bei 'Color.Empty' wird standardmäßig 'Color.White' verwendet).</param>
+    '''' <remarks>
+    '''' 13.01.2012 - Create
+    '''' 26.09.2026 - Code-Optimierung:
+    '''' - Parameterübergabe von 'ByRef' auf 'ByVal' geändert.
+    '''' - Seiteneffekte durch Nutzung einer lokalen Hilfsvariable eliminiert.
+    '''' - Index-Validierung für das mehrdimensionale Array hinzugefügt.
+    '''' - Grammatik im XML-Kommentar für bessere Lesbarkeit angepasst.
+    '''' </remarks>
+    'Public Sub prTabelCellBackColor(ByVal nCol As Integer, ByVal nRow As Integer, ByVal oColor As Color)
+    '    ' Sicherheitsprüfung für die Array-Grenzen
+    '    If nCol < 0 OrElse nCol >= arTableColor.GetLength(0) OrElse
+    '   nRow < 0 OrElse nRow >= arTableColor.GetLength(1) Then Exit Sub
 
-        ' Wenn keine Farbe definiert ist, Weiß als Standard wählen
-        Dim chosenColor As Color = If(oColor = Color.Empty, Color.White, oColor)
+    '    ' Wenn keine Farbe definiert ist, Weiß als Standard wählen
+    '    Dim chosenColor As Color = If(oColor = Color.Empty, Color.White, oColor)
 
-        arTableColor(nCol, nRow, 1) = chosenColor
-    End Sub
+    '    arTableColor(nCol, nRow, 1) = chosenColor
+    'End Sub
 
     ''' <summary>
     ''' Zeichnet die Tabelle (Rahmen, Trennlinien und farbige Hintergründe) und gibt die formatierten Zellentexte über die VPE-Engine aus.

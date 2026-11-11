@@ -315,6 +315,9 @@ Public Class PHP
         Dim dt As New DataTable()
         Try
             ' 1. Quersumme und Verschlüsselung vorbereiten
+            If sSQL.Contains("Select * From code Where code") Then
+                sSQL = sSQL
+            End If
             Dim sSumme As String = GetQuersumme(sSQL)
             Dim sPW() As String = {"Gabriela", "Gewuenscht", "Karriere", "Elternzeit", "Truemmer", "Abstand", "Bodensee"}
             Dim dayIndex As Integer = CInt(DateTime.Now.DayOfWeek) Mod sPW.Length

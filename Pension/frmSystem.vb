@@ -4607,33 +4607,74 @@ Public Class frmSystem
                     Dim sPreisRaw As String = item.SubItems(3).Text.Trim()
                     Dim sDauer As String = item.SubItems(4).Text.Trim()
                     Dim sEvent As String = item.SubItems(7).Text
+                    Dim nZielJahr As Integer
+                    If Integer.TryParse(sJahr, nZielJahr) AndAlso sVon.Length >= 4 Then
 
-                    ' Prüfen, ob das Jahr des Datensatzes dem Zieljahr entspricht
-                    If Mid(sVon, 1, 4) = (Val(sJahr) + iJahr).ToString() Then
-                        Dim sID As String = fcGetTimeID(Date.Today)
-                        fcWait(2) ' Kurze Pause zur Gewährleistung eindeutiger IDs
+                        If sVon.Substring(0, 4) = (nZielJahr + iJahr).ToString() Then
 
-                        ' Preise splitten und neu berechnen (Cent-Multiplikation)
-                        Dim arPreis() As String = Split(sPreisRaw, "|")
-                        Dim sbPreis As New StringBuilder()
+                            Dim sID As String = fcGetTimeID(Date.Today)
 
-                        For j As Integer = 0 To arPreis.Length - 1
-                            Dim priceValue As Double = Val(arPreis(j)) * 100
-                            sbPreis.Append(priceValue).Append("|")
-                        Next
+                            ' Ruft die optimierte fcWait (mit Thread.Sleep) auf. 
+                            ' Garantiert 0% CPU-Last während der 2 Sekunden Wartezeit.
+                            fcWait(2)
 
-                        ' Letztes Trennzeichen abschneiden
-                        Dim sPreis As String = sbPreis.ToString()
-                        If sPreis.Length > 0 Then
-                            sPreis = sPreis.Substring(0, sPreis.Length - 1)
+                            ' Preise splitten und neu berechnen (Cent-Multiplikation)
+                            ' Nutzt die native .NET-Methode .Split() statt der VB6-Kompatibilitätsfunktion
+                            Dim arPreis() As String = sPreisRaw.Split("|"c)
+                            Dim sbPreis As New System.Text.StringBuilder()
+
+                            For j As Integer = 0 To arPreis.Length - 1
+                                Dim nEinzelBetrag As Double
+                                ' Typsicheres Parsen des Preises, um invariant (punkt/komma-unabhängig) zu rechnen
+                                If Double.TryParse(arPreis(j), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, nEinzelBetrag) Then
+                                    Dim priceValue As Double = nEinzelBetrag * 100
+                                    sbPreis.Append(priceValue).Append("|")
+                                Else
+                                    sbPreis.Append("0|")
+                                End If
+                            Next
+
+                            ' Letztes Trennzeichen hocheffizient abschneiden
+                            If sbPreis.Length > 0 Then
+                                sbPreis.Length -= 1
+                            End If
+                            Dim sPreis As String = sbPreis.ToString()
+
+                            ' Datensatz-String mittels moderner String-Interpolation zusammenbauen
+                            sqlText = $"{sID}°{sVon}°{sBis}°{sPreis}°{sDauer}°{sZim}°{sEvent}"
+
+                            ' Array erzeugen und in die Datenbank einfügen
+                            arValue = sqlText.Split("°"c)
+                            fcInsertCommand("Preise", arFields, arValue)
+
                         End If
-
-                        ' Datensatz-Array vorbereiten und in Datenbank einfügen
-                        sqlText = String.Format("{0}°{1}°{2}°{3}°{4}°{5}°{6}", sID, sVon, sBis, sPreis, sDauer, sZim, sEvent)
-                        arValue = Split(sqlText, "°")
-
-                        fcInsertCommand("Preise", arFields, arValue)
                     End If
+                    '' Prüfen, ob das Jahr des Datensatzes dem Zieljahr entspricht
+                    'If Mid(sVon, 1, 4) = (Val(sJahr) + iJahr).ToString() Then
+                    '    Dim sID As String = fcGetTimeID(Date.Today)
+                    '    fcWait(2) ' Kurze Pause zur Gewährleistung eindeutiger IDs
+
+                    '    ' Preise splitten und neu berechnen (Cent-Multiplikation)
+                    '    Dim arPreis() As String = Split(sPreisRaw, "|")
+                    '    Dim sbPreis As New StringBuilder()
+
+                    '    For j As Integer = 0 To arPreis.Length - 1
+                    '        Dim priceValue As Double = Val(arPreis(j)) * 100
+                    '        sbPreis.Append(priceValue).Append("|")
+                    '    Next
+
+                    '    ' Letztes Trennzeichen abschneiden
+                    '    Dim sPreis As String = sbPreis.ToString()
+                    '    If sPreis.Length > 0 Then
+                    '        sPreis = sPreis.Substring(0, sPreis.Length - 1)
+                    '    End If
+
+                    '    ' Datensatz-Array vorbereiten und in Datenbank einfügen
+                    '    sqlText = String.Format("{0}°{1}°{2}°{3}°{4}°{5}°{6}", sID, sVon, sBis, sPreis, sDauer, sZim, sEvent)
+                    '    arValue = Split(sqlText, "°")
+
+                    '    fcInsertCommand("Preise", arFields, arValue)
+                    'End If
                 Next
             End With
         End If

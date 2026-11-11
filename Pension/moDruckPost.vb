@@ -1060,34 +1060,34 @@ Module moDruckPost
 
 
 
-    ''' <summary>
-    ''' Ersetzt das erste Vorkommen eines Suchzeichens in einem String durch einen Ziel-String.
-    ''' </summary>
-    ''' <param name="sText">Der zu verarbeitende Text (ByRef übergeben).</param>
-    ''' <param name="sSuch">Das Zeichen oder die Zeichenkette, nach der gesucht wird.</param>
-    ''' <param name="sZiel">Die Zeichenkette, die stattdessen eingesetzt wird.</param>
-    ''' <returns>Der modifizierte Gesamttext als String.</returns>
-    ''' <remarks>
-    ''' 07.10.2026 - Code-Optimierung:
-    ''' - Schleife komplett entfernt: Ersetzt durch die performante, native '.IndexOf()'-Methode.
-    ''' - Datentyp definiert: Expliziten Rückgabetyp 'As String' hinzugefügt, um Option Strict Konformität zu garantieren.
-    ''' - Logik bereinigt: Eliminiert die riskanten, verschachtelten 'Replace'-Aufrufe der alten Variante.
-    ''' </remarks>
-    Public Function fcChangs(ByRef sText As String, ByVal sSuch As String, ByVal sZiel As String) As String
-        If String.IsNullOrEmpty(sText) OrElse String.IsNullOrEmpty(sSuch) Then
-            Return sText
-        End If
+    '''' <summary>
+    '''' Ersetzt das erste Vorkommen eines Suchzeichens in einem String durch einen Ziel-String.
+    '''' </summary>
+    '''' <param name="sText">Der zu verarbeitende Text (ByRef übergeben).</param>
+    '''' <param name="sSuch">Das Zeichen oder die Zeichenkette, nach der gesucht wird.</param>
+    '''' <param name="sZiel">Die Zeichenkette, die stattdessen eingesetzt wird.</param>
+    '''' <returns>Der modifizierte Gesamttext als String.</returns>
+    '''' <remarks>
+    '''' 07.10.2026 - Code-Optimierung:
+    '''' - Schleife komplett entfernt: Ersetzt durch die performante, native '.IndexOf()'-Methode.
+    '''' - Datentyp definiert: Expliziten Rückgabetyp 'As String' hinzugefügt, um Option Strict Konformität zu garantieren.
+    '''' - Logik bereinigt: Eliminiert die riskanten, verschachtelten 'Replace'-Aufrufe der alten Variante.
+    '''' </remarks>
+    'Public Function fcChangs(ByRef sText As String, ByVal sSuch As String, ByVal sZiel As String) As String
+    '    If String.IsNullOrEmpty(sText) OrElse String.IsNullOrEmpty(sSuch) Then
+    '        Return sText
+    '    End If
 
-        ' Position des gesuchten Zeichens/Strings bestimmen
-        Dim nPos As Integer = sText.IndexOf(sSuch)
+    '    ' Position des gesuchten Zeichens/Strings bestimmen
+    '    Dim nPos As Integer = sText.IndexOf(sSuch)
 
-        ' Wenn gefunden, den String an dieser Position sauber aufteilen und neu zusammensetzen
-        If nPos <> -1 Then
-            sText = sText.Substring(0, nPos) & sZiel & sText.Substring(nPos + sSuch.Length)
-        End If
+    '    ' Wenn gefunden, den String an dieser Position sauber aufteilen und neu zusammensetzen
+    '    If nPos <> -1 Then
+    '        sText = sText.Substring(0, nPos) & sZiel & sText.Substring(nPos + sSuch.Length)
+    '    End If
 
-        Return sText
-    End Function
+    '    Return sText
+    'End Function
 
 
     ''' <summary>
@@ -2057,7 +2057,6 @@ Module moDruckPost
     ''' </summary>
     ''' <param name="zimmerNamen">Die Liste der Zimmernamen, die formatiert werden sollen.</param>
     ''' <returns>Eine für die Tabellenzelle formatierte String-Zeichenkette mit Zeilenumbrüchen.</returns>
-
     Private Function GeneriereDruckText(ByVal zimmerNamen As List(Of String)) As String
         If zimmerNamen.Count = 0 Then Return ""
 
