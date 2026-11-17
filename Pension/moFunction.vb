@@ -1820,123 +1820,6 @@ Module moFunction
         Return dt.AddDays(-tageBisSonntag)
     End Function
 
-    '''' <summary>
-    '''' Berechnet das Osterdatum
-    '''' </summary>
-    '''' <param name="Jahr"></param>
-    '''' <returns></returns>
-    '''' <remarks>
-    '''' 23.12.2011 Create
-    '''' </remarks>
-    'Private Function fcOsterdatum(ByVal Jahr As Integer) As Date
-    '    Dim a As Integer, b As Integer, c As Integer
-    '    Dim d As Integer, e As Integer
-    '    Dim Tag As Integer, Monat As Integer
-
-    '    a = Jahr Mod 19
-    '    b = Jahr Mod 4
-    '    c = Jahr Mod 7
-    '    d = (19 * a + 24) Mod 30
-    '    e = (2 * b + 4 * c + 6 * d + 5) Mod 7
-
-    '    Tag = 22 + d + e
-    '    Monat = 3
-
-    '    If Tag > 31 Then
-    '        Tag = d + e - 9
-    '        Monat = 4
-    '    ElseIf Tag = 26 And Monat = 4 Then
-    '        Tag = 19
-    '    ElseIf Tag = 25 And Monat = 4 And d = 28 And e = 6 And a > 10 Then
-    '        Tag = 18
-    '    End If
-    '    fcOsterdatum = DateSerial(Jahr, Monat, Tag)
-    'End Function
-
-    '' Beginn der Sommerzeit berechnen
-    'Private Function GetBeginnSommerzeit(ByVal JahrA As Long) As Date
-    '    Dim i As Long
-    '    Dim sTag As String
-    '    Dim sDay As Date
-    '    For i = 31 To 20 Step -1
-    '        sDay = i & ".3." & JahrA
-    '        sTag = WeekdayName(Weekday(sDay, FirstDayOfWeek.Monday))
-    '        If sTag = "Sonntag" Then
-    '            GetBeginnSommerzeit = sDay
-    '            Exit For
-    '        End If
-    '    Next i
-    'End Function
-
-    '' Beginn der Winterzeit berechnen
-    'Private Function GetBeginnWinterzeit(ByVal JahrA As Long) As Date
-    '    Dim i As Long
-    '    Dim sTag As String
-    '    Dim sDay As Date
-    '    For i = 31 To 20 Step -1
-    '        sDay = i & ".10." & JahrA
-    '        sTag = WeekdayName(Weekday(sDay, FirstDayOfWeek.Monday))
-    '        If sTag = "Sonntag" Then
-    '            GetBeginnWinterzeit = sDay
-    '            Exit For
-    '        End If
-    '    Next
-    'End Function
-
-    '' Erntedank berechnen
-    'Private Function GetErntedankfest(ByVal JahrA As Long) As Date
-    '    Dim i As Long
-    '    Dim sTag As String
-    '    Dim sDay As Date
-    '    For i = 1 To 16
-    '        sDay = i & ".10." & JahrA
-    '        sTag = WeekdayName(Weekday(sDay, FirstDayOfWeek.Monday))
-    '        If sTag = "Sonntag" Then
-    '            GetErntedankfest = sDay
-    '            Exit For
-    '        End If
-
-    '    Next
-    'End Function
-
-    '' Muttertag berechnen
-    'Private Function GetMuttertag(ByVal JahrA As Long) As Date
-    '    Dim W1 As Boolean
-    '    Dim i As Long
-    '    Dim sTag As String
-    '    Dim sDay As Date
-    '    W1 = False
-    '    For i = 1 To 31
-    '        sDay = i & ".5." & JahrA
-    '        sTag = WeekdayName(Weekday(sDay, FirstDayOfWeek.Monday))
-    '        If sTag = "Sonntag" Then
-    '            If W1 = True Then
-    '                GetMuttertag = sDay
-    '                Exit For
-    '            Else
-    '                W1 = True
-    '            End If
-
-    '        End If
-    '    Next
-    'End Function
-
-    '' 4. Advent berechnen
-    'Private Function GetViertenAdvent(ByVal JahrA As Long) As Date
-    '    Dim i As Long
-    '    Dim sTag As String
-    '    Dim sDay As Date
-    '    For i = 24 To 1 Step -1
-    '        sDay = i & ".12." & JahrA
-    '        sTag = WeekdayName(Weekday(sDay, FirstDayOfWeek.Monday))
-    '        If sTag = "Sonntag" Then
-    '            GetViertenAdvent = sDay
-    '            Exit For
-    '        End If
-    '    Next
-
-    'End Function
-
 #End Region
 
 #Region "Programm Funktionen.(Hotel)..............................................................."
@@ -2011,102 +1894,205 @@ Module moFunction
 
 
     ''' <summary>
-    ''' Ermittelt den Objektnamen aus der Objekt-ID
+    ''' Ermittelt den Namen eines Objekts anhand seiner eindeutigen Objekt-ID aus einer DataTable.
+    ''' Durchsucht alle nicht gelöschten Zeilen der Tabelle und gibt den zugehörigen Namen zurück.
     ''' </summary>
-    ''' <param name="dtT"></param>
-    ''' <param name="sObj"></param>
-    ''' <returns></returns>
+    ''' <param name="dtT">Die DataTable, welche die Objektdaten (Spalten "ID" und "Name") enthält.</param>
+    ''' <param name="sObj">Die zu suchende Objekt-ID.</param>
+    ''' <returns>Den gefundenen Objektnamen oder ein einzelnes Leerzeichen (" "), falls die ID nicht gefunden wurde oder ungültig ist.</returns>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Null- und Leerzeichen-Prüfung (Guard Clauses) für Parameter ergänzt, um NullReferenceExceptions zu vermeiden.
+    ''' - Veraltete Zuweisung über den Funktionsnamen durch modernes 'Return' ersetzt.
+    ''' - 'For Each'-Schleife statt indexbasierter 'For'-Schleife für bessere Lesbarkeit verwendet.
+    ''' - Typsicheren Zugriff über 'Field(Of String)' und robusten String-Vergleich implementiert.
+    ''' - Inline-Kommentare zur besseren Wartbarkeit hinzugefügt.
     ''' </remarks>
     Public Function fcGetObjektName(ByVal dtT As DataTable, ByVal sObj As String) As String
-        fcGetObjektName = " "
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
+        ' Standard-Rückgabewert beibehalten (Abwärtskompatibilität)
+        Const DefaultResult As String = " "
 
-        For i = 0 To nMax
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                If sObj.Trim = dtT.Rows(i).Item("ID").ToString Then
-                    fcGetObjektName = dtT.Rows(i).Item("Name").ToString
-                    Exit For
+        ' Guard Clauses: Abbruch bei fehlender Tabelle oder leerer Such-ID
+        If dtT Is Nothing OrElse String.IsNullOrWhiteSpace(sObj) Then
+            Return DefaultResult
+        End If
+
+        Dim sSuchID As String = sObj.Trim()
+
+        ' Alle Zeilen der Tabelle durchlaufen
+        For Each row As DataRow In dtT.Rows
+            ' Gelöschte Zeilen überspringen, um DeletedRowInaccessibleException zu verhindern
+            If row.RowState <> DataRowState.Deleted Then
+                ' Sicherer Abruf der ID (behandelt auch DBNull automatisch als Nothing)
+                Dim sRowID As String = row.Field(Of String)("ID")
+
+                If sRowID IsNot Nothing AndAlso String.Equals(sSuchID, sRowID.Trim(), StringComparison.OrdinalIgnoreCase) Then
+                    ' Gefundenen Namen zurückgeben (falls DBNull, wird DefaultResult genutzt)
+                    Return If(row.Field(Of String)("Name"), DefaultResult)
                 End If
             End If
         Next
+
+        Return DefaultResult
     End Function
 
+
     ''' <summary>
-    ''' Ermittelt die Objekt/Zimmer-ID aus den Namen
+    ''' Ermittelt eine Objekt- oder Zimmer-ID (bzw. einen dynamischen Zielspaltenwert) anhand des Objektnamens.
+    ''' Durchsucht alle nicht gelöschten Zeilen einer DataTable nach dem Namen und gibt den getrimmten Wert der angegebenen Zielspalte zurück.
     ''' </summary>
-    ''' <param name="dtT"></param>
-    ''' <param name="sObj"></param>
-    ''' <returns></returns>
+    ''' <param name="dtT">Die DataTable, welche die Objekt- bzw. Zimmerdaten (inklusive der Spalte "Name") enthält.</param>
+    ''' <param name="sObj">Der zu suchende Objekt- oder Zimmername.</param>
+    ''' <param name="sResult">Der Name der Spalte, deren Wert bei einem Treffer zurückgegeben werden soll (z. B. "ID").</param>
+    ''' <returns>Den gefundenen und getrimmten Wert aus der Zielspalte oder ein einzelnes Leerzeichen (" "), falls kein Treffer gefunden wurde oder Parameter ungültig sind.</returns>
     ''' <remarks>
-    ''' 19.12.2011 Create
+    ''' 19.12.2011 - Create
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Fehlenden Parameter 'sResult' im XML-Kommentar ergänzt und dokumentiert.
+    ''' - Guard Clauses für Null-Werte, leere Strings sowie Prüfung auf Existenz der Spalten ("Name" und 'sResult') ergänzt.
+    ''' - Veraltete Zuweisung über den Funktionsnamen durch modernes 'Return' ersetzt.
+    ''' - 'For Each'-Schleife und sicheren String-Vergleich ('String.Equals') statt indexbasierter Schleife verwendet.
+    ''' - DBNull-sichere Konvertierung über 'Convert.ToString' eingebaut, um Exceptions und Typ-Konflikte (z. B. Integer-IDs) zu vermeiden.
     ''' </remarks>
     Public Function fcGetObjektZimmerID(ByVal dtT As DataTable, ByVal sObj As String, ByVal sResult As String) As String
-        fcGetObjektZimmerID = " "
+        ' Standard-Rückgabewert beibehalten (Abwärtskompatibilität)
+        Const DefaultResult As String = " "
 
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
+        ' Guard Clauses: Prüfung auf ungültige Parameter
+        If dtT Is Nothing OrElse String.IsNullOrWhiteSpace(sObj) OrElse String.IsNullOrWhiteSpace(sResult) Then
+            Return DefaultResult
+        End If
 
-        For i = 0 To nMax
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                If sObj.Trim = dtT.Rows(i).Item("Name").ToString.Trim Then
-                    fcGetObjektZimmerID = dtT.Rows(i).Item(sResult).ToString.Trim 'ID 
-                    Exit For
+        ' Prüfen, ob die benötigten Spalten überhaupt in der DataTable existieren
+        If Not dtT.Columns.Contains("Name") OrElse Not dtT.Columns.Contains(sResult) Then
+            Return DefaultResult
+        End If
+
+        Dim sSuchName As String = sObj.Trim()
+
+        ' Alle Zeilen der Tabelle durchlaufen
+        For Each row As DataRow In dtT.Rows
+            ' Gelöschte Zeilen überspringen, um DeletedRowInaccessibleException zu verhindern
+            If row.RowState <> DataRowState.Deleted Then
+                ' Convert.ToString wandelt DBNull sicher in String.Empty um, ohne abzustürzen
+                Dim sRowName As String = Convert.ToString(row("Name")).Trim()
+
+                If String.Equals(sSuchName, sRowName, StringComparison.OrdinalIgnoreCase) Then
+                    ' Wert der dynamischen Zielspalte sicher auslesen und trimmen
+                    Dim sZielWert As String = Convert.ToString(row(sResult)).Trim()
+                    Return If(String.IsNullOrEmpty(sZielWert), DefaultResult, sZielWert)
                 End If
             End If
         Next
+
+        Return DefaultResult
     End Function
 
+
     ''' <summary>
-    ''' Ermittelt die Namen aus der Objekt/Zimmer-ID
+    ''' Ermittelt den Namen eines Objekts oder Zimmers anhand seiner eindeutigen ID.
+    ''' Durchsucht alle nicht gelöschten Zeilen der DataTable nach der ID und gibt den zugehörigen Namen zurück.
     ''' </summary>
-    ''' <param name="dtT"></param>
-    ''' <param name="sZim"></param>
-    ''' <returns></returns>
+    ''' <param name="dtT">Die DataTable, welche die Objekt- bzw. Zimmerdaten (Spalten "ID" und "Name") enthält.</param>
+    ''' <param name="sZim">Die zu suchende Objekt- oder Zimmer-ID.</param>
+    ''' <returns>Den gefundenen Namen oder ein einzelnes Leerzeichen (" "), falls kein Treffer gefunden wurde oder Parameter ungültig sind.</returns>
     ''' <remarks>
-    ''' 02.02.2012 Create
+    ''' 02.02.2012 - Create
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Guard Clauses für Null-Werte, leere Strings sowie Prüfung auf Existenz der Spalten ("ID" und "Name") ergänzt.
+    ''' - Veraltete Zuweisung über den Funktionsnamen durch modernes 'Return' ersetzt.
+    ''' - 'For Each'-Schleife und sicheren String-Vergleich ('String.Equals') statt indexbasierter Schleife verwendet.
+    ''' - DBNull-sichere Konvertierung über 'Convert.ToString' eingebaut, um Exceptions und Typ-Konflikte (z. B. Integer-IDs) zu vermeiden.
+    ''' - Inline-Kommentare zur besseren Wartbarkeit hinzugefügt.
     ''' </remarks>
     Public Function fcGetObjektZimmerName(ByVal dtT As DataTable, ByVal sZim As String) As String
-        fcGetObjektZimmerName = " "
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
-        For i = 0 To nMax
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                If sZim.Trim = dtT.Rows(i).Item("ID").ToString Then
-                    fcGetObjektZimmerName = dtT.Rows(i).Item("Name").ToString
-                    Exit For
+        ' Standard-Rückgabewert beibehalten (Abwärtskompatibilität)
+        Const DefaultResult As String = " "
+
+        ' Guard Clauses: Prüfung auf ungültige Parameter
+        If dtT Is Nothing OrElse String.IsNullOrWhiteSpace(sZim) Then
+            Return DefaultResult
+        End If
+
+        ' Prüfen, ob die benötigten Spalten in der DataTable vorhanden sind
+        If Not dtT.Columns.Contains("ID") OrElse Not dtT.Columns.Contains("Name") Then
+            Return DefaultResult
+        End If
+
+        Dim sSuchID As String = sZim.Trim()
+
+        ' Alle Zeilen der Tabelle durchlaufen
+        For Each row As DataRow In dtT.Rows
+            ' Gelöschte Zeilen überspringen, um DeletedRowInaccessibleException zu verhindern
+            If row.RowState <> DataRowState.Deleted Then
+                ' Convert.ToString wandelt DBNull und numerische IDs sicher in einen String um
+                Dim sRowID As String = Convert.ToString(row("ID")).Trim()
+
+                If String.Equals(sSuchID, sRowID, StringComparison.OrdinalIgnoreCase) Then
+                    Dim sGefundenerName As String = Convert.ToString(row("Name"))
+                    Return If(String.IsNullOrEmpty(sGefundenerName), DefaultResult, sGefundenerName)
                 End If
             End If
         Next
+
+        Return DefaultResult
     End Function
-
-
 
     ''' <summary>
-    ''' Ermittelt den Wert
+    ''' Ermittelt einen einzelnen Wert aus einer beliebigen Zielspalte einer DataTable anhand eines Suchkriteriums.
+    ''' Durchsucht alle nicht gelöschten Zeilen nach dem angegebenen Vergleichswert in der Suchspalte und gibt den Wert der Zielspalte zurück.
     ''' </summary>
-    ''' <param name="dtT"></param>
-    ''' <param name="sWert">ZimmmerNummer</param>
-    ''' <param name="sVergleich">"Name"</param>
-    ''' <param name="sResult">"ID"</param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <param name="dtT">Die DataTable, welche die zu durchsuchenden Daten enthält.</param>
+    ''' <param name="sWert">Der gesuchte Wert (z. B. eine Zimmernummer oder ein Name).</param>
+    ''' <param name="sVergleich">Der Name der Spalte, in der nach <paramref name="sWert"/> gesucht wird (z. B. "Name").</param>
+    ''' <param name="sResult">Der Name der Spalte, deren Wert bei einem Treffer zurückgegeben wird (z. B. "ID").</param>
+    ''' <returns>Den gefundenen Wert aus der Zielspalte oder ein einzelnes Leerzeichen (" "), falls kein Treffer gefunden wurde oder Parameter ungültig sind.</returns>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - XML-Dokumentation für alle Parameter und den Rückgabewert vervollständigt.
+    ''' - Guard Clauses für Null-Werte, leere Strings sowie Prüfung auf Existenz der dynamischen Spalten ('sVergleich' und 'sResult') ergänzt.
+    ''' - Veraltete Zuweisung über den Funktionsnamen durch modernes 'Return' ersetzt.
+    ''' - 'For Each'-Schleife und sicheren String-Vergleich ('String.Equals') statt indexbasierter Schleife verwendet.
+    ''' - DBNull-sichere Konvertierung über 'Convert.ToString' eingebaut, um Exceptions und Typ-Konflikte zu vermeiden.
+    ''' - Inline-Kommentare zur besseren Wartbarkeit hinzugefügt.
+    ''' </remarks>
     Public Function fcGetOneValue(ByVal dtT As DataTable, ByVal sWert As String, ByVal sVergleich As String, ByVal sResult As String) As String
-        fcGetOneValue = " "
-        Dim i As Integer
-        Dim nMax As Integer = dtT.Rows.Count - 1
+        ' Standard-Rückgabewert beibehalten (Abwärtskompatibilität)
+        Const DefaultResult As String = " "
 
-        For i = 0 To nMax
-            If dtT.Rows(i).RowState <> DataRowState.Deleted Then
-                If sWert.Trim = dtT.Rows(i).Item(sVergleich).ToString Then
-                    fcGetOneValue = dtT.Rows(i).Item(sResult).ToString
-                    Exit For
+        ' Guard Clauses: Prüfung auf ungültige Parameter
+        If dtT Is Nothing OrElse
+       String.IsNullOrWhiteSpace(sWert) OrElse
+       String.IsNullOrWhiteSpace(sVergleich) OrElse
+       String.IsNullOrWhiteSpace(sResult) Then
+            Return DefaultResult
+        End If
+
+        ' Prüfen, ob beide dynamisch übergebenen Spalten in der DataTable existieren
+        If Not dtT.Columns.Contains(sVergleich) OrElse Not dtT.Columns.Contains(sResult) Then
+            Return DefaultResult
+        End If
+
+        Dim sSuchWert As String = sWert.Trim()
+
+        ' Alle Zeilen der Tabelle durchlaufen
+        For Each row As DataRow In dtT.Rows
+            ' Gelöschte Zeilen überspringen, um DeletedRowInaccessibleException zu verhindern
+            If row.RowState <> DataRowState.Deleted Then
+                ' Convert.ToString wandelt DBNull und andere Datentypen sicher in einen String um
+                Dim sZellenWert As String = Convert.ToString(row(sVergleich)).Trim()
+
+                If String.Equals(sSuchWert, sZellenWert, StringComparison.OrdinalIgnoreCase) Then
+                    Dim sGefundenerWert As String = Convert.ToString(row(sResult))
+                    Return If(String.IsNullOrEmpty(sGefundenerWert), DefaultResult, sGefundenerWert)
                 End If
             End If
         Next
+
+        Return DefaultResult
     End Function
+
 
 
     ''' <summary>
@@ -2382,86 +2368,6 @@ Module moFunction
         Return (Preis / 100).ToString("F2")
     End Function
 
-
-
-    '''' <summary>
-    '''' Ermittelt die ZimmerPreis (ZimmerID in Zeile Null)
-    '''' </summary>
-    '''' <param name="ZimID"></param>
-    '''' <param name="PeFP"></param>
-    '''' <param name="ADatum"></param>
-    '''' <param name="EDatum"></param>
-    '''' <returns></returns>
-    '''' <remarks>
-    '''' 26.12.2011 Create
-    '''' </remarks>
-    'Public Function fcGetZimPreis(ByRef ZimID As String, ByRef PeFP As String, ByRef ADatum As String, ByRef EDatum As String) As String
-    '    Dim i As Integer
-    '    Dim aPeFP() As String = Split(PeFP, "/")
-    '    Dim nFPreis As Decimal = Val(aPeFP(1))
-    '    Dim Person As String = aPeFP(0)
-    '    Dim nAbzug As Decimal = 0
-    '    Dim nMax As Integer = dtZim.Rows.Count - 1
-    '    Dim Preis As Decimal = 0
-    '    For i = 0 To nMax
-    '        If dtZim.Rows(i).Item("ID").ToString = ZimID Then
-    '            Select Case Person
-    '                Case Is = "1"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P1").ToString)
-    '                Case Is = "2"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P2").ToString)
-    '                Case Is = "3"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P3").ToString)
-    '                Case Is = "4"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P4").ToString)
-    '                Case Is = "5"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P5").ToString)
-    '                Case Is = "6"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P6").ToString)
-    '                Case Is = "7"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P7").ToString)
-    '                Case Is = "8"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P8").ToString)
-    '                Case Is = "9"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P9").ToString)
-    '                Case Is = "10"
-    '                    nAbzug = Val(dtZim.Rows(i).Item("P10").ToString)
-    '            End Select
-    '        End If
-    '    Next
-    '    Dim sSQL As String = "Select * from Preise WHERE  ZimID = '" & ZimID & "'"
-    '    Dim dtPreis As DataTable = fcReadDataTable(sSQL)
-    '    Dim dVon As Date = CDate(EDatum)
-    '    Dim dBis As Date = CDate(ADatum)
-    '    Dim dAtuell As Date = Date.Today
-    '    Dim nPreis As Decimal
-    '    Dim dVon1 As Date
-    '    Dim dBis1 As Date
-    '    Dim aPreis() As String
-    '    Dim nTag As Integer
-    '    nFPreis = nFPreis * Val(Person) * 100
-    '    nMax = dtPreis.Rows.Count - 1
-    '    Do While dVon <> dBis
-    '        nPreis = 0
-    '        For i = 0 To nMax
-    '            dVon1 = CDate(fcUmDatum(dtPreis.Rows(i).Item("ADatum").ToString))
-    '            dBis1 = CDate(fcUmDatum(dtPreis.Rows(i).Item("EDatum").ToString))
-    '            If dVon1 <= dVon And dBis1 >= dVon Then
-    '                aPreis = Split(dtPreis.Rows(i).Item("Preis"), "|")
-    '                nTag = Weekday(dVon, FirstDayOfWeek.Monday) - 1
-    '                If nPreis < Val(aPreis(nTag)) Then
-    '                    nPreis = Val(aPreis(nTag))
-    '                End If
-    '            End If
-    '        Next
-    '        If nPreis > 0 Then
-    '            Preis = Preis + nPreis + nFPreis - (nAbzug * 100)
-    '        End If
-    '        dVon = DateAdd(DateInterval.Day, 1, dVon)
-    '    Loop
-    '    fcGetZimPreis = Str(Preis / 100)
-    'End Function
-
     ''' <summary>
     ''' Übersetzt einen übergebenen Text anhand der in der Systemdatenbank hinterlegten Sprachkonfiguration.
     ''' Passt zudem den Zeichensatz basierend auf der gewählten Sprache an.
@@ -2520,41 +2426,6 @@ Module moFunction
             Return sText
         End If
     End Function
-
-
-    'Function fcLanguage(ByRef nSprache As Integer, ByRef sText As String) As String
-    '    Dim sLanguage As Array = Split(ReadOneValueFromSystemDb("Language"), vbCrLf)
-
-
-
-    '    Dim sText1 As Array
-    '    Dim sText2 As String = ""
-    '    Dim x As String
-    '    Dim n As Boolean = False
-    '    Dim sSprache As Array = Split(sLanguage(0), ";")
-    '    Dim cSprache As Array = Split(sSprache(nSprache + 1), ",")
-
-    '    prZeichenSatz(cSprache(2))
-
-    '    For i = 0 To sLanguage.Length - 1
-    '        x = AtLeft(sLanguage(i), ";", 1)
-    '        If AtLeft(sLanguage(i), ";", 1) = sText Then
-    '            sText1 = Split(sLanguage(i), ";")
-    '            sText2 = sText1(nSprache + 1)
-    '            n = True
-    '            Exit For
-    '        End If
-    '    Next
-    '    If n = True Then
-    '        fcLanguage = sText2
-    '    Else
-    '        fcLanguage = sText
-    '    End If
-    'End Function
-
-
-
-
 #End Region
 
 #Region "Programm Funktionen.(Schloss)..............................................................."
@@ -2599,7 +2470,7 @@ Module moFunction
             ' .ToString() ersetzt Str() und Trim(), da es kein führendes Vorzeichen-Leerzeichen erzeugt
             sC = fcCode(c.ToString())
 
-            Dim sSQL As String = $"Select * From code Where code='{sC}'"
+            Dim sSQL As String = $"Select * From Code Where code='{sC}'"
             Dim dt As DataTable = fcReadDataTable(sSQL)
 
             ' Wenn kein Datensatz gefunden wurde, ist der Code eindeutig und die Schleife bricht ab
@@ -2661,117 +2532,167 @@ Module moFunction
         Return cleanedCode.PadLeft(nLength, "0"c)
     End Function
 
-
-    'Function fcCode(ByRef sCode As String) As String
-    '    sCode = fcUmECode(sCode, 5)
-    '    Dim Ziffer As String
-    '    Dim sCode1 As String = ""
-    '    For i = 1 To sCode.Length
-    '        Ziffer = Mid(sCode, i, 1)
-    '        sCode1 = sCode1 & fcUmECode(Ziffer, 3) & ";"
-    '    Next
-    '    fcCode = Mid(sCode1, 1, sCode1.Length - 1)
-    'End Function
-    Function fcUmCode(ByRef sCode As String) As String    ' 1;12;..;123 -> 001;012;123
-        Dim aCode() As String = Split(sCode, ";")
-
-        sCode = ""
-        For i = 0 To aCode.Length - 1
-            aCode(i) = aCode(i).Trim
-
-            sCode = sCode & fcUmECode(aCode(i), 3) & ";"
-        Next
-        fcUmCode = Mid(sCode, 1, sCode.Length - 1)
-    End Function
-    'Function fcUmECode(ByRef sCode1 As String, ByRef nLength As Integer) As String
-    '    fcUmECode = "000000000" & sCode1.Trim
-    '    Dim iL As Integer = fcUmECode.Length
-    '    Dim iL1 As Integer = iL - nLength + 1
-    '    fcUmECode = Mid(fcUmECode, iL1, nLength)
-    'End Function
-
-    Function fcRFIDDatum(ByRef Datum As String) As String
-        fcRFIDDatum = Mid(Datum, 1, 2) & ";" & Mid(Datum, 3, 2) & ";" & Mid(Datum, 5, 2) & ";" & Mid(Datum, 7, 2)
-    End Function
-    Function fcRFIDZeit(ByRef Zeit As String) As String
-        If Zeit = "0" Then
-            Zeit = "1200"
+    ''' <summary>
+    ''' Formatiert eine semikolongetrennte Liste von Einzelcodes auf eine einheitliche dreistellige Länge (z. B. "1;12;123" zu "001;012;123").
+    ''' Zerlegt die Eingabe anhand des Trennzeichens, bereinigt Leerzeichen und füllt jeden Teilcode über 'fcUmECode' auf.
+    ''' </summary>
+    ''' <param name="sCode">Die semikolongetrennte Zeichenkette der Codes (wird per ByRef ebenfalls mit dem formatierten Ergebnis überschrieben).</param>
+    ''' <returns>Die neu zusammengesetzte, semikolongetrennte Zeichenkette mit dreistelligen Codes oder String.Empty bei ungültiger Eingabe.</returns>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation für Zusammenfassung, Parameter und Rückgabewert ergänzt.
+    ''' - Guard Clause ('String.IsNullOrWhiteSpace') ergänzt, um Abstürze bei leeren Eingaben ('Mid(..., 0)') zu verhindern.
+    ''' - Veraltete VB6-Funktionen ('Split', 'Mid') und String-Verkettungen in Schleifen durch modernes '.NET' ('String.Split', 'String.Join') ersetzt.
+    ''' - Explizite Schleifenvariable ('As Integer') deklariert (Option Strict-Kompatibilität) und 'ByRef'-Verhalten abwärtskompatibel beibehalten.
+    ''' </remarks>
+    Public Function fcUmCode(ByRef sCode As String) As String
+        ' Guard Clause: Absturz bei Nothing oder leerem String vermeiden
+        If String.IsNullOrWhiteSpace(sCode) Then
+            sCode = String.Empty
+            Return String.Empty
         End If
-        fcRFIDZeit = Mid(Zeit, 1, 2) & ";" & Mid(Zeit, 3, 2)
-    End Function
 
+        ' String an Semikolons aufteilen
+        Dim aCode() As String = sCode.Split(";"c)
 
-    Function fcWeg34(ByRef sZahl As String) As String
-        Dim nZahl As Long = Val(sZahl)
-        Dim N1 As Long = 16777216 '4294967296
-        Dim N2 As Integer = 65536
-        Dim N3 As Integer = 256
-        Dim Z1 As Integer = 0
-        Dim Z2 As Integer = 0
-        Dim Z3 As Integer = 0
-        Dim Z4 As Integer = 0
-        Z1 = Int(nZahl / N1)
-        nZahl = nZahl - (Z1 * N1)
-        Z2 = Int(nZahl / N2)
-        nZahl = nZahl - (Z2 * N2)
-        Z3 = Int(nZahl / N3)
-        Z4 = nZahl - (Z3 * N3)
-        fcWeg34 = fcUmCode("0;" & Z1.ToString & ";" & Z2.ToString & ";" & Z3.ToString & ";" & Z4.ToString)
-    End Function
-
-    Sub prRFIDSI(ByRef sRFID As String)
-        Dim sRFID1 As String = ReadOneValueFromSystemDb("delRFID")
-        sRFID = sRFID & sRFID1
-        SaveOneValueInSystemDb("delRFID", sRFID)
-    End Sub
-
-    Sub prRFIDSIsend()
-        Dim sRFID1 As String = ReadOneValueFromSystemDb("RFID")   'delRFID
-        Dim aRFID() As String = Split(sRFID1, "|") 'vbCrLf)
-        Dim sT As String = ""
-        sRFID1 = ""
-        For i = 0 To aRFID.Length - 1
-            If aRFID(i).Trim <> "" Then
-                sT = aRFID(i)
-                If False = PHP.Data(aRFID(i) & "|", arIni(34)) Then
-                    sRFID1 = sRFID1 & sT & vbCrLf
-                End If
-            End If
+        ' Jeden Teilcode bereinigen und auf 3 Stellen formatieren
+        For i As Integer = 0 To aCode.Length - 1
+            aCode(i) = fcUmECode(aCode(i).Trim(), 3)
         Next
-        SaveOneValueInSystemDb("delRFID", sRFID1)
-    End Sub
 
+        ' Array sauber wieder mit Semikolon verbinden (spart das nachträgliche Abschneiden des letzten Zeichens)
+        sCode = String.Join(";", aCode)
+
+        Return sCode
+    End Function
+
+    ''' <summary>
+    ''' Formatiert einen achtstelligen Datumsstring für die RFID-Verarbeitung in vier zweistellige, semikolongetrennte Blöcke (z. B. "20261111" zu "20;26;11;11").
+    ''' </summary>
+    ''' <param name="Datum">Der achtstellige Datumsstring ohne Trennzeichen.</param>
+    ''' <returns>Den in Zweiergruppen mit Semikolon getrennten Datumsstring oder String.Empty, falls die Eingabe kürzer als 8 Zeichen ist.</returns>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation ergänzt.
+    ''' - Längen- und Null-Prüfung (Guard Clause) eingebaut, um 'ArgumentOutOfRangeException' bei zu kurzen Strings zu verhindern.
+    ''' - Veraltete VB6-Funktion 'Mid' durch modernes .NET '.Substring()' und 'String.Join()' ersetzt.
+    ''' - Veraltete Zuweisung über den Funktionsnamen durch modernes 'Return' ersetzt.
+    ''' </remarks>
+    Public Function fcRFIDDatum(ByRef Datum As String) As String
+        ' Guard Clause: Sicherstellen, dass Datum nicht Nothing ist und mindestens 8 Zeichen hat
+        If String.IsNullOrWhiteSpace(Datum) OrElse Datum.Trim().Length < 8 Then
+            Return String.Empty
+        End If
+
+        Dim sCleanDatum As String = Datum.Trim()
+
+        ' In vier 2-stellige Blöcke aufteilen und mit Semikolon verbinden
+        Return String.Join(";",
+                       sCleanDatum.Substring(0, 2),
+                       sCleanDatum.Substring(2, 2),
+                       sCleanDatum.Substring(4, 2),
+                       sCleanDatum.Substring(6, 2))
+    End Function
+
+    ''' <summary>
+    ''' Formatiert einen vierstelligen Zeitstring für die RFID-Verarbeitung in zwei zweistellige, semikolongetrennte Blöcke (z. B. "1430" zu "14;30").
+    ''' Wandelt den Sonderwert "0" vorab in den Standardwert "1200" um.
+    ''' </summary>
+    ''' <param name="Zeit">Der vierstellige Zeitstring ohne Trennzeichen (oder "0" als Standard-Fallback; wird per ByRef bei "0" auf "1200" aktualisiert).</param>
+    ''' <returns>Den in Stunden und Minuten mit Semikolon getrennten Zeitstring (z. B. "14;30") oder String.Empty bei ungültiger Länge.</returns>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation inklusive Hinweis auf den Sonderfall "0" ergänzt.
+    ''' - Null- und Längenprüfung (Guard Clause) ergänzt, um 'ArgumentOutOfRangeException' bei zu kurzen Strings zu vermeiden.
+    ''' - Veraltete VB6-Funktion 'Mid' durch modernes .NET '.Substring()' und 'Return' ersetzt.
+    ''' - Inline-Kommentare zur besseren Nachvollziehbarkeit der Sonderlogik hinzugefügt.
+    ''' </remarks>
+    Public Function fcRFIDZeit(ByRef Zeit As String) As String
+        ' Guard Clause: Prüfung auf leere Eingabe
+        If String.IsNullOrWhiteSpace(Zeit) Then
+            Return String.Empty
+        End If
+
+        Dim sCleanZeit As String = Zeit.Trim()
+
+        ' Sonderfall abfangen: "0" wird auf Standardzeit "1200" gesetzt (inkl. ByRef-Rückschreibung wie im Original)
+        If sCleanZeit = "0" Then
+            sCleanZeit = "1200"
+            Zeit = sCleanZeit
+        End If
+
+        ' Sicherstellen, dass mindestens 4 Zeichen für Stunden und Minuten vorhanden sind
+        If sCleanZeit.Length < 4 Then
+            Return String.Empty
+        End If
+
+        ' Stunden und Minuten mit Semikolon getrennt zurückgeben
+        Return $"{sCleanZeit.Substring(0, 2)};{sCleanZeit.Substring(2, 2)}"
+    End Function
+
+    ''' <summary>
+    ''' Zerlegt eine 32-Bit-Zahl (z. B. eine Wiegand-34-Bit-Kartennummer) in vier einzelne Bytes (Big-Endian)
+    ''' und formatiert diese inklusive führender "0;" über 'fcUmCode' als dreistellige, semikolongetrennte Code-Folge.
+    ''' </summary>
+    ''' <param name="sZahl">Die umzuwandelnde Ganzzahl als Zeichenkette.</param>
+    ''' <returns>Eine semikolongetrennte Zeichenkette im Format "000;BBB;BBB;BBB;BBB" oder "000;000;000;000;000" bei ungültiger Eingabe.</returns>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation ergänzt.
+    ''' - Veraltetes VB6-'Val()' und Fließkomma-Division ('Int(nZahl / N1)') durch typsicheres 'Long.TryParse' sowie exakte Ganzzahldivision ('\') und Modulo ('Mod') ersetzt.
+    ''' - Magische Zahlen (16777216, 65536, 256) durch sprechende Konstanten ersetzt.
+    ''' - String-Zusammenbau über 'String.Join' und modernes 'Return' vereinfacht.
+    ''' </remarks>
+    Public Function fcWeg34(ByRef sZahl As String) As String
+        ' Konstanten für die Byte-Zerlegung (2^24, 2^16, 2^8)
+        Const Byte3Divisor As Long = 16777216L
+        Const Byte2Divisor As Long = 65536L
+        Const Byte1Divisor As Long = 256L
+
+        Dim nZahl As Long = 0
+
+        ' Sicheres Parsen der Eingabe (falls leer oder ungültig, bleibt nZahl = 0)
+        If Not String.IsNullOrWhiteSpace(sZahl) Then
+            Long.TryParse(sZahl.Trim(), nZahl)
+        End If
+
+        ' Zahl in 4 Einzelbytes (0-255) zerlegen (exakte Ganzzahldivision '\' und Restwert 'Mod')
+        Dim z1 As Long = nZahl \ Byte3Divisor
+        nZahl = nZahl Mod Byte3Divisor
+
+        Dim z2 As Long = nZahl \ Byte2Divisor
+        nZahl = nZahl Mod Byte2Divisor
+
+        Dim z3 As Long = nZahl \ Byte1Divisor
+        Dim z4 As Long = nZahl Mod Byte1Divisor
+
+        ' Rohstring zusammenbauen und über fcUmCode auf dreistellige Blöcke formatieren
+        Dim sRawCode As String = String.Join(";", "0", z1, z2, z3, z4)
+        Return fcUmCode(sRawCode)
+    End Function
+
+
+    'Function fcWeg34(ByRef sZahl As String) As String
+    '    Dim nZahl As Long = Val(sZahl)
+    '    Dim N1 As Long = 16777216 '4294967296
+    '    Dim N2 As Integer = 65536
+    '    Dim N3 As Integer = 256
+    '    Dim Z1 As Integer = 0
+    '    Dim Z2 As Integer = 0
+    '    Dim Z3 As Integer = 0
+    '    Dim Z4 As Integer = 0
+    '    Z1 = Int(nZahl / N1)
+    '    nZahl = nZahl - (Z1 * N1)
+    '    Z2 = Int(nZahl / N2)
+    '    nZahl = nZahl - (Z2 * N2)
+    '    Z3 = Int(nZahl / N3)
+    '    Z4 = nZahl - (Z3 * N3)
+    '    fcWeg34 = fcUmCode("0;" & Z1.ToString & ";" & Z2.ToString & ";" & Z3.ToString & ";" & Z4.ToString)
+    'End Function
 
 #End Region
 
 #Region "Programm Funktionen.(Color)"
-
-    '''' <summary>
-    '''' wandelt ein RGB-String in ein Color-Objeckt um
-    '''' dim Color as Color  = fcStringRGB("192,54,34")
-    '''' </summary>
-    '''' <param name="sColorRGB"></param>
-    '''' <returns></returns>
-    '''' <remarks>
-    '''' 03.02.2012 Create
-    '''' </remarks>
-    'Public Function fcStringRGB(ByVal sColorRGB As String) As Color
-    '    If sColorRGB <> Nothing Then
-    '        Dim arT() As String = sColorRGB.Split(",")
-    '        Dim R As Integer = 0
-    '        Dim G As Integer = 0
-    '        Dim B As Integer = 0
-    '        Try
-    '            R = Val(arT(0)) : G = Val(arT(1)) : B = Val(arT(2))
-    '        Catch ex As Exception
-    '            R = 0 : G = 0 : B = 0
-    '        Finally
-    '            fcStringRGB = Color.FromArgb(R, G, B)
-    '        End Try
-    '    End If
-    'End Function
-
-
 
     ''' <summary>
     ''' Wandelt einen RGB-String (z. B. "192,54,34") in ein .NET Color-Objekt um.
@@ -2818,31 +2739,54 @@ Module moFunction
         Return Color.Empty
     End Function
 
-
-
     ''' <summary>
-    ''' wandelt ein Color-Objeckt in ein RGB-String  um
-    ''' dim srgb as string  = fcRGBstring(color.Black)  ->"0,0,0"
+    ''' Wandelt ein Color-Objekt in einen kommagetrennten RGB-String um (z. B. Color.Black zu "0,0,0").
+    ''' Liest die Farbkanäle Rot, Grün und Blau direkt aus dem Farbobjekt aus und gibt sie formatiert zurück.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="oColor">Das umzuwandelnde System.Drawing.Color-Objekt.</param>
+    ''' <returns>Ein kommagetrennter RGB-String im Format "R,G,B" (z. B. "255,128,0").</returns>
+    ''' <example>
+    ''' <code>
+    ''' Dim sRgb As String = fcRGBString(Color.Black) ' Ergibt "0,0,0"
+    ''' </code>
+    ''' </example>
     ''' <remarks>
-    ''' 03.02.2012 Create
+    ''' 03.02.2012 - Create
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Umständliches String-Parsing ('Color.ToArgb.ToString', 'Mid', 'Extract') durch direkten Zugriff auf die Eigenschaften '.R', '.G' und '.B' ersetzt.
+    ''' - Überflüssigen Try-Catch-Finally-Block entfernt, da der direkte Eigenschaftszugriff auf die Werttyp-Struktur 'Color' keine Exceptions auslöst.
+    ''' - Veraltete Zuweisung über den Funktionsnamen durch modernes 'Return' und String-Interpolation ersetzt.
+    ''' - XML-Dokumentation um fehlenden Parameter 'oColor', Rückgabewert und sauberen '&lt;example&gt;'-Block ergänzt.
     ''' </remarks>
-    Function fcRGBString(ByRef oColor As Color) As String
-        Dim sColor As String = Color.FromArgb(oColor.ToArgb).ToString
-        Dim sR As String = "0"
-        Dim sG As String = "0"
-        Dim sB As String = "0"
-        Try
-            sR = Mid(Extract(sColor, "R", ",", 1), 2)
-            sG = Mid(Extract(sColor, "G", ",", 1), 2)
-            sB = Mid(Extract(sColor, "B", "]", 1), 2)
-        Catch ex As Exception
-            sR = "0" : sG = "0" : sB = "0"
-        Finally
-            fcRGBString = sR & "," & sG & "," & sB
-        End Try
+    Public Function fcRGBString(ByRef oColor As Color) As String
+        ' Direkter Zugriff auf die RGB-Byte-Eigenschaften des Color-Objekts (ohne String-Zerlegung)
+        Return $"{oColor.R},{oColor.G},{oColor.B}"
     End Function
+
+
+    '''' <summary>
+    '''' wandelt ein Color-Objeckt in ein RGB-String  um
+    '''' dim srgb as string  = fcRGBstring(color.Black)  ->"0,0,0"
+    '''' </summary>
+    '''' <returns></returns>
+    '''' <remarks>
+    '''' 03.02.2012 Create
+    '''' </remarks>
+    'Function fcRGBString(ByRef oColor As Color) As String
+    '    Dim sColor As String = Color.FromArgb(oColor.ToArgb).ToString
+    '    Dim sR As String = "0"
+    '    Dim sG As String = "0"
+    '    Dim sB As String = "0"
+    '    Try
+    '        sR = Mid(Extract(sColor, "R", ",", 1), 2)
+    '        sG = Mid(Extract(sColor, "G", ",", 1), 2)
+    '        sB = Mid(Extract(sColor, "B", "]", 1), 2)
+    '    Catch ex As Exception
+    '        sR = "0" : sG = "0" : sB = "0"
+    '    Finally
+    '        fcRGBString = sR & "," & sG & "," & sB
+    '    End Try
+    'End Function
 
     ''' <summary>
     ''' Lädt das Farbschema aus der Konfigurationsdatei in die globalen Farbvariablen.
@@ -3078,19 +3022,88 @@ Module moFunction
         End Try
     End Function
 
+    ''' <summary>
+    ''' Prüft, ob eine übergebene Zeichenkette einer gültigen E-Mail-Adressstruktur entspricht.
+    ''' Nutzt die integrierte .NET-Validierung über 'System.Net.Mail.MailAddress' und verhindert Abstürze bei leeren Eingaben.
+    ''' </summary>
+    ''' <param name="email">Die zu überprüfende E-Mail-Adresse.</param>
+    ''' <returns><c>True</c>, wenn das Format der E-Mail-Adresse gültig ist; andernfalls <c>False</c>.</returns>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation ergänzt.
+    ''' - Guard Clause ('String.IsNullOrWhiteSpace') ergänzt, um 'ArgumentNullException' bei Nothing-Werten zu verhindern.
+    ''' - Einfache Regex-Prüfung (die z. B. "a@b" ohne Domain-Endung akzeptierte) durch standardkonforme 'System.Net.Mail.MailAddress'-Validierung ersetzt.
+    ''' - Inline-Kommentare zur besseren Wartbarkeit hinzugefügt.
+    ''' </remarks>
+    Public Function ValidateEmail(ByVal email As String) As Boolean
+        ' Guard Clause: Leere Strings oder Nothing sofort als ungültig abweisen
+        If String.IsNullOrWhiteSpace(email) Then
+            Return False
+        End If
 
-    Function ValidateEmail(ByVal email As String) As Boolean
-        Dim emailRegex As New System.Text.RegularExpressions.Regex(
-            "^(?<user>[^@]+)@(?<host>.+)$")
-        Dim emailMatch As System.Text.RegularExpressions.Match =
-           emailRegex.Match(email)
-        Return emailMatch.Success
+        Dim sCleanEmail As String = email.Trim()
+
+        ' Einfache Vorab-Prüfung auf '@' und mindestens einen Punkt im Domain-Teil
+        Dim atIndex As Integer = sCleanEmail.IndexOf("@"c)
+        If atIndex <= 0 OrElse sCleanEmail.IndexOf("."c, atIndex) <= atIndex + 1 Then
+            Return False
+        End If
+
+        ' Standardkonforme Syntax-Validierung über die .NET-Klasse MailAddress
+        Try
+            Dim mailAddr As New System.Net.Mail.MailAddress(sCleanEmail)
+            Return String.Equals(mailAddr.Address, sCleanEmail, StringComparison.OrdinalIgnoreCase)
+        Catch ex As FormatException
+            Return False
+        End Try
     End Function
+
+
+    'Function ValidateEmail(ByVal email As String) As Boolean
+    '    Dim emailRegex As New System.Text.RegularExpressions.Regex(
+    '        "^(?<user>[^@]+)@(?<host>.+)$")
+    '    Dim emailMatch As System.Text.RegularExpressions.Match =
+    '       emailRegex.Match(email)
+    '    Return emailMatch.Success
+    'End Function
+
+    ''' <summary>
+    ''' Hilfsklasse zur benutzerdefinierten Validierung von SSL/TLS-Serverzertifikaten bei Netzwerkverbindungen.
+    ''' Akzeptiert pauschal alle Zertifikate (inklusive selbstsignierter oder abgelaufener Zertifikate) ohne Fehlerprüfung.
+    ''' </summary>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation für Klasse, Methode, Parameter und Rückgabewert ergänzt.
+    ''' - Sicherheitshinweis im Kommentar ergänzt, da das pauschale Akzeptieren aller Zertifikate Man-in-the-Middle-Angriffe ermöglicht (nur für interne/lokale Test- oder geschlossene Netzwerke empfohlen).
+    ''' - Vollständige Typnamen für X509-Klassen zur besseren Übersichtlichkeit verwendet.
+    ''' </remarks>
     Public Class CertificateOverride
-        Public Function RemoteCertificateValidationCallback(ByVal sender As Object, ByVal certificate As X509Certificate, ByVal chain As X509Chain, ByVal sslPolicyErrors As Net.Security.SslPolicyErrors) As Boolean
+
+        ''' <summary>
+        ''' Rückrufmethode (Callback) für den 'ServicePointManager.ServerCertificateValidationCallback'.
+        ''' Überschreibt die Standard-Zertifikatsprüfung und gibt stets <c>True</c> zurück.
+        ''' </summary>
+        ''' <param name="sender">Das Objekt, das die Validierungsanforderung ausgelöst hat.</param>
+        ''' <param name="certificate">Das vom Remote-Server bereitgestellte X.509-Zertifikat.</param>
+        ''' <param name="chain">Die Zertifizierungskette, die dem Remote-Zertifikat zugeordnet ist.</param>
+        ''' <param name="sslPolicyErrors">Ein oder mehrere Fehler, die bei der Standardprüfung des Zertifikats festgestellt wurden.</param>
+        ''' <returns>Gibt immer <c>True</c> zurück, um das Zertifikat als gültig einzustufen.</returns>
+        Public Function RemoteCertificateValidationCallback(ByVal sender As Object,
+                                                        ByVal certificate As System.Security.Cryptography.X509Certificates.X509Certificate,
+                                                        ByVal chain As System.Security.Cryptography.X509Certificates.X509Chain,
+                                                        ByVal sslPolicyErrors As System.Net.Security.SslPolicyErrors) As Boolean
+            ' Hinweis: Deaktiviert die SSL-Zertifikatsprüfung vollständig (z. B. für lokale PHP-/Geräte-Schnittstellen)
             Return True
         End Function
+
     End Class
+
+
+    'Public Class CertificateOverride
+    '    Public Function RemoteCertificateValidationCallback(ByVal sender As Object, ByVal certificate As X509Certificate, ByVal chain As X509Chain, ByVal sslPolicyErrors As Net.Security.SslPolicyErrors) As Boolean
+    '        Return True
+    '    End Function
+    'End Class
 
     ''' <summary>
     ''' Fragt den Benutzer, ob eine Zahlungsbestätigung gesendet werden soll.
@@ -3181,118 +3194,320 @@ Module moFunction
 #End Region
 
 #Region "Programm Funktionen.(Datensicherung)"
+
     ''' <summary>
-    ''' Datensicherung
-    ''' dim fcSaveDate as string  = True /False
+    ''' Führt eine tägliche Datensicherung eines Quellordners in ein datiertes Zielverzeichnis durch und verwaltet die Aufbewahrungsanzahl.
+    ''' Prüft, ob für das heutige Datum bereits ein Backup existiert, kopiert bei Bedarf die Daten und löscht den ältesten Sicherungsordner,
+    ''' sobald die maximale Anzahl an Sicherungen (<paramref name="iMenge"/>) erreicht oder überschritten wurde.
     ''' </summary>
-    ''' <returns></returns>
+    ''' <param name="sQuelle">Der vollständige Pfad des zu sichernden Quellverzeichnisses.</param>
+    ''' <param name="sZiel">Das Basis-Zielverzeichnis, in dem die Sicherungsordner abgelegt werden.</param>
+    ''' <param name="sName">Das Namenspräfix für die Sicherungsordner (z. B. "Backup_").</param>
+    ''' <param name="iMenge">Die maximale Anzahl an vorzuhaltenden Sicherungsordnern.</param>
+    ''' <returns>Gibt <c>"True"</c> zurück, wenn die Sicherungsprüfung erfolgreich durchlaufen wurde; andernfalls <c>"False"</c> bei Fehlern oder ungültigen Pfaden.</returns>
     ''' <remarks>
-    ''' 13.06.2018 Create
+    ''' 13.06.2018 - Create
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation für alle Parameter und den Rückgabewert ergänzt.
+    ''' - Guard Clauses für Parameter und 'Directory.Exists'-Prüfung für das Quellverzeichnis ergänzt sowie 'Try-Catch'-Fehlerbehandlung eingebaut (gibt im Fehlerfall "False" zurück).
+    ''' - Umständliches Zusammenbauen und anschließendes Splitten von Ordnernamen über Strings ('sDir' / 'Split') durch direkte Verarbeitung von 'DirectoryInfo'-Objekten ersetzt.
+    ''' - Filterung auf Ordner mit passendem Präfix ('sName') ergänzt, damit fremde Unterordner im Zielverzeichnis nicht versehentlich gelöscht werden.
+    ''' - Pfadzusammensetzung über 'System.IO.Path.Combine' abgesichert und Prüfung auf 'Directory.Exists' vor dem Löschen ergänzt.
+    ''' - Explizite String-Rückgabe ("True" / "False") für Option Strict-Kompatibilität verwendet.
     ''' </remarks>
-    Function fcSaveDate(ByRef sQuelle As String, ByRef sZiel As String, ByRef sName As String, ByRef iMenge As Integer) As String
-        fcSaveDate = True
-        Dim dirPrograms As New DirectoryInfo(sZiel)
-        Dim dirs = From dir In dirPrograms.EnumerateDirectories()
-        Dim sDir As String = ""
-        For Each di As DirectoryInfo In dirs
-            sDir = sDir & ";" & di.Name
-        Next
-
-
-        'Datensicherung bei einschalten sichenungs Phath ist in der Si.ini 
-        Dim aDir As Array = Split(sDir, ";")
-        Dim sName1 As String
-        Dim sDatum As String = fcUmDatum(Date.Today.ToString)
-        Dim iZahl As Integer = 0
-        For i = 1 To aDir.Length - 1
-            If sDatum = Mid(aDir(i), sName.Length + 1) Then
-                iZahl = 1
-                Exit For
-
-            End If
-        Next
-        If iZahl = 0 Then
-            CopyFolder(sQuelle, sZiel & "\" & sName & sDatum)
+    Public Function fcSaveDate(ByRef sQuelle As String, ByRef sZiel As String, ByRef sName As String, ByRef iMenge As Integer) As String
+        ' Guard Clauses: Parameter und Existenz des Quellordners prüfen
+        If String.IsNullOrWhiteSpace(sQuelle) OrElse String.IsNullOrWhiteSpace(sZiel) OrElse sName Is Nothing Then
+            Return "False"
         End If
-        Dim sD As String = "99999999"
-        If aDir.Length >= iMenge Then
-            For i = 1 To aDir.Length - 1
-                sName1 = Mid(aDir(i), sName.Length + 1)
-                If sD > sName1 Then
-                    sD = sName1
+
+        If Not System.IO.Directory.Exists(sQuelle) Then
+            Return "False"
+        End If
+
+        Try
+            ' Zielverzeichnis anlegen, falls es noch nicht existiert
+            Dim dirZiel As New System.IO.DirectoryInfo(sZiel)
+            If Not dirZiel.Exists Then
+                dirZiel.Create()
+            End If
+
+            ' Alle vorhandenen Sicherungsordner ermitteln, die mit dem angegebenen Präfix beginnen
+            Dim lstBackupDirs As New List(Of System.IO.DirectoryInfo)()
+            For Each di As System.IO.DirectoryInfo In dirZiel.EnumerateDirectories()
+                If di.Name.StartsWith(sName, StringComparison.OrdinalIgnoreCase) Then
+                    lstBackupDirs.Add(di)
                 End If
             Next
-            Dim sDel As String = sZiel & "\" & sName & sD
-            DelFolder(sDel)
-            Directory.Delete(sDel)
+
+            ' Heutiges Datums-Suffix ermitteln
+            Dim sDatumHeute As String = fcUmDatum(Date.Today.ToString())
+            Dim sBackupOrdnerHeute As String = sName & sDatumHeute
+            Dim bHeuteVorhanden As Boolean = False
+
+            ' Prüfen, ob für heute bereits eine Sicherung existiert
+            For Each di As System.IO.DirectoryInfo In lstBackupDirs
+                If String.Equals(di.Name, sBackupOrdnerHeute, StringComparison.OrdinalIgnoreCase) Then
+                    bHeuteVorhanden = True
+                    Exit For
+                End If
+            Next
+
+            ' Falls heute noch nicht gesichert wurde: Quellordner kopieren
+            If Not bHeuteVorhanden Then
+                Dim sZielPfadHeute As String = System.IO.Path.Combine(sZiel, sBackupOrdnerHeute)
+                CopyFolder(sQuelle, sZielPfadHeute)
+
+                ' Neu erstellten Ordner für die anschließende Mengenprüfung zur Liste hinzufügen
+                If System.IO.Directory.Exists(sZielPfadHeute) Then
+                    lstBackupDirs.Add(New System.IO.DirectoryInfo(sZielPfadHeute))
+                End If
+            End If
+
+            ' Ältesten Sicherungsordner löschen, falls die maximale Anzahl (iMenge) überschritten wurde
+            If iMenge > 0 AndAlso lstBackupDirs.Count > iMenge Then
+                Dim sAeltestesDatum As String = "99999999"
+                Dim dirAeltestes As System.IO.DirectoryInfo = Nothing
+
+                For Each di As System.IO.DirectoryInfo In lstBackupDirs
+                    If di.Name.Length > sName.Length Then
+                        Dim sOrdnerDatum As String = di.Name.Substring(sName.Length)
+                        If String.CompareOrdinal(sAeltestesDatum, sOrdnerDatum) > 0 Then
+                            sAeltestesDatum = sOrdnerDatum
+                            dirAeltestes = di
+                        End If
+                    End If
+                Next
+
+                ' Gefundenen ältesten Ordner sicher entfernen
+                If dirAeltestes IsNot Nothing AndAlso dirAeltestes.Exists Then
+                    DelFolder(dirAeltestes.FullName)
+                    If System.IO.Directory.Exists(dirAeltestes.FullName) Then
+                        System.IO.Directory.Delete(dirAeltestes.FullName, True)
+                    End If
+                End If
+            End If
+
+            Return "True"
+
+        Catch ex As Exception
+            Return "False"
+        End Try
+    End Function
+
+
+    '''' <summary>
+    '''' Datensicherung
+    '''' dim fcSaveDate as string  = True /False
+    '''' </summary>
+    '''' <returns></returns>
+    '''' <remarks>
+    '''' 13.06.2018 Create
+    '''' </remarks>
+    'Function fcSaveDate(ByRef sQuelle As String, ByRef sZiel As String, ByRef sName As String, ByRef iMenge As Integer) As String
+    '    fcSaveDate = True
+    '    Dim dirPrograms As New DirectoryInfo(sZiel)
+    '    Dim dirs = From dir In dirPrograms.EnumerateDirectories()
+    '    Dim sDir As String = ""
+    '    For Each di As DirectoryInfo In dirs
+    '        sDir = sDir & ";" & di.Name
+    '    Next
+
+
+    '    'Datensicherung bei einschalten sichenungs Phath ist in der Si.ini 
+    '    Dim aDir As Array = Split(sDir, ";")
+    '    Dim sName1 As String
+    '    Dim sDatum As String = fcUmDatum(Date.Today.ToString)
+    '    Dim iZahl As Integer = 0
+    '    For i = 1 To aDir.Length - 1
+    '        If sDatum = Mid(aDir(i), sName.Length + 1) Then
+    '            iZahl = 1
+    '            Exit For
+
+    '        End If
+    '    Next
+    '    If iZahl = 0 Then
+    '        CopyFolder(sQuelle, sZiel & "\" & sName & sDatum)
+    '    End If
+    '    Dim sD As String = "99999999"
+    '    If aDir.Length >= iMenge Then
+    '        For i = 1 To aDir.Length - 1
+    '            sName1 = Mid(aDir(i), sName.Length + 1)
+    '            If sD > sName1 Then
+    '                sD = sName1
+    '            End If
+    '        Next
+    '        Dim sDel As String = sZiel & "\" & sName & sD
+    '        DelFolder(sDel)
+    '        Directory.Delete(sDel)
+    '    End If
+
+
+
+
+
+    'End Function
+
+    ''' <summary>
+    ''' Löscht den gesamten Inhalt eines Verzeichnisses (alle Dateien sowie rekursiv alle Unterordner),
+    ''' lässt jedoch das angegebene Basis-Verzeichnis (<paramref name="sSrcPath"/>) selbst leer bestehen.
+    ''' </summary>
+    ''' <param name="sSrcPath">Der vollständige Pfad des zu leerenden Verzeichnisses.</param>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Veralteten/kopierten Zeilenkommentar durch vollständige XML-Dokumentation ersetzt.
+    ''' - Guard Clauses ('String.IsNullOrWhiteSpace' und 'Directory.Exists') ergänzt, um 'DirectoryNotFoundException' bei nicht vorhandenen Pfaden zu verhindern.
+    ''' - Schreibschutz-Attribute ('FileAttributes.ReadOnly') vor dem Löschen entfernt, damit Dateien nicht mit 'UnauthorizedAccessException' abbrechen.
+    ''' - 'For Each'-Schleifen statt indexbasierter Schleifen für bessere Lesbarkeit verwendet.
+    ''' - Inline-Kommentare zur besseren Wartbarkeit hinzugefügt.
+    ''' </remarks>
+    Public Sub DelFolder(ByVal sSrcPath As String)
+        ' Guard Clauses: Abbruch bei ungültigem oder nicht vorhandenem Pfad
+        If String.IsNullOrWhiteSpace(sSrcPath) OrElse Not System.IO.Directory.Exists(sSrcPath) Then
+            Exit Sub
         End If
 
+        ' 1. Alle Dateien im aktuellen Ordner löschen
+        For Each sFile As String In System.IO.Directory.GetFiles(sSrcPath)
+            ' Schreibschutz entfernen, falls gesetzt, um Zugriffsfehler zu vermeiden
+            Dim attributes As System.IO.FileAttributes = System.IO.File.GetAttributes(sFile)
+            If (attributes And System.IO.FileAttributes.ReadOnly) = System.IO.FileAttributes.ReadOnly Then
+                System.IO.File.SetAttributes(sFile, attributes And Not System.IO.FileAttributes.ReadOnly)
+            End If
 
+            System.IO.File.Delete(sFile)
+        Next
 
-
-
-    End Function
-    ' Gesamten Inhalt eines Ordners kopieren
-    Public Sub DelFolder(ByVal sSrcPath As String)
-
-        ' zunächst alle Dateien des Quell-Ordners ermitteln
-        ' und del
-        Dim sFiles() As String = System.IO.Directory.GetFiles(sSrcPath)
-        Dim sFile As String
-        For i As Integer = 0 To sFiles.Length - 1
-            sFile = sFiles(i)
-            File.Delete(sFile)
-        Next i
-
-
-        '    ' jetzt alle Unterordner ermitteln und die delFolder-Funktion
-        '    ' rekursiv aufrufen
-        Dim sDirs() As String = System.IO.Directory.GetDirectories(sSrcPath)
-        Dim sDir As String
-        For i As Integer = 0 To sDirs.Length - 1
-            sDir = sDirs(i)
-            '   sDir = sDirs(i).Substring(sDirs(i).LastIndexOf("\") + 1)
-            DelFolder(sDirs(i))
-
-            Directory.Delete(sDirs(i))
-        Next i
-
+        ' 2. Alle Unterordner rekursiv leeren und anschließend selbst entfernen
+        For Each sDir As String In System.IO.Directory.GetDirectories(sSrcPath)
+            DelFolder(sDir)
+            System.IO.Directory.Delete(sDir, False)
+        Next
     End Sub
-    ' Gesamten Inhalt eines Ordners kopieren
-    Public Sub CopyFolder(ByVal sSrcPath As String, ByVal sDestPath As String, Optional ByVal bSubFolder As Boolean = True, Optional ByVal bOverWrite As Boolean = True)
 
-        ' Falls Zielordner nicht existiert, jetzt erstellen
+    '' Gesamten Inhalt eines Ordners kopieren
+    'Public Sub DelFolder(ByVal sSrcPath As String)
+
+    '    ' zunächst alle Dateien des Quell-Ordners ermitteln
+    '    ' und del
+    '    Dim sFiles() As String = System.IO.Directory.GetFiles(sSrcPath)
+    '    Dim sFile As String
+    '    For i As Integer = 0 To sFiles.Length - 1
+    '        sFile = sFiles(i)
+    '        File.Delete(sFile)
+    '    Next i
+
+
+    '    '    ' jetzt alle Unterordner ermitteln und die delFolder-Funktion
+    '    '    ' rekursiv aufrufen
+    '    Dim sDirs() As String = System.IO.Directory.GetDirectories(sSrcPath)
+    '    Dim sDir As String
+    '    For i As Integer = 0 To sDirs.Length - 1
+    '        sDir = sDirs(i)
+    '        '   sDir = sDirs(i).Substring(sDirs(i).LastIndexOf("\") + 1)
+    '        DelFolder(sDirs(i))
+
+    '        Directory.Delete(sDirs(i))
+    '    Next i
+
+    'End Sub
+
+    ''' <summary>
+    ''' Kopiert den gesamten Inhalt eines Quellverzeichnisses in ein Zielverzeichnis.
+    ''' Unterstützt das optionale rekursive Mitkopieren von Unterordnern sowie das Überschreiben bestehender Zieldateien.
+    ''' </summary>
+    ''' <param name="sSrcPath">Der vollständige Pfad des Quellverzeichnisses.</param>
+    ''' <param name="sDestPath">Der vollständige Pfad des Zielverzeichnisses (wird erstellt, falls nicht vorhanden).</param>
+    ''' <param name="bSubFolder">Optional: Gibt an, ob Unterordner ebenfalls rekursiv kopiert werden sollen (Standard: <c>True</c>).</param>
+    ''' <param name="bOverWrite">Optional: Gibt an, ob bereits vorhandene Dateien im Zielordner überschrieben werden sollen (Standard: <c>True</c>).</param>
+    ''' <remarks>
+    ''' 11.11.2026 - Code-Optimierung:
+    ''' - Vollständige XML-Dokumentation inklusive aller optionalen Parameter ergänzt.
+    ''' - Guard Clauses für Parameter und 'Directory.Exists(sSrcPath)' ergänzt, um Abstürze bei ungültigen Quellpfaden zu vermeiden.
+    ''' - Fehleranfälliges String-Slicing ('Substring(LastIndexOf("\"))') und Pfad-Verkettungen ('&amp; "\" &amp;') durch 'System.IO.Path.GetFileName' und 'System.IO.Path.Combine' ersetzt.
+    ''' - Endlosschleifen-Schutz beim Kopieren in ein Unterverzeichnis des Quellordners durch normalisierten Pfadvergleich ('Path.GetFullPath') abgesichert.
+    ''' - 'For Each'-Schleifen und 'OrElse' (Short-Circuit-Evaluation) verwendet.
+    ''' </remarks>
+    Public Sub CopyFolder(ByVal sSrcPath As String, ByVal sDestPath As String, Optional ByVal bSubFolder As Boolean = True, Optional ByVal bOverWrite As Boolean = True)
+        ' Guard Clauses: Parameter und Existenz des Quellordners prüfen
+        If String.IsNullOrWhiteSpace(sSrcPath) OrElse String.IsNullOrWhiteSpace(sDestPath) Then
+            Exit Sub
+        End If
+
+        If Not System.IO.Directory.Exists(sSrcPath) Then
+            Exit Sub
+        End If
+
+        ' Zielordner erstellen, falls er noch nicht existiert
         If Not System.IO.Directory.Exists(sDestPath) Then
             System.IO.Directory.CreateDirectory(sDestPath)
         End If
 
-        ' zunächst alle Dateien des Quell-Ordners ermitteln
-        ' und kopieren
-        Dim sFiles() As String = System.IO.Directory.GetFiles(sSrcPath)
-        Dim sFile As String
-        For i As Integer = 0 To sFiles.Length - 1
-            ' Falls Datei im Zielordner bereits existiert, nur 
-            ' kopieren, wenn Parameter "bOverWrite" auf True 
-            ' festgelegt ist
-            sFile = sFiles(i).Substring(sFiles(i).LastIndexOf("\") + 1)
-            If bOverWrite Or Not System.IO.File.Exists(sDestPath & "\" & sFile) Then
-                System.IO.File.Copy(sFiles(i), sDestPath & "\" & sFile, True)
-            End If
-        Next i
+        ' 1. Alle Dateien des Quellordners ermitteln und kopieren
+        For Each sSourceFile As String In System.IO.Directory.GetFiles(sSrcPath)
+            Dim sFileName As String = System.IO.Path.GetFileName(sSourceFile)
+            Dim sDestFile As String = System.IO.Path.Combine(sDestPath, sFileName)
 
+            ' Kopieren, wenn Überschreiben erlaubt ist oder die Zieldatei noch nicht existiert
+            If bOverWrite OrElse Not System.IO.File.Exists(sDestFile) Then
+                System.IO.File.Copy(sSourceFile, sDestFile, bOverWrite)
+            End If
+        Next
+
+        ' 2. Optional alle Unterordner rekursiv kopieren
         If bSubFolder Then
-            ' jetzt alle Unterordner ermitteln und die CopyFolder-Funktion
-            ' rekursiv aufrufen
-            Dim sDirs() As String = System.IO.Directory.GetDirectories(sSrcPath)
-            Dim sDir As String
-            For i As Integer = 0 To sDirs.Length - 1
-                If sDirs(i) <> sDestPath Then
-                    sDir = sDirs(i).Substring(sDirs(i).LastIndexOf("\") + 1)
-                    CopyFolder(sDirs(i), sDestPath & "\" & sDir, True, bOverWrite)
+            ' Normalisierten Zielpfad für sicheren Vergleich ermitteln (verhindert Endlosrekursion)
+            Dim sNormalizedDest As String = System.IO.Path.GetFullPath(sDestPath).TrimEnd("\"c, "/"c)
+
+            For Each sSourceDir As String In System.IO.Directory.GetDirectories(sSrcPath)
+                Dim sNormalizedCurrentDir As String = System.IO.Path.GetFullPath(sSourceDir).TrimEnd("\"c, "/"c)
+
+                If Not String.Equals(sNormalizedCurrentDir, sNormalizedDest, StringComparison.OrdinalIgnoreCase) Then
+                    Dim sDirName As String = System.IO.Path.GetFileName(sSourceDir)
+                    Dim sNewDestDir As String = System.IO.Path.Combine(sDestPath, sDirName)
+
+                    CopyFolder(sSourceDir, sNewDestDir, True, bOverWrite)
                 End If
-            Next i
+            Next
         End If
     End Sub
+
+
+    '' Gesamten Inhalt eines Ordners kopieren
+    'Public Sub CopyFolder(ByVal sSrcPath As String, ByVal sDestPath As String, Optional ByVal bSubFolder As Boolean = True, Optional ByVal bOverWrite As Boolean = True)
+
+    '    ' Falls Zielordner nicht existiert, jetzt erstellen
+    '    If Not System.IO.Directory.Exists(sDestPath) Then
+    '        System.IO.Directory.CreateDirectory(sDestPath)
+    '    End If
+
+    '    ' zunächst alle Dateien des Quell-Ordners ermitteln
+    '    ' und kopieren
+    '    Dim sFiles() As String = System.IO.Directory.GetFiles(sSrcPath)
+    '    Dim sFile As String
+    '    For i As Integer = 0 To sFiles.Length - 1
+    '        ' Falls Datei im Zielordner bereits existiert, nur 
+    '        ' kopieren, wenn Parameter "bOverWrite" auf True 
+    '        ' festgelegt ist
+    '        sFile = sFiles(i).Substring(sFiles(i).LastIndexOf("\") + 1)
+    '        If bOverWrite Or Not System.IO.File.Exists(sDestPath & "\" & sFile) Then
+    '            System.IO.File.Copy(sFiles(i), sDestPath & "\" & sFile, True)
+    '        End If
+    '    Next i
+
+    '    If bSubFolder Then
+    '        ' jetzt alle Unterordner ermitteln und die CopyFolder-Funktion
+    '        ' rekursiv aufrufen
+    '        Dim sDirs() As String = System.IO.Directory.GetDirectories(sSrcPath)
+    '        Dim sDir As String
+    '        For i As Integer = 0 To sDirs.Length - 1
+    '            If sDirs(i) <> sDestPath Then
+    '                sDir = sDirs(i).Substring(sDirs(i).LastIndexOf("\") + 1)
+    '                CopyFolder(sDirs(i), sDestPath & "\" & sDir, True, bOverWrite)
+    '            End If
+    '        Next i
+    '    End If
+    'End Sub
 
 #End Region
 

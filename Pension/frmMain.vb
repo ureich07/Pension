@@ -1,4 +1,5 @@
 ﻿Imports System.Text
+Imports System.IO
 
 Public Class frmMain
     Dim lClick As Boolean
@@ -64,6 +65,7 @@ Public Class frmMain
         prColorRead()
         prSetTabelleBuchung(dtZim)
         prLadeBuchung(dtBuc)
+        LadeKAnreisePlatzhalter()
 
         ' 5. Berechtigungen standardmäßig einschränken (Freigabe erfolgt meist nach Login)
         tsbSystem.Enabled = False
@@ -1370,28 +1372,28 @@ Public Class frmMain
         lGesp = False
     End Sub
 
-    ''' <summary>
-    ''' Koordinaten (XY) beim Drücken der Maustaste (Reihe/Spalte) ermitteln
-    ''' </summary>
-    ''' <param name="sender">Das auslösende Objekt.</param>
-    ''' <param name="e">Die Ereignisdaten mit den Zellkoordinaten.</param>
-    ''' <remarks>
-    ''' 12.01.2012 Create
-    ''' 25.09.2026: Fehler bei Header-Klicks (-1) behoben
-    ''' </remarks>
-    Private Sub dgBuchung_CellMouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgBuchung.CellMouseDown
-        ' Sicherstellen, dass nicht auf einen Header (Index -1) geklickt wurde
-        If e.RowIndex >= 0 AndAlso e.ColumnIndex >= 0 Then
-            arX(0) = e.RowIndex
-            arX(1) = e.ColumnIndex
+    '''' <summary>
+    '''' Koordinaten (XY) beim Drücken der Maustaste (Reihe/Spalte) ermitteln
+    '''' </summary>
+    '''' <param name="sender">Das auslösende Objekt.</param>
+    '''' <param name="e">Die Ereignisdaten mit den Zellkoordinaten.</param>
+    '''' <remarks>
+    '''' 12.01.2012 Create
+    '''' 25.09.2026: Fehler bei Header-Klicks (-1) behoben
+    '''' </remarks>
+    'Private Sub dgBuchung_CellMouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgBuchung.CellMouseDown
+    '    ' Sicherstellen, dass nicht auf einen Header (Index -1) geklickt wurde
+    '    If e.RowIndex >= 0 AndAlso e.ColumnIndex >= 0 Then
+    '        arX(0) = e.RowIndex
+    '        arX(1) = e.ColumnIndex
 
-            ' Prüfen, ob die linke Maustaste gedrückt wurde
-            If e.Button = Windows.Forms.MouseButtons.Left Then
-                arX(4) = arX(0)
-                arX(5) = arX(1)
-            End If
-        End If
-    End Sub
+    '        ' Prüfen, ob die linke Maustaste gedrückt wurde
+    '        If e.Button = Windows.Forms.MouseButtons.Left Then
+    '            arX(4) = arX(0)
+    '            arX(5) = arX(1)
+    '        End If
+    '    End If
+    'End Sub
 
     ''' <summary>
     ''' Koordinaten (XY) beim Loslassen der Maustaste (Spalte/Reihe) ermitteln
@@ -2029,36 +2031,200 @@ Public Class frmMain
     End Sub
 
     ''' <summary>
-    ''' Bei Rechtsklick Buchungstext und Makrotext der Reservierung anzeigen
+    ''' Verhindert das Öffnen des Kontextmenüs bei einem Rechtsklick auf Kopfzeilen oder die ersten beiden sichtbaren Spalten.
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+    ''' <param name="sender">Das auslösende ContextMenuStrip.</param>
+    ''' <param name="e">Die Ereignisdaten zum Abbrechen des Öffnens.</param>
     ''' <remarks>
-    ''' 01.04.2012 Create
+    ''' 17.11.2026 - Create: Kontextmenü für die ersten beiden sichtbaren Spalten und Header-Bereiche gesperrt.
     ''' </remarks>
-    Private Sub dgBuchung_CellMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgBuchung.CellMouseClick
-        If e.Button = Windows.Forms.MouseButtons.Right Then
-            If e.ColumnIndex > 1 And e.RowIndex > -1 Then
-                Dim sTmp As String
-                Dim sBNr As String = dgBuchung.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
-                sBNr = Extract(sBNr, "(", ")", 1)
-                If sBNr <> "" Then
-                    Dim sSQL As String = "Select * From Buchung Where BID='" & sBNr & "'"
-                    Dim dt As DataTable = fcReadDataTable(sSQL)
-                    sTmp = dt.Rows(0).Item("BText").ToString '& vbCrLf
-                    Dim dtB As DataTable = fcReadDataTable("Select * from BTexte Where ID='" & sTmp & "'")
-                    If dtB.Rows.Count <> 0 Then
-                        sTmp = dtB.Rows(0).Item(3).ToString & vbCrLf & vbCrLf
-                    Else
-                        sTmp = ""
-                    End If
-                    sTmp = sTmp & dt.Rows(0).Item("MText").ToString & vbCrLf
+    Private Sub cmMain_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles cmMain.Opening
+        ' Mausposition in Grid-Koordinaten umrechnen
+        Dim mausPos As Point = dgBuchung.PointToClient(Cursor.Position)
+        Dim hit As DataGridView.HitTestInfo = dgBuchung.HitTest(mausPos.X, mausPos.Y)
 
-                    If sTmp.Trim = "" Then Exit Sub
-                    MsgBox(sTmp, MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Buchnungstext zur Buchung: " & sBNr)
+        ' Kontextmenü abbrechen, wenn nicht auf eine gültige Datenzelle geklickt wurde
+        If hit.Type <> DataGridViewHitTestType.Cell OrElse hit.RowIndex < 0 OrElse hit.ColumnIndex < 0 Then
+            e.Cancel = True
+            Return
+        End If
+
+        ' Prüfen, ob es sich um eine der ersten beiden sichtbaren Spalten handelt
+        Dim sichtbareSpaltenDavor As Integer = 0
+        Dim geklickteSpalte As DataGridViewColumn = dgBuchung.Columns(hit.ColumnIndex)
+
+        For Each col As DataGridViewColumn In dgBuchung.Columns
+            If col.Visible AndAlso col.DisplayIndex < geklickteSpalte.DisplayIndex Then
+                sichtbareSpaltenDavor += 1
+            End If
+        Next
+
+        ' Bei der 1. (0 davor) oder 2. (1 davor) sichtbaren Spalte das Öffnen abbrechen
+        If sichtbareSpaltenDavor < 2 Then
+            e.Cancel = True
+        End If
+    End Sub
+
+
+    ''' <summary>
+    ''' Verarbeitet Mausklicks (Drücken der Maustaste) in der Buchungstabelle.
+    ''' Ermittelt die angeklickten Zellkoordinaten (Reihe/Spalte) für das Array 'arX'.
+    ''' Füllt bei einem Linksklick auf die erste Spalte (Index 0) alle leeren Zellen der Zeile mit "k.A.".
+    ''' Zeigt bei einem Rechtsklick auf eine Buchungszelle (ab Spalte 2, nicht in Spalte 0 und 1) den zugehörigen Buchungs- und Makrotext in einem Meldungsfenster an.
+    ''' </summary>
+    ''' <param name="sender">Das auslösende Objekt (DataGridView).</param>
+    ''' <param name="e">Die Mausereignisdaten mit Maustaste sowie Zeilen- und Spaltenkoordinaten.</param>
+    ''' <remarks>
+    ''' 12.01.2012 - Create (Koordinatenermittlung 'arX')
+    ''' 01.04.2012 - Create (Buchungstext-Anzeige bei Rechtsklick)
+    ''' 25.09.2026 - Fehler bei Header-Klicks (-1) behoben.
+    ''' 17.11.2026 - Zusammenführung und Code-Optimierung:
+    ''' - 'CellMouseClick' und 'CellMouseDown' in einer zentralen 'CellMouseDown'-Methode vereint, da Rechtsklicks im DataGridView bei 'CellMouseClick' unterdrückt werden können.
+    ''' - Linksklick-Logik für Spalte 0 ergänzt: Leere Zellen der jeweiligen Zeile werden automatisch mit "k.A." befüllt.
+    ''' - Rechtsklick-Logik strikt auf Spalten ab Index 2 beschränkt (Spalte 0 und 1 werden ignoriert).
+    ''' - Null-Sicherheit beim Auslesen der Zellenwerte ('Convert.ToString') sowie beim Zugriff auf 'DataTable'-Zeilen ergänzt.
+    ''' </remarks>
+    Private Sub dgBuchung_CellMouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgBuchung.CellMouseDown
+        ' Klicks auf Spalten- oder Zeilenköpfe (Index -1) ignorieren
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+
+        ' Aktuelle Zellkoordinaten sichern
+        arX(0) = e.RowIndex
+        arX(1) = e.ColumnIndex
+
+        Select Case e.Button
+            Case Windows.Forms.MouseButtons.Left
+                ' Startkoordinaten für Linksklick merken
+                arX(4) = arX(0)
+                arX(5) = arX(1)
+
+                ' Bei Linksklick auf die erste Spalte (Index 0) leere Zellen der Zeile mit "k.A." füllen
+                If e.ColumnIndex = 0 Then
+                    TogglePlatzhalterInZeile(dgBuchung.Rows(e.RowIndex), "k.A.")
+                    'FuelleLeereZellenInZeile(dgBuchung.Rows(e.RowIndex), "k.A.")
+                End If
+
+
+        End Select
+    End Sub
+
+    ''' <summary>
+    ''' Schaltet den angegebenen Platzhaltertext in einer DataGridView-Zeile um.
+    ''' Entfernt den Platzhalter aus allen Zellen der Zeile, falls er bereits vorhanden ist; trägt ihn andernfalls in alle leeren Zellen ein.
+    ''' </summary>
+    ''' <param name="row">Die zu bearbeitende Tabellenzeile.</param>
+    ''' <param name="platzhalterText">Der umzuschaltende Text (z. B. "k.A.").</param>
+    Private Sub TogglePlatzhalterInZeile(ByVal row As DataGridViewRow, ByVal platzhalterText As String)
+        ' Neue, noch nicht gespeicherte Eingabezeile (NewRow) überspringen
+        If row Is Nothing OrElse row.IsNewRow Then Return
+
+        ' 1. Schritt: Prüfen, ob der Platzhalter in dieser Zeile bereits mindestens einmal vorkommt
+        Dim platzhalterVorhanden As Boolean = False
+        For Each cell As DataGridViewCell In row.Cells
+            Dim wert As String = Convert.ToString(cell.Value).Trim()
+            If String.Equals(wert, platzhalterText, StringComparison.OrdinalIgnoreCase) Then
+                platzhalterVorhanden = True
+                Exit For
+            End If
+        Next
+
+        ' 2. Zellen der Zeile aktualisieren (Spalte 0 enthält das Datum und wird nicht überschrieben)
+        SetzeOderEntfernePlatzhalterInZeile(row, platzhalterText, Not platzhalterVorhanden)
+
+        ' 3. Datum aus Spalte 0 auslesen und in "K_Anreise.txt" eintragen bzw. daraus löschen
+        Dim datumSchluessel As String = moFunction.fcUmDatum(row.Cells(0).Value)
+        If Not String.IsNullOrWhiteSpace(datumSchluessel) Then
+            AktualisiereKAnreiseDatei(datumSchluessel, Not platzhalterVorhanden)
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Setzt den Platzhalter in alle leeren Zellen der Zeile oder entfernt ihn wieder.
+    ''' Spalte 0 (Datumsspalte) bleibt dabei unverändert.
+    ''' </summary>
+    Private Sub SetzeOderEntfernePlatzhalterInZeile(ByVal row As DataGridViewRow, ByVal platzhalterText As String, ByVal eintragen As Boolean)
+        For Each cell As DataGridViewCell In row.Cells
+            ' Spalte 0 enthält das Datum und soll nicht verändert werden
+            If cell.ColumnIndex = 0 Then Continue For
+            Dim aktuellerWert As String = Convert.ToString(cell.Value).Trim()
+
+            If eintragen Then
+                If String.IsNullOrWhiteSpace(aktuellerWert) Then
+                    cell.Value = platzhalterText
+                End If
+            Else
+                If String.Equals(aktuellerWert, platzhalterText, StringComparison.OrdinalIgnoreCase) Then
+                    cell.Value = String.Empty
                 End If
             End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Fügt ein Datum (jjjjmmtt) zur Datei "K_Anreise.txt" hinzu oder entfernt es daraus.
+    ''' </summary>
+    ''' <param name="datumJJJJMMTT">Das formatierte Datum (z. B. "20261117").</param>
+    ''' <param name="hinzufuegen">True = in Datei schreiben; False = aus Datei löschen.</param>
+    Private Sub AktualisiereKAnreiseDatei(ByVal datumJJJJMMTT As String, ByVal hinzufuegen As Boolean)
+        Dim dateiPfad As String = Path.Combine(cgPfad, "K_Anreise.txt")
+        Dim eintraege As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+
+        ' Bestehende Einträge einlesen, falls die Datei bereits existiert
+        If System.IO.File.Exists(dateiPfad) Then
+            For Each zeile As String In System.IO.File.ReadAllLines(dateiPfad)
+                Dim bereinigt As String = zeile.Trim()
+                If Not String.IsNullOrWhiteSpace(bereinigt) Then
+                    eintraege.Add(bereinigt)
+                End If
+            Next
         End If
+
+        ' Eintrag hinzufügen oder entfernen
+        If hinzufuegen Then
+            eintraege.Add(datumJJJJMMTT)
+        Else
+            eintraege.Remove(datumJJJJMMTT)
+        End If
+
+        ' Sortiert zurück in die Datei schreiben (UTF-8)
+        Dim sortierteListe As List(Of String) = eintraege.ToList()
+        sortierteListe.Sort()
+        System.IO.File.WriteAllLines(dateiPfad, sortierteListe)
+    End Sub
+
+    ''' <summary>
+    ''' Liest beim Starten bzw. nach dem Laden der Tabelle die Datei "K_Anreise.txt" aus
+    ''' und füllt alle passenden Zeilen in 'dgBuchung' automatisch mit "k.A.".
+    ''' </summary>
+    ''' <remarks>
+    ''' 17.11.2026 - Create: Wiederherstellung gespeicherter "k.A."-Zeilen anhand von "K_Anreise.txt".
+    ''' </remarks>
+    Public Sub LadeKAnreisePlatzhalter()
+        ' IP.ini einlesen und auswerten
+        Dim dateiPfad As String = Path.Combine(cgPfad, "K_Anreise.txt")
+
+        If Not System.IO.File.Exists(dateiPfad) Then Return
+
+        ' Alle gespeicherten Daten (jjjjmmtt) in ein schnelles Such-Set laden
+        Dim gespeicherteDaten As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+        For Each zeile As String In System.IO.File.ReadAllLines(dateiPfad)
+            Dim bereinigt As String = zeile.Trim()
+            If Not String.IsNullOrWhiteSpace(bereinigt) Then
+                gespeicherteDaten.Add(bereinigt)
+            End If
+        Next
+
+        If gespeicherteDaten.Count = 0 Then Return
+
+        ' Alle Zeilen im Grid prüfen und bei Treffer mit "k.A." füllen
+        For Each row As DataGridViewRow In dgBuchung.Rows
+            If row.IsNewRow Then Continue For
+
+            Dim datumSchluessel As String = moFunction.fcUmDatum(row.Cells(0).Value)
+            If Not String.IsNullOrWhiteSpace(datumSchluessel) AndAlso gespeicherteDaten.Contains(datumSchluessel) Then
+                SetzeOderEntfernePlatzhalterInZeile(row, "k.A.", True)
+            End If
+        Next
     End Sub
 
     ''' <summary>
@@ -2496,5 +2662,6 @@ Public Class frmMain
         ' Stoppt den Timer, um eine wiederholte Ausführung zu verhindern
         tiWait.Enabled = False
     End Sub
+
 
 End Class

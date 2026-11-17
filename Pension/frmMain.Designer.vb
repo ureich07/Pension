@@ -152,7 +152,7 @@ Partial Class frmMain
         Me.cmMain.ImageScalingSize = New System.Drawing.Size(20, 20)
         Me.cmMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmNew, Me.tsS1, Me.tsmEdit, Me.tsS2, Me.tsmCopy, Me.tscBuchnung, Me.tsmInset, Me.ToolStripSeparator15, Me.tsmGesperrt, Me.ToolStripSeparator13, Me.tsmDelete, Me.tsmInfo, Me.ToolStripSeparator17, Me.tstAnreise, Me.tstEnd, Me.tsS3, Me.ToolStripSeparator16, Me.tsmDruckAnAb, Me.ToolStripSeparator4, Me.tscCheckin, Me.ToolStripSeparator11, Me.tsmChekin1, Me.tsmCheckin2, Me.tsmCheckin3, Me.tsmCheckin4, Me.tsmCheckin5, Me.tsmChekinNew})
         Me.cmMain.Name = "cmMain"
-        Me.cmMain.Size = New System.Drawing.Size(261, 465)
+        Me.cmMain.Size = New System.Drawing.Size(261, 487)
         '
         'tsmNew
         '
@@ -774,43 +774,43 @@ Partial Class frmMain
         'tsmSystem
         '
         Me.tsmSystem.Name = "tsmSystem"
-        Me.tsmSystem.Size = New System.Drawing.Size(180, 22)
+        Me.tsmSystem.Size = New System.Drawing.Size(125, 22)
         Me.tsmSystem.Text = "Anpassen"
         '
         'ToolStripSeparator12
         '
         Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
-        Me.ToolStripSeparator12.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator12.Size = New System.Drawing.Size(122, 6)
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DatenKontrolleToolStripMenuItem, Me.IDKundeBuchung, Me.ServerFehlerToolStripMenuItem, Me.IniToolStripMenuItem})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(125, 22)
         Me.ToolStripMenuItem1.Text = "Database"
         '
         'DatenKontrolleToolStripMenuItem
         '
         Me.DatenKontrolleToolStripMenuItem.Name = "DatenKontrolleToolStripMenuItem"
-        Me.DatenKontrolleToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.DatenKontrolleToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.DatenKontrolleToolStripMenuItem.Text = "Kunden doppelt"
         '
         'IDKundeBuchung
         '
         Me.IDKundeBuchung.Name = "IDKundeBuchung"
-        Me.IDKundeBuchung.Size = New System.Drawing.Size(180, 22)
+        Me.IDKundeBuchung.Size = New System.Drawing.Size(169, 22)
         Me.IDKundeBuchung.Text = "Kunde->Buchung"
         '
         'ServerFehlerToolStripMenuItem
         '
         Me.ServerFehlerToolStripMenuItem.Name = "ServerFehlerToolStripMenuItem"
-        Me.ServerFehlerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ServerFehlerToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.ServerFehlerToolStripMenuItem.Text = "Server Fehler"
         '
         'IniToolStripMenuItem
         '
         Me.IniToolStripMenuItem.Name = "IniToolStripMenuItem"
-        Me.IniToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.IniToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.IniToolStripMenuItem.Text = "INI-Datei"
         '
         'tsVersion
