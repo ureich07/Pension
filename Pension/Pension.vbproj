@@ -157,6 +157,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Vorlagen.Designer.vb">
+      <DependentUpon>Vorlagen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Vorlagen.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmAnzahlung.Designer.vb">
       <DependentUpon>frmAnzahlung.vb</DependentUpon>
     </Compile>
@@ -326,6 +332,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Vorlagen.resx">
+      <DependentUpon>Vorlagen.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmAnzahlung.resx">
       <DependentUpon>frmAnzahlung.vb</DependentUpon>
     </EmbeddedResource>

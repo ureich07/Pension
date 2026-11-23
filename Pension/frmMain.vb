@@ -2663,5 +2663,7 @@ Public Class frmMain
         tiWait.Enabled = False
     End Sub
 
-
+    Private Sub tsbVorlagen_Click(sender As Object, e As EventArgs) Handles tsbVorlagen.Click
+        frmVorlagen.Show()
+    End Sub
 End Class

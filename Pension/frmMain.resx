@@ -295,16 +295,16 @@
   <data name="tsbSuchen.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIpSURBVDhPlZLNS9NxHMffO0RQKFREf0BFRYcuHT0EFURC
-        B72EEYGHDnaQZkpD07IkS9HUCCKwtNqWLZ8S2kKZaGlC0+yg+YSKWSLW3MactuoVv22gmz3QC7637+v9
-        efh+pb+Qn+8wlz/una6w91PrnKLG6vHnXbJVS9ouaUPi/Tgqqtx1E7M+5sLgWYb2r9ATgEcDQc5bGoYk
-        7ZG0MdGLUFnZmdk16sVgPgTuBXBMQvMMdCyC/X2A1NTsF7GQ9dyzDXZ7lmDYD64ZcPugKwi9K/AqBD1L
-        cOFmW0DSqUTXwGR1z9IXBNcnaPeCBxgGxoAPwOB3qHG8RVJxomxgetgRDWiYiFYeAmaBBeAzMALcbY0E
-        GAtdh+lW7Zu+Lh+0fISelWhlQw4DIWAUKKlsCv0xoKCg/oq1z0unPzqz0fYcsBxZK4x+CZCScnrstyOE
-        G48XP2+yvSwte8qTAR+vgzD4I9rFODDlDZKdUzYvqU5SRpz87dmx+p/OdAbKT2Ixm6czMnJHLpe7gnea
-        +2nsneL+g3fhtPTscUn1krIk7V6V7Ucj8tDVI9gsFs5llU5KqpJ0UdK12Ly3JZXEns+Qox/JaBtXOiMl
-        hyNyUZHVn5S0zSHprKT9knZK2itpn6RdcV95pflEJs60ODk5eWurJIukA7EqpoSzSlv1me7J0kPY83LW
-        yvmSDkratE5IpLCw0Hkj15DrFpOTt7SskTf/U46xI7aU65LM/yv/Ak60hHJLflkkAAAAAElFTkSuQmCC
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIpSURBVDhPlZLNS9NxHMffO0RQOKiI/oCKig5dOnoIKoiE
+        DnoJIwIPHewgzZSGpmVJlqKpEUSgaLUtWz4ltIUy0dKEptlB8wkVs0SsuY05bdUrfttAnT3QC7637+v9
+        efh+pb+Ql+e0lD3unS539FPjmqLa5g3kXrFXSdopaVPi/XWUV3rqJmb9zEXAuwztX6EnCI8GQly0NgxJ
+        2idpc6IXpaKiM6Nr1IfBfBg8C+CchOYZ6FgEx/sgKSlZL+IhG3lgH+z2LsFwANwz4PFDVwh6V+BVGHqW
+        4NLttqCkM4mugcnmmaUvBO5P0O4DLzAMjAEfgMHvUO18i6SiRNnA9LAjFtAwEas8BMwCC8BnYAS43xoN
+        MBa6AdOdmjd9XX5o+Qg9K7HKhhwBwsAoUFzRFP5jQH5+/TVbn4/OQGxmo+05YDm6Vhj9EiQ5+ezYb0eI
+        NJ4set5kf1lS+pQnA35eh2DwR6yLcWDKFyIru3ReUp2k9HXyt2cn6n+60hgoO43VYplOT88ZuVrmDt1r
+        7qexd4ra2neR1LSscUn1kjIl7V2VHcej8tD1Y9itVi5klkxKqpR0WdKN+Lx3JRXHn8+QYx/JaBt3GiPF
+        R6NyYaEtkJS0wynpvKSDknZL2i/pgKQ9677ySvOpDFyp62SzeXurJKukQ/EqpoSzSlvVue7JkiM4crPX
+        ynmSDkvaskFIpKCgwHUrx5DrFs3mbS1r5K3/lOPsii/lpiTL/8q/AE0bhHE7e34ZAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="tsbSystem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

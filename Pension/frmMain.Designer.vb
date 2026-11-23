@@ -129,6 +129,8 @@ Partial Class frmMain
         Me.MonthCalendar1 = New System.Windows.Forms.MonthCalendar()
         Me.tsmCheckOut = New System.Windows.Forms.ToolStripMenuItem()
         Me.trTransponder = New System.Windows.Forms.Timer(Me.components)
+        Me.tsbVorlagen = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripSeparator14 = New System.Windows.Forms.ToolStripSeparator()
         CType(Me.dgBuchung, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmMain.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -152,7 +154,7 @@ Partial Class frmMain
         Me.cmMain.ImageScalingSize = New System.Drawing.Size(20, 20)
         Me.cmMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmNew, Me.tsS1, Me.tsmEdit, Me.tsS2, Me.tsmCopy, Me.tscBuchnung, Me.tsmInset, Me.ToolStripSeparator15, Me.tsmGesperrt, Me.ToolStripSeparator13, Me.tsmDelete, Me.tsmInfo, Me.ToolStripSeparator17, Me.tstAnreise, Me.tstEnd, Me.tsS3, Me.ToolStripSeparator16, Me.tsmDruckAnAb, Me.ToolStripSeparator4, Me.tscCheckin, Me.ToolStripSeparator11, Me.tsmChekin1, Me.tsmCheckin2, Me.tsmCheckin3, Me.tsmCheckin4, Me.tsmCheckin5, Me.tsmChekinNew})
         Me.cmMain.Name = "cmMain"
-        Me.cmMain.Size = New System.Drawing.Size(261, 487)
+        Me.cmMain.Size = New System.Drawing.Size(261, 465)
         '
         'tsmNew
         '
@@ -661,7 +663,7 @@ Partial Class frmMain
         'tsMain
         '
         Me.tsMain.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.tsMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbClose, Me.ToolStripSeparator1, Me.tsbKunde, Me.ToolStripSeparator2, Me.tsbStatistik, Me.ToolStripSeparator3, Me.tsbPersonen, Me.ToolStripSeparator5, Me.tsbDruck, Me.ToolStripSeparator9, Me.tsbSuchen, Me.ToolStripSeparator10, Me.tsbSystem, Me.tsVersion, Me.tsbLogin, Me.ToolStripSeparator18, Me.tsbRFID, Me.ToolStripSeparator7, Me.tslDatum, Me.tslTabelle, Me.tslGesammt, Me.tslSatznummer, Me.ToolStripSeparator8, Me.ToolStripButton1, Me.ToolStripSeparator6})
+        Me.tsMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbClose, Me.ToolStripSeparator1, Me.tsbKunde, Me.ToolStripSeparator2, Me.tsbVorlagen, Me.ToolStripSeparator14, Me.tsbStatistik, Me.ToolStripSeparator3, Me.tsbPersonen, Me.ToolStripSeparator5, Me.tsbDruck, Me.ToolStripSeparator9, Me.tsbSuchen, Me.ToolStripSeparator10, Me.tsbSystem, Me.tsVersion, Me.tsbLogin, Me.ToolStripSeparator18, Me.tsbRFID, Me.ToolStripSeparator7, Me.tslDatum, Me.tslTabelle, Me.tslGesammt, Me.tslSatznummer, Me.ToolStripSeparator8, Me.ToolStripButton1, Me.ToolStripSeparator6})
         Me.tsMain.Location = New System.Drawing.Point(0, 0)
         Me.tsMain.Name = "tsMain"
         Me.tsMain.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
@@ -924,6 +926,20 @@ Partial Class frmMain
         Me.tsmCheckOut.Size = New System.Drawing.Size(158, 22)
         Me.tsmCheckOut.Text = "Verschieben"
         '
+        'tsbVorlagen
+        '
+        Me.tsbVorlagen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.tsbVorlagen.Image = Global.Pension.My.Resources.Resources.cabview_dll_Ico14_ico_Ico1
+        Me.tsbVorlagen.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.tsbVorlagen.Name = "tsbVorlagen"
+        Me.tsbVorlagen.Size = New System.Drawing.Size(24, 24)
+        Me.tsbVorlagen.Text = "Vorlagen"
+        '
+        'ToolStripSeparator14
+        '
+        Me.ToolStripSeparator14.Name = "ToolStripSeparator14"
+        Me.ToolStripSeparator14.Size = New System.Drawing.Size(6, 27)
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1058,4 +1074,6 @@ Partial Class frmMain
     Friend WithEvents tsbPersonen As ToolStripButton
     Friend WithEvents tsmGesperrt As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator13 As ToolStripSeparator
+    Friend WithEvents tsbVorlagen As ToolStripButton
+    Friend WithEvents ToolStripSeparator14 As ToolStripSeparator
 End Class
